@@ -102,32 +102,32 @@ export default async function AdminFeedbackDetailPage({
       : entry.screenshotUrl
         ? [{ id: `${entry.id}-legacy`, url: entry.screenshotUrl }]
         : [];
-  const submittedAtText = format(new Date(entry.createdAt), 'MMM dd, yyyy HH:mm');
-  const submitterName = entry.user.name || 'there';
-  const feedbackTypeLabel = entry.type.toLowerCase();
+  const submittedAtText = format(new Date(entry.createdAt), 'yyyy年MM月dd日 HH:mm');
+  const submitterName = entry.user.name || 'ご担当者';
+  const feedbackTypeLabel = entry.type === 'REVIEW' ? 'レビュー' : 'フィードバック';
   const quotedMessage = entry.message
     .split('\n')
     .map((line) => `> ${line}`)
     .join('\n');
   const mailtoHref = entry.user.email
     ? `mailto:${entry.user.email}?subject=${encodeURIComponent(
-        `[OpenFrame ${entry.type}] Re: ${entry.title}`
+        `[つなぐレビュー ${feedbackTypeLabel}] Re: ${entry.title}`
       )}&body=${encodeURIComponent(
-        `Hi ${submitterName},\n\nThanks for your ${feedbackTypeLabel}.\n\n` +
-          `I reviewed your submission:\n` +
-          `Title: ${entry.title}\n` +
-          `Submitted: ${submittedAtText}\n\n` +
-          `Your message:\n${quotedMessage}\n\n`
+        `${submitterName} 様\n\n${feedbackTypeLabel}をお寄せいただきありがとうございます。\n\n` +
+          `いただいた内容を確認しました。\n` +
+          `タイトル: ${entry.title}\n` +
+          `投稿日時: ${submittedAtText}\n\n` +
+          `メッセージ:\n${quotedMessage}\n\n`
       )}`
     : null;
 
   return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-3xl font-bold tracking-tight">Feedback Detail</h2>
+        <h2 className="text-3xl font-bold tracking-tight">フィードバック詳細</h2>
         <div className="flex items-center gap-2">
           <Button variant="outline" asChild>
-            <Link href="/admin/feedback">Back to list</Link>
+            <Link href="/admin/feedback">一覧に戻る</Link>
           </Button>
           <DeleteFeedbackButton
             feedbackId={entry.id}
@@ -145,24 +145,24 @@ export default async function AdminFeedbackDetailPage({
             <Badge variant="outline">{entry.type}</Badge>
             {entry.category && <Badge variant="secondary">{entry.category}</Badge>}
             <Badge variant="outline">{entry.status}</Badge>
-            {entry.rating && <Badge variant="outline">Rating: {entry.rating}/5</Badge>}
+            {entry.rating && <Badge variant="outline">評価: {entry.rating}/5</Badge>}
           </div>
           <CardTitle className="text-xl">{entry.title}</CardTitle>
           <div className="text-sm text-muted-foreground">
-            Submitted by {entry.user.name || 'Anonymous'} (
+            投稿者: {entry.user.name || '匿名'} (
             {entry.user.email && mailtoHref ? (
               <a href={mailtoHref} className="underline hover:text-foreground">
                 {entry.user.email}
               </a>
             ) : (
-              'No email'
+              'メールアドレスなし'
             )}
-            ) on {submittedAtText}
+            ) · {submittedAtText}
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <h3 className="text-sm font-semibold uppercase text-muted-foreground">Message</h3>
+            <h3 className="text-sm font-semibold uppercase text-muted-foreground">メッセージ</h3>
             <div className="whitespace-pre-wrap rounded-md border p-4 text-sm leading-relaxed">
               {entry.message}
             </div>
@@ -170,11 +170,11 @@ export default async function AdminFeedbackDetailPage({
 
           <div className="space-y-2">
             <h3 className="text-sm font-semibold uppercase text-muted-foreground">
-              Screenshots ({screenshotItems.length})
+              スクリーンショット ({screenshotItems.length})
             </h3>
             {screenshotItems.length === 0 ? (
               <div className="rounded-md border p-4 text-sm text-muted-foreground">
-                No screenshots attached.
+                スクリーンショットは添付されていません。
               </div>
             ) : (
               <div className="grid gap-3 md:grid-cols-2">
@@ -188,12 +188,12 @@ export default async function AdminFeedbackDetailPage({
                   >
                     <Image
                       src={screenshot.url}
-                      alt={`Screenshot ${index + 1}`}
+                      alt={`スクリーンショット ${index + 1}`}
                       width={1000}
                       height={600}
                       className="h-52 w-full rounded-sm object-contain"
                     />
-                    <p className="mt-2 text-xs text-muted-foreground">Open full size</p>
+                    <p className="mt-2 text-xs text-muted-foreground">原寸で開く</p>
                   </a>
                 ))}
               </div>

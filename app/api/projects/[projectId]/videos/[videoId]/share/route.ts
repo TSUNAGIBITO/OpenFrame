@@ -26,7 +26,7 @@ async function requireShareManagementAccess(projectId: string, videoId: string, 
 
   const access = await checkProjectAccess(video.project, userId);
   if (!access.canEdit) {
-    return { error: apiErrors.forbidden('Access denied') as Response, video: null };
+    return { error: apiErrors.forbidden('アクセスが拒否されました') as Response, video: null };
   }
 
   return { error: null, video };
@@ -126,7 +126,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error fetching video share link:', error);
-    return apiErrors.internalError('Failed to fetch video share link');
+    return apiErrors.internalError('動画の共有リンクの取得に失敗しました');
   }
 }
 
@@ -155,7 +155,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const password = typeof body?.password === 'string' ? body.password.trim() : '';
     if (password.length > MAX_SHARE_PASSWORD_LENGTH) {
       return apiErrors.badRequest(
-        `Password must be ${MAX_SHARE_PASSWORD_LENGTH} characters or fewer`
+        `パスワードは ${MAX_SHARE_PASSWORD_LENGTH} 文字以内で入力してください`
       );
     }
     const passwordHash = password ? await bcrypt.hash(password, 12) : null;
@@ -246,7 +246,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     if (!link) {
-      return apiErrors.internalError('Failed to create video share link');
+      return apiErrors.internalError('動画の共有リンクの作成に失敗しました');
     }
 
     // Keyed on the link id, so re-issuing the token for a link that already
@@ -262,7 +262,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error creating video share link:', error);
-    return apiErrors.internalError('Failed to create video share link');
+    return apiErrors.internalError('動画の共有リンクの作成に失敗しました');
   }
 }
 
@@ -289,7 +289,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const clearPassword = body?.clearPassword === true;
     if (rawPassword !== undefined && rawPassword.length > MAX_SHARE_PASSWORD_LENGTH) {
       return apiErrors.badRequest(
-        `Password must be ${MAX_SHARE_PASSWORD_LENGTH} characters or fewer`
+        `パスワードは ${MAX_SHARE_PASSWORD_LENGTH} 文字以内で入力してください`
       );
     }
 
@@ -341,7 +341,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error updating video share link:', error);
-    return apiErrors.internalError('Failed to update video share link');
+    return apiErrors.internalError('動画の共有リンクの更新に失敗しました');
   }
 }
 
@@ -372,6 +372,6 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error deleting video share link:', error);
-    return apiErrors.internalError('Failed to delete video share link');
+    return apiErrors.internalError('動画の共有リンクの削除に失敗しました');
   }
 }

@@ -156,7 +156,7 @@ export function VideoDragDropUploader({
         } | null;
 
         if (!response.ok) {
-          throw new Error(payload?.error || 'Failed to load projects');
+          throw new Error(payload?.error || 'プロジェクトの読み込みに失敗しました');
         }
 
         const pageProjects = payload?.data?.projects || [];
@@ -176,7 +176,7 @@ export function VideoDragDropUploader({
       hasLoadedProjectsRef.current = true;
     } catch (error) {
       console.error('Failed to load projects for upload:', error);
-      toast.error('Failed to load projects for upload');
+      toast.error('アップロード先プロジェクトの読み込みに失敗しました');
     } finally {
       setIsLoadingProjects(false);
     }
@@ -235,7 +235,7 @@ export function VideoDragDropUploader({
 
     resetUploadState();
     setShowCancelUploadDialog(false);
-    toast.info('Upload cancelled');
+    toast.info('アップロードをキャンセルしました');
   }, [isUploading, resetUploadState]);
 
   const uploadQueueToProject = useCallback(
@@ -259,7 +259,7 @@ export function VideoDragDropUploader({
 
         const item = initialQueue[index];
         setUploadProgress(0);
-        setUploadStatus(`Uploading ${index + 1} of ${initialQueue.length}: ${item.file.name}`);
+        setUploadStatus(`アップロード中 ${index + 1}/${initialQueue.length}: ${item.file.name}`);
 
         setQueue((prev) =>
           prev.map((entry) =>
@@ -280,7 +280,7 @@ export function VideoDragDropUploader({
               );
             },
             onStatus: (status) => {
-              setUploadStatus(`Uploading ${index + 1} of ${initialQueue.length}: ${status}`);
+              setUploadStatus(`アップロード中 ${index + 1}/${initialQueue.length}: ${status}`);
             },
             onTusUploadReady: (upload) => {
               activeTusUploadRef.current = upload;
@@ -309,7 +309,7 @@ export function VideoDragDropUploader({
           activeTusUploadRef.current = null;
           failCount += 1;
 
-          const message = error instanceof Error ? error.message : 'Failed to upload video';
+          const message = error instanceof Error ? error.message : '動画のアップロードに失敗しました';
           const isTrialLimit = isTrialStorageError(error);
           setQueue((prev) =>
             prev.map((entry) =>
@@ -320,7 +320,7 @@ export function VideoDragDropUploader({
           );
           // Keeps the error code alive to the toast: a trial account that has run
           // out of room is shown the plan rather than just told the upload failed.
-          toastApiError(error, 'Failed to upload video', { prefix: item.file.name });
+          toastApiError(error, '動画のアップロードに失敗しました', { prefix: item.file.name });
         }
       }
 
@@ -337,17 +337,17 @@ export function VideoDragDropUploader({
       if (successCount > 0 && failCount === 0) {
         toast.success(
           successCount === 1
-            ? `Video uploaded to ${projectName ?? projectsById.get(projectId) ?? 'project'}`
-            : `${successCount} videos uploaded to ${projectName ?? projectsById.get(projectId) ?? 'project'}`
+            ? `${projectName ?? projectsById.get(projectId) ?? 'プロジェクト'} に動画をアップロードしました`
+            : `${projectName ?? projectsById.get(projectId) ?? 'プロジェクト'} に${successCount}件の動画をアップロードしました`
         );
         if (fixedProjectId) {
           setDialogOpen(false);
           setQueue([]);
         }
       } else if (successCount > 0 && failCount > 0) {
-        toast.warning(`${successCount} uploaded, ${failCount} failed`);
+        toast.warning(`${successCount}件成功、${failCount}件失敗`);
       } else if (failCount > 0) {
-        toast.error('All uploads failed');
+        toast.error('すべてのアップロードに失敗しました');
       }
     },
     [bunnyCdnHostname, directUploadProvider, fixedProjectId, projectsById, resetUploadState, router]
@@ -356,7 +356,7 @@ export function VideoDragDropUploader({
   const handleDropFiles = useCallback(
     (files: File[]) => {
       if (!canUpload) {
-        toast.error('You do not have permission to upload videos here');
+        toast.error('ここに動画をアップロードする権限がありません');
         return;
       }
 
@@ -364,12 +364,12 @@ export function VideoDragDropUploader({
       const invalidCount = files.length - videoFiles.length;
 
       if (videoFiles.length === 0) {
-        toast.error('Please drop valid video files');
+        toast.error('有効な動画ファイルをドロップしてください');
         return;
       }
 
       if (invalidCount > 0) {
-        toast.error(`${invalidCount} file${invalidCount === 1 ? '' : 's'} skipped (not a video)`);
+        toast.error(`${invalidCount}件のファイルをスキップしました(動画ではありません)`);
       }
 
       if (fixedProjectId) {
@@ -449,11 +449,11 @@ export function VideoDragDropUploader({
           <div className="flex h-full items-center justify-center px-4">
             <div className="w-full max-w-2xl rounded-2xl border-2 border-dashed border-primary bg-background p-10 text-center shadow-2xl">
               <UploadCloud className="mx-auto mb-4 h-10 w-10 text-primary" />
-              <p className="text-lg font-semibold">Drop videos to upload</p>
+              <p className="text-lg font-semibold">動画をドロップしてアップロード</p>
               <p className="mt-2 text-sm text-muted-foreground">
                 {fixedProjectId
-                  ? `Upload multiple videos to ${fixedProjectName ?? 'current project'}`
-                  : 'Drop multiple videos, then choose a project.'}
+                  ? `${fixedProjectName ?? '現在のプロジェクト'} に複数の動画をアップロードします`
+                  : '複数の動画をドロップして、プロジェクトを選んでください。'}
               </p>
             </div>
           </div>
@@ -476,14 +476,14 @@ export function VideoDragDropUploader({
         <DialogContent className="border-2 border-border bg-background text-foreground sm:max-w-xl">
           <DialogHeader className="space-y-1">
             <DialogTitle className="text-2xl font-bold">
-              {needsProjectSelection ? 'Choose a project' : 'Uploading videos'}
+              {needsProjectSelection ? 'プロジェクトを選択' : '動画をアップロード中'}
             </DialogTitle>
             <DialogDescription>
               {hasQueue
                 ? totalCount === 1
-                  ? `Upload 1 video${needsProjectSelection ? ' to:' : ''}`
-                  : `Upload ${totalCount} videos${needsProjectSelection ? ' to:' : ''}`
-                : 'Drop video files anywhere on this page to start.'}
+                  ? `1件の動画をアップロード${needsProjectSelection ? '(選択先):' : ''}`
+                  : `${totalCount}件の動画をアップロード${needsProjectSelection ? '(選択先):' : ''}`
+                : 'このページのどこにでも動画ファイルをドロップすると始まります。'}
             </DialogDescription>
           </DialogHeader>
 
@@ -516,7 +516,7 @@ export function VideoDragDropUploader({
                               href="/settings"
                               className="ml-1 align-middle font-medium underline underline-offset-2"
                             >
-                              Upgrade
+                              アップグレード
                             </Link>
                           )}
                         </p>
@@ -537,7 +537,7 @@ export function VideoDragDropUploader({
             {!fixedProjectId && (
               <div className="space-y-2">
                 {isLoadingProjects ? (
-                  <p className="text-sm text-muted-foreground">Loading projects...</p>
+                  <p className="text-sm text-muted-foreground">プロジェクトを読み込み中...</p>
                 ) : projects.length > 0 ? (
                   <div className="max-h-80 overflow-y-auto border border-border">
                     {projects.map((project) => (
@@ -574,20 +574,20 @@ export function VideoDragDropUploader({
                           {project.name}
                         </p>
                         <p className="mt-1 text-sm text-muted-foreground">
-                          {project.description || 'Project'}
+                          {project.description || 'プロジェクト'}
                         </p>
                       </button>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground">No projects available</p>
+                  <p className="text-sm text-muted-foreground">利用できるプロジェクトがありません</p>
                 )}
               </div>
             )}
 
             {(selectedProjectId || fixedProjectId) && (
               <p className="text-sm text-muted-foreground">
-                Target:{' '}
+                アップロード先:{' '}
                 <span className="font-medium text-foreground">
                   {selectedProjectName ??
                     fixedProjectName ??
@@ -600,7 +600,7 @@ export function VideoDragDropUploader({
               <div className="space-y-2">
                 <p className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  {uploadStatus || 'Uploading...'}
+                  {uploadStatus || 'アップロード中...'}
                 </p>
                 {uploadProgress > 0 && uploadProgress < 100 && (
                   <div className="h-2 w-full rounded-full bg-secondary">
@@ -612,8 +612,8 @@ export function VideoDragDropUploader({
                 )}
                 {totalCount > 1 && (
                   <p className="text-xs text-muted-foreground">
-                    {doneCount} of {totalCount} complete
-                    {errorCount > 0 ? ` · ${errorCount} failed` : ''}
+                    {totalCount}件中{doneCount}件完了
+                    {errorCount > 0 ? ` · ${errorCount}件失敗` : ''}
                   </p>
                 )}
               </div>
@@ -621,16 +621,15 @@ export function VideoDragDropUploader({
 
             {!fixedProjectId && !isUploading && hasQueue && pendingCount > 0 && (
               <p className="text-xs text-muted-foreground">
-                Click a project card to start uploading {pendingCount} video
-                {pendingCount === 1 ? '' : 's'}.
+                プロジェクトのカードをクリックすると、{pendingCount}件の動画のアップロードが始まります。
               </p>
             )}
 
             {!isUploading && hasQueue && (doneCount > 0 || errorCount > 0) && (
               <p className="text-xs text-muted-foreground">
-                {doneCount > 0 ? `${doneCount} uploaded` : ''}
-                {doneCount > 0 && errorCount > 0 ? ', ' : ''}
-                {errorCount > 0 ? `${errorCount} failed` : ''}
+                {doneCount > 0 ? `${doneCount}件アップロード完了` : ''}
+                {doneCount > 0 && errorCount > 0 ? '、' : ''}
+                {errorCount > 0 ? `${errorCount}件失敗` : ''}
               </p>
             )}
           </div>
@@ -640,15 +639,15 @@ export function VideoDragDropUploader({
       <AlertDialog open={showCancelUploadDialog} onOpenChange={setShowCancelUploadDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Cancel upload?</AlertDialogTitle>
+            <AlertDialogTitle>アップロードをキャンセルしますか?</AlertDialogTitle>
             <AlertDialogDescription>
               {totalCount > 1
-                ? 'Video uploads are in progress. If you cancel now, the current upload and any remaining queued files will be discarded.'
-                : 'A video upload is in progress. If you cancel now, the current upload will be discarded.'}
+                ? '動画のアップロードが進行中です。今キャンセルすると、進行中のアップロードとキューに残っているファイルは破棄されます。'
+                : '動画のアップロードが進行中です。今キャンセルすると、進行中のアップロードは破棄されます。'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={!isUploading}>Keep uploading</AlertDialogCancel>
+            <AlertDialogCancel disabled={!isUploading}>アップロードを続ける</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               disabled={!isUploading}
@@ -656,7 +655,7 @@ export function VideoDragDropUploader({
                 void cancelPendingUpload();
               }}
             >
-              Cancel upload
+              アップロードをキャンセル
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

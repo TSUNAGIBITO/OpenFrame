@@ -22,18 +22,18 @@ export default function WatchError({
           <Film className="h-12 w-12 text-muted-foreground" />
           <AlertTriangle className="absolute -bottom-1 -right-1 h-6 w-6 text-destructive" />
         </div>
-        <h1 className="text-2xl font-bold">Video Unavailable</h1>
+        <h1 className="text-2xl font-bold">動画を表示できません</h1>
         <p className="text-muted-foreground max-w-md">
-          We couldn&apos;t load this video. It may have been removed or the link might be incorrect.
+          この動画を読み込めませんでした。削除されたか、リンクが正しくない可能性があります。
         </p>
-        {error.digest && <p className="text-muted-foreground text-xs">Error ID: {error.digest}</p>}
+        {error.digest && <p className="text-muted-foreground text-xs">エラーID: {error.digest}</p>}
       </div>
       <div className="flex gap-2">
         <Button onClick={reset} variant="default">
-          Try again
+          再試行
         </Button>
         <Button onClick={() => (window.location.href = '/')} variant="outline">
-          Go home
+          ホームへ
         </Button>
       </div>
     </div>

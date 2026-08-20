@@ -31,15 +31,15 @@ function buildRegisterHref(callbackUrl: string): string {
 }
 
 const ERROR_MESSAGES: Record<string, string> = {
-  RegistrationClosed: 'Sign-up is currently invite-only. Contact an administrator.',
+  RegistrationClosed: '現在、新規登録は招待制です。管理者にお問い合わせください。',
   // Generic message — avoid confirming whether a credentials account exists for this email
-  OAuthAccountNotLinked: 'Sign-in failed. Please try a different method or contact support.',
-  OAuthCallbackError: 'OAuth sign-in failed. Please try again.',
+  OAuthAccountNotLinked: 'サインインに失敗しました。別の方法をお試しいただくか、サポートにお問い合わせください。',
+  OAuthCallbackError: 'OAuthサインインに失敗しました。もう一度お試しください。',
   OAuthEmailNotVerified:
-    'Your OAuth account email is not verified. Please verify it with your provider and try again.',
-  InvalidVerificationToken: 'The verification link is invalid or has expired.',
-  VerificationFailed: 'Email verification failed. Please try again.',
-  Default: 'Something went wrong. Please try again.',
+    'OAuthアカウントのメールアドレスが未確認です。プロバイダー側で確認のうえ、もう一度お試しください。',
+  InvalidVerificationToken: '確認リンクが無効か、有効期限が切れています。',
+  VerificationFailed: 'メールアドレスの確認に失敗しました。もう一度お試しください。',
+  Default: 'エラーが発生しました。もう一度お試しください。',
 };
 
 interface LoginFormInnerProps {
@@ -88,7 +88,7 @@ function LoginFormInner({ googleEnabled, githubEnabled }: LoginFormInnerProps) {
       });
 
       if (result?.error) {
-        setError('Invalid email or password');
+        setError('メールアドレスまたはパスワードが正しくありません');
         return;
       }
 
@@ -98,7 +98,7 @@ function LoginFormInner({ googleEnabled, githubEnabled }: LoginFormInnerProps) {
       router.push(isSafeRelativePath(destination) ? destination : '/dashboard');
       router.refresh();
     } catch {
-      setError('Something went wrong. Please try again.');
+      setError('エラーが発生しました。もう一度お試しください。');
     } finally {
       setIsLoading(false);
     }
@@ -116,11 +116,11 @@ function LoginFormInner({ googleEnabled, githubEnabled }: LoginFormInnerProps) {
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle>Welcome back</CardTitle>
+        <CardTitle>おかえりなさい</CardTitle>
         <CardDescription>
           {isInvitationFlow
-            ? 'Sign in to accept your invitation'
-            : 'Sign in to your account to continue'}
+            ? 'サインインして招待を承諾してください'
+            : 'アカウントにサインインして続行してください'}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -132,13 +132,13 @@ function LoginFormInner({ googleEnabled, githubEnabled }: LoginFormInnerProps) {
         */}
         {showSuccess && (
           <div className="p-3 rounded-md bg-green-500/10 text-green-600 text-sm mb-4">
-            Account created successfully! You can sign in now.
+            アカウントを作成しました。サインインできます。
           </div>
         )}
 
         {showVerifiedSuccess && (
           <div className="p-3 rounded-md bg-green-500/10 text-green-600 text-sm mb-4">
-            Email verified successfully! You can now sign in.
+            メールアドレスを確認しました。サインインできます。
           </div>
         )}
 
@@ -181,7 +181,7 @@ function LoginFormInner({ googleEnabled, githubEnabled }: LoginFormInnerProps) {
                     />
                   </svg>
                 )}
-                Continue with Google
+                Googleで続ける
               </Button>
             )}
             {githubEnabled && (
@@ -204,7 +204,7 @@ function LoginFormInner({ googleEnabled, githubEnabled }: LoginFormInnerProps) {
                     <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
                   </svg>
                 )}
-                Continue with GitHub
+                GitHubで続ける
               </Button>
             )}
           </div>
@@ -217,7 +217,7 @@ function LoginFormInner({ googleEnabled, githubEnabled }: LoginFormInnerProps) {
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">or continue with email</span>
+              <span className="bg-card px-2 text-muted-foreground">またはメールアドレスで続ける</span>
             </div>
           </div>
         )}
@@ -225,7 +225,7 @@ function LoginFormInner({ googleEnabled, githubEnabled }: LoginFormInnerProps) {
         {/* Email Form */}
         <form onSubmit={handleEmailLogin} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">メールアドレス</Label>
             <Input
               id="email"
               type="email"
@@ -240,7 +240,7 @@ function LoginFormInner({ googleEnabled, githubEnabled }: LoginFormInnerProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">パスワード</Label>
             <Input
               id="password"
               type="password"
@@ -257,14 +257,14 @@ function LoginFormInner({ googleEnabled, githubEnabled }: LoginFormInnerProps) {
 
           <Button type="submit" className="w-full" disabled={anyLoading}>
             {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-            Sign in
+            サインイン
           </Button>
         </form>
 
         <p className="text-center text-sm text-muted-foreground mt-6">
-          Don&apos;t have an account?{' '}
+          アカウントをお持ちでない方は{' '}
           <Link href={registerHref} className="text-primary hover:underline">
-            Sign up
+            新規登録
           </Link>
         </p>
       </CardContent>
@@ -276,8 +276,8 @@ export function LoginFormSkeleton() {
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle>Welcome back</CardTitle>
-        <CardDescription>Sign in to your account to continue</CardDescription>
+        <CardTitle>おかえりなさい</CardTitle>
+        <CardDescription>アカウントにサインインして続行してください</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="h-10 bg-muted animate-pulse rounded-md" />

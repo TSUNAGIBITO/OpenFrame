@@ -10,15 +10,14 @@ export default function WatchNotFound() {
           <Film className="h-12 w-12 text-muted-foreground" />
           <XCircle className="absolute -bottom-1 -right-1 h-6 w-6 text-destructive" />
         </div>
-        <h1 className="text-2xl font-bold">Video Not Found</h1>
+        <h1 className="text-2xl font-bold">動画が見つかりません</h1>
         <p className="text-muted-foreground max-w-md">
-          The video you&apos;re looking for doesn&apos;t exist, has been removed, or the link may be
-          expired.
+          お探しの動画は存在しないか、削除されたか、リンクの有効期限が切れている可能性があります。
         </p>
       </div>
       <div className="flex gap-2">
         <Button asChild variant="default">
-          <Link href="/">Go home</Link>
+          <Link href="/">ホームへ</Link>
         </Button>
       </div>
     </div>

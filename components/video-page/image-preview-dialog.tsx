@@ -39,7 +39,7 @@ export const ImagePreviewDialog = memo(function ImagePreviewDialog({
           }
         }}
       >
-        <DialogTitle className="sr-only">{title || 'Image Preview'}</DialogTitle>
+        <DialogTitle className="sr-only">{title || '画像プレビュー'}</DialogTitle>
         <div
           className="w-[min(96vw,1500px)] h-[min(94vh,1000px)] border border-border/60 bg-black/80 shadow-2xl flex flex-col overflow-hidden"
           onClick={(e) => e.stopPropagation()}
@@ -49,7 +49,7 @@ export const ImagePreviewDialog = memo(function ImagePreviewDialog({
               className="flex-1 min-w-0 text-sm text-foreground truncate"
               title={title || undefined}
             >
-              {title || 'Image Preview'}
+              {title || '画像プレビュー'}
             </p>
             {canDownload ? (
               <Button
@@ -72,7 +72,7 @@ export const ImagePreviewDialog = memo(function ImagePreviewDialog({
                     window.URL.revokeObjectURL(url);
                   } catch (error) {
                     console.error('Failed to download image:', error);
-                    toast.error('Failed to download image');
+                    toast.error('画像のダウンロードに失敗しました');
                   }
                 }}
               >
@@ -99,7 +99,7 @@ export const ImagePreviewDialog = memo(function ImagePreviewDialog({
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={previewImage}
-                alt={title || 'Preview'}
+                alt={title || 'プレビュー'}
                 className="max-w-full max-h-full object-contain rounded-md select-none cursor-default"
                 onClick={(e) => e.stopPropagation()}
               />

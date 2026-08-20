@@ -126,7 +126,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const access = await checkProjectAccess(video.project, session?.user?.id);
 
     if (!access.hasAccess) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const canDownload = canDownloadProjectMedia(video.project, access);
@@ -147,7 +147,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-cache');
   } catch (error) {
     logError('Error fetching video:', error);
-    return apiErrors.internalError('Failed to fetch video');
+    return apiErrors.internalError('動画の取得に失敗しました');
   }
 }
 
@@ -177,7 +177,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const access = await checkProjectAccess(video.project, session.user.id);
     if (!access.canEdit) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const body = await request.json();
@@ -188,7 +188,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       position !== undefined &&
       (typeof position !== 'number' || !Number.isInteger(position) || position < 0)
     ) {
-      return apiErrors.badRequest('position must be a non-negative integer');
+      return apiErrors.badRequest('position は 0 以上の整数である必要があります');
     }
 
     const updateData: Record<string, unknown> = {};
@@ -216,7 +216,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error updating video:', error);
-    return apiErrors.internalError('Failed to update video');
+    return apiErrors.internalError('動画の更新に失敗しました');
   }
 }
 
@@ -258,7 +258,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     const access = await checkProjectAccess(video.project, session.user.id);
     if (!access.canEdit) {
-      return apiErrors.forbidden('Only project owner or admin can delete videos');
+      return apiErrors.forbidden('動画を削除できるのはプロジェクトのオーナーまたは管理者のみです');
     }
 
     const bunnyRefs = [
@@ -297,6 +297,6 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error deleting video:', error);
-    return apiErrors.internalError('Failed to delete video');
+    return apiErrors.internalError('動画の削除に失敗しました');
   }
 }

@@ -34,20 +34,20 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const access = await checkProjectAccess(project, session.user.id);
     if (!access.canEdit) {
-      return apiErrors.forbidden('Only project owner or admin can delete videos');
+      return apiErrors.forbidden('動画を削除できるのはプロジェクトのオーナーまたは管理者のみです');
     }
 
     const body = await request.json();
     const { videoIds } = body as { videoIds?: unknown };
 
     if (!Array.isArray(videoIds) || videoIds.length === 0) {
-      return apiErrors.badRequest('videoIds must be a non-empty array');
+      return apiErrors.badRequest('videoIds は空でない配列である必要があります');
     }
     if (videoIds.length > MAX_BULK_DELETE) {
-      return apiErrors.badRequest(`You can delete at most ${MAX_BULK_DELETE} videos at once`);
+      return apiErrors.badRequest(`一度に削除できる動画は最大 ${MAX_BULK_DELETE} 本です`);
     }
     if (!videoIds.every((id) => typeof id === 'string' && id.trim().length > 0)) {
-      return apiErrors.badRequest('Each video id must be a non-empty string');
+      return apiErrors.badRequest('各動画 ID は空でない文字列である必要があります');
     }
 
     const normalizedIds = [...new Set(videoIds.map((id) => id.trim()))];
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       result = await deleteProjectVideosWithCleanup(projectId, normalizedIds);
     } catch (error) {
       if (error instanceof Error && error.message === 'VIDEO_NOT_FOUND') {
-        return apiErrors.badRequest('One or more selected videos do not belong to this project');
+        return apiErrors.badRequest('選択した動画の中にこのプロジェクトに属さないものがあります');
       }
       // Storage refused a delete, so nothing was removed and the videos are still there.
       // Saying so lets the caller retry, which is the whole point of leaving the rows.
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           error.cleanupInput
         );
         return apiErrors.internalError(
-          'Could not delete the stored media for these videos. Nothing was deleted; please try again.'
+          'これらの動画の保存済みメディアを削除できませんでした。何も削除されていません。もう一度お試しください。'
         );
       }
       throw error;
@@ -88,6 +88,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error bulk deleting videos:', error);
-    return apiErrors.internalError('Failed to delete selected videos');
+    return apiErrors.internalError('選択した動画の削除に失敗しました');
   }
 }

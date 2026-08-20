@@ -99,12 +99,12 @@ function ErrorFallback({ error, context, onReset, onReload }: ErrorFallbackProps
 
       <div className="space-y-1">
         <h3 className="text-lg font-semibold">
-          {context ? `${context} crashed` : 'Something went wrong'}
+          {context ? `${context} でエラーが発生しました` : '問題が発生しました'}
         </h3>
         <p className="text-muted-foreground text-sm max-w-sm">
           {isVideoContext
-            ? 'The video player encountered an error. Try reloading or go back to the project.'
-            : 'An unexpected error occurred. Try resetting the component or reload the page.'}
+            ? '動画プレーヤーでエラーが発生しました。再読み込みするか、プロジェクトに戻ってください。'
+            : '予期しないエラーが発生しました。もう一度試すか、ページを再読み込みしてください。'}
         </p>
       </div>
 
@@ -116,10 +116,10 @@ function ErrorFallback({ error, context, onReset, onReload }: ErrorFallbackProps
 
       <div className="flex gap-2">
         <Button onClick={onReset} variant="default" size="sm">
-          Try again
+          もう一度試す
         </Button>
         <Button onClick={onReload} variant="outline" size="sm">
-          Reload page
+          ページを再読み込み
         </Button>
       </div>
     </div>

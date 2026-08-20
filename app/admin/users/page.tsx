@@ -85,7 +85,7 @@ function getOwnBillingAccess(
 }
 
 export const metadata: Metadata = {
-  title: 'Manage Users | Admin',
+  title: 'ユーザー管理 | 管理',
 };
 
 type SortBy =
@@ -133,9 +133,9 @@ const STATUS_SORT_ORDER: BillingSubscriptionStatus[] = [
 ];
 
 const ACCESS_FILTERS: Array<{ value: AccessFilter; label: string }> = [
-  { value: 'ALL', label: 'All Access' },
-  { value: 'ACTIVE', label: 'Has Access' },
-  { value: 'NONE', label: 'No Access' },
+  { value: 'ALL', label: 'すべてのアクセス' },
+  { value: 'ACTIVE', label: 'アクセスあり' },
+  { value: 'NONE', label: 'アクセスなし' },
 ];
 
 const MAX_QUERY_LENGTH = 120;
@@ -154,7 +154,7 @@ const SORTABLE_COLUMNS: SortBy[] = [
 ];
 
 function formatBytes(bytes: number, decimals = 2) {
-  if (bytes < 0) return 'Error Fetching';
+  if (bytes < 0) return '取得エラー';
   if (!+bytes) return '0 Bytes';
   const k = 1000;
   const dm = decimals < 0 ? 0 : decimals;
@@ -536,26 +536,26 @@ export default async function AdminUsersPage({
   return (
     <div className="flex-1 space-y-4">
       <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Users</h2>
+        <h2 className="text-3xl font-bold tracking-tight">ユーザー</h2>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Bunny Stream Storage</CardTitle>
+            <CardTitle className="text-sm font-medium">Bunny Stream ストレージ</CardTitle>
             <Film className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {isBunnyUploadsFeatureEnabled()
                 ? formatBytes(bunnyStorageStats.totalBytes)
-                : 'Disabled'}
+                : '無効'}
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Cloudflare R2 Media Storage</CardTitle>
+            <CardTitle className="text-sm font-medium">Cloudflare R2 メディアストレージ</CardTitle>
             <HardDrive className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -578,17 +578,17 @@ export default async function AdminUsersPage({
               name="q"
               defaultValue={query}
               maxLength={MAX_QUERY_LENGTH}
-              placeholder="Search by name or email…"
-              aria-label="Search users by name or email"
+              placeholder="名前またはメールアドレスで検索…"
+              aria-label="名前またはメールアドレスでユーザーを検索"
               className="w-72"
             />
             <Button type="submit" size="sm">
-              Search
+              検索
             </Button>
           </form>
           {hasActiveFilters && (
             <Button variant="ghost" size="sm" asChild>
-              <Link href={clearFiltersHref}>Clear filters</Link>
+              <Link href={clearFiltersHref}>フィルターをクリア</Link>
             </Button>
           )}
         </div>
@@ -597,7 +597,7 @@ export default async function AdminUsersPage({
           <>
             <div className="flex flex-wrap gap-2">
               <Button variant={statusFilter === 'ALL' ? 'default' : 'outline'} size="sm" asChild>
-                <Link href={buildStatusHref('ALL')}>All Statuses</Link>
+                <Link href={buildStatusHref('ALL')}>すべてのステータス</Link>
               </Button>
               {STATUS_FILTERS.map((status) => (
                 <Button
@@ -629,11 +629,11 @@ export default async function AdminUsersPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>All Users</CardTitle>
+          <CardTitle>すべてのユーザー</CardTitle>
           <CardDescription>
             {hasActiveFilters
-              ? `${matchingUsers} of ${totalUsers} users match the current filters.`
-              : `A comprehensive list of all ${totalUsers} users registered on the platform.`}
+              ? `${totalUsers}人中${matchingUsers}人が現在のフィルターに一致しています。`
+              : `プラットフォームに登録されている全${totalUsers}人のユーザー一覧です。`}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -646,7 +646,7 @@ export default async function AdminUsersPage({
                       href={buildSortHref('user')}
                       className="inline-flex items-center gap-1 hover:underline"
                     >
-                      User
+                      ユーザー
                       <span className="text-xs">
                         {getSortIndicator('user', sortBy, sortDirection)}
                       </span>
@@ -658,7 +658,7 @@ export default async function AdminUsersPage({
                         href={buildSortHref('subscription')}
                         className="inline-flex items-center gap-1 hover:underline"
                       >
-                        Subscription
+                        サブスクリプション
                         <span className="text-xs">
                           {getSortIndicator('subscription', sortBy, sortDirection)}
                         </span>
@@ -670,7 +670,7 @@ export default async function AdminUsersPage({
                       href={buildSortHref('joinedDate')}
                       className="inline-flex items-center gap-1 hover:underline"
                     >
-                      Joined Date
+                      登録日
                       <span className="text-xs">
                         {getSortIndicator('joinedDate', sortBy, sortDirection)}
                       </span>
@@ -681,7 +681,7 @@ export default async function AdminUsersPage({
                       href={buildSortHref('workspacesOwned')}
                       className="inline-flex items-center justify-center gap-1 hover:underline"
                     >
-                      Workspaces Owned
+                      所有ワークスペース
                       <span className="text-xs">
                         {getSortIndicator('workspacesOwned', sortBy, sortDirection)}
                       </span>
@@ -692,7 +692,7 @@ export default async function AdminUsersPage({
                       href={buildSortHref('invitedMembers')}
                       className="inline-flex items-center justify-center gap-1 hover:underline"
                     >
-                      Invited Members
+                      招待メンバー
                       <span className="text-xs">
                         {getSortIndicator('invitedMembers', sortBy, sortDirection)}
                       </span>
@@ -703,7 +703,7 @@ export default async function AdminUsersPage({
                       href={buildSortHref('projectsOwned')}
                       className="inline-flex items-center justify-center gap-1 hover:underline"
                     >
-                      Projects Owned
+                      所有プロジェクト
                       <span className="text-xs">
                         {getSortIndicator('projectsOwned', sortBy, sortDirection)}
                       </span>
@@ -714,7 +714,7 @@ export default async function AdminUsersPage({
                       href={buildSortHref('totalComments')}
                       className="inline-flex items-center justify-center gap-1 hover:underline"
                     >
-                      Total Comments
+                      総コメント数
                       <span className="text-xs">
                         {getSortIndicator('totalComments', sortBy, sortDirection)}
                       </span>
@@ -725,7 +725,7 @@ export default async function AdminUsersPage({
                       href={buildSortHref('bunnyUpload')}
                       className="inline-flex items-center justify-end gap-1 hover:underline"
                     >
-                      Bunny Upload
+                      Bunny アップロード
                       <span className="text-xs">
                         {getSortIndicator('bunnyUpload', sortBy, sortDirection)}
                       </span>
@@ -736,7 +736,7 @@ export default async function AdminUsersPage({
                       href={buildSortHref('downloadEgress')}
                       className="inline-flex items-center justify-end gap-1 hover:underline"
                     >
-                      Download Egress (Est.)
+                      ダウンロード転送量(概算)
                       <span className="text-xs">
                         {getSortIndicator('downloadEgress', sortBy, sortDirection)}
                       </span>
@@ -747,7 +747,7 @@ export default async function AdminUsersPage({
                       href={buildSortHref('mediaStorage')}
                       className="inline-flex items-center justify-end gap-1 hover:underline"
                     >
-                      Media Storage
+                      メディアストレージ
                       <span className="text-xs">
                         {getSortIndicator('mediaStorage', sortBy, sortDirection)}
                       </span>
@@ -759,7 +759,7 @@ export default async function AdminUsersPage({
                 {paginatedUsers.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={stripeBillingEnabled ? 10 : 9} className="h-24 text-center">
-                      {hasActiveFilters ? 'No users match these filters.' : 'No users found.'}
+                      {hasActiveFilters ? 'このフィルターに一致するユーザーはいません。' : 'ユーザーが見つかりません。'}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -767,7 +767,7 @@ export default async function AdminUsersPage({
                     <TableRow key={user.id}>
                       <TableCell>
                         <div className="flex flex-col">
-                          <span className="font-medium">{user.name || 'Anonymous'}</span>
+                          <span className="font-medium">{user.name || '匿名'}</span>
                           <span className="text-xs text-muted-foreground">{user.email}</span>
                         </div>
                       </TableCell>
@@ -787,21 +787,21 @@ export default async function AdminUsersPage({
                                 {access.hasAppAccess ? (
                                   <span className="inline-flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
                                     <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                                    Active access
+                                    アクセス有効
                                     {access.viaCollaboration
-                                      ? ' · via team'
+                                      ? ' · チーム経由'
                                       : endsAt
-                                        ? ` · until ${format(new Date(endsAt), 'MMM dd')}`
+                                        ? ` · ${format(new Date(endsAt), 'MM月dd日')}まで`
                                         : ''}
                                   </span>
                                 ) : (
-                                  <span className="text-xs text-muted-foreground">No access</span>
+                                  <span className="text-xs text-muted-foreground">アクセスなし</span>
                                 )}
                               </div>
                             </TableCell>
                           );
                         })()}
-                      <TableCell>{format(new Date(user.createdAt), 'MMM dd, yyyy')}</TableCell>
+                      <TableCell>{format(new Date(user.createdAt), 'yyyy年MM月dd日')}</TableCell>
                       <TableCell className="text-center">{user._count.ownedWorkspaces}</TableCell>
                       <TableCell className="text-center">{user.invitedMembersCount}</TableCell>
                       <TableCell className="text-center">{user._count.projects}</TableCell>
@@ -841,10 +841,10 @@ export default async function AdminUsersPage({
           {totalPages > 1 && (
             <div className="flex items-center justify-end space-x-2 py-4">
               <Button variant="outline" size="sm" disabled={page <= 1} asChild={page > 1}>
-                {page > 1 ? <Link href={buildUsersPageHref(page - 1)}>Previous</Link> : 'Previous'}
+                {page > 1 ? <Link href={buildUsersPageHref(page - 1)}>前へ</Link> : '前へ'}
               </Button>
               <span className="text-sm font-medium">
-                Page {page} of {totalPages}
+                {totalPages}ページ中{page}ページ
               </span>
               <Button
                 variant="outline"
@@ -852,7 +852,7 @@ export default async function AdminUsersPage({
                 disabled={page >= totalPages}
                 asChild={page < totalPages}
               >
-                {page < totalPages ? <Link href={buildUsersPageHref(page + 1)}>Next</Link> : 'Next'}
+                {page < totalPages ? <Link href={buildUsersPageHref(page + 1)}>次へ</Link> : '次へ'}
               </Button>
             </div>
           )}

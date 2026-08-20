@@ -54,8 +54,8 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { href: '/dashboard', label: 'Projects', icon: FolderOpen },
-  { href: '/workspaces', label: 'Workspaces', icon: Building2 },
+  { href: '/dashboard', label: 'プロジェクト', icon: FolderOpen },
+  { href: '/workspaces', label: 'ワークスペース', icon: Building2 },
 ];
 
 interface HeaderProps {
@@ -102,13 +102,13 @@ export function Header({ user, showAppNavigation = false }: HeaderProps) {
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="md:hidden mr-2">
               <Menu className="h-5 w-5" />
-              <span className="sr-only">Toggle menu</span>
+              <span className="sr-only">メニューを開閉</span>
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-64">
-            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+            <SheetTitle className="sr-only">ナビゲーションメニュー</SheetTitle>
             <SheetDescription className="sr-only">
-              Access your projects and workspaces
+              プロジェクトとワークスペースにアクセスできます
             </SheetDescription>
             <nav className="flex flex-col gap-2 mt-10">
               {showAppNavigation &&
@@ -138,7 +138,7 @@ export function Header({ user, showAppNavigation = false }: HeaderProps) {
                   )}
                 >
                   <LayoutDashboard className="h-4 w-4" />
-                  Admin Panel
+                  管理パネル
                 </Link>
               )}
             </nav>
@@ -178,7 +178,7 @@ export function Header({ user, showAppNavigation = false }: HeaderProps) {
               )}
             >
               <LayoutDashboard className="h-4 w-4" />
-              Admin Panel
+              管理パネル
             </Link>
           )}
         </nav>
@@ -192,14 +192,14 @@ export function Header({ user, showAppNavigation = false }: HeaderProps) {
                   <Button
                     variant="ghost"
                     size="icon"
-                    aria-label="Search"
+                    aria-label="検索"
                     onClick={() => setSearchOpen(true)}
                   >
                     <Search className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="flex items-center gap-1.5">
-                  <span>Search</span>
+                  <span>検索</span>
                   <kbd className="inline-flex h-5 items-center rounded border border-background/30 bg-background/20 px-1 font-mono text-[10px] text-background">
                     Ctrl K
                   </kbd>
@@ -211,7 +211,7 @@ export function Header({ user, showAppNavigation = false }: HeaderProps) {
             <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
               <Link href="/feedback">
                 <MessageSquareQuote className="h-4 w-4 mr-1.5" />
-                Feedback
+                フィードバック
               </Link>
             </Button>
           )}
@@ -221,7 +221,7 @@ export function Header({ user, showAppNavigation = false }: HeaderProps) {
               variant="ghost"
               size="icon"
               className="sm:hidden"
-              aria-label="Feedback and reviews"
+              aria-label="フィードバックとレビュー"
             >
               <Link href="/feedback">
                 <MessageSquareQuote className="h-4 w-4" />
@@ -259,25 +259,25 @@ export function Header({ user, showAppNavigation = false }: HeaderProps) {
                   <DropdownMenuItem asChild>
                     <Link href="/admin">
                       <LayoutDashboard className="h-4 w-4 mr-2" />
-                      Admin Panel
+                      管理パネル
                     </Link>
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem asChild>
                   <Link href="/settings">
                     <Settings className="h-4 w-4 mr-2" />
-                    Settings
+                    設定
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setShortcutsOpen(true)}>
                   <Keyboard className="h-4 w-4 mr-2" />
-                  Shortcuts
+                  ショートカット
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/signout">
                     <LogOut className="h-4 w-4 mr-2" />
-                    Sign out
+                    ログアウト
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -286,7 +286,7 @@ export function Header({ user, showAppNavigation = false }: HeaderProps) {
             <Button asChild variant="outline" size="sm">
               <Link href="/login">
                 <User className="h-4 w-4 mr-1" />
-                Sign in
+                ログイン
               </Link>
             </Button>
           )}

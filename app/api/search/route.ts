@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const cfg = RATE_LIMIT_CONFIGS['search'];
     const rl = await checkRateLimit(userId, 'search', cfg);
     if (!rl.allowed) {
-      return new Response(JSON.stringify({ error: 'Too many requests. Please try again later.' }), {
+      return new Response(JSON.stringify({ error: 'リクエストが多すぎます。しばらくしてから再度お試しください。' }), {
         status: 429,
         headers: { 'Content-Type': 'application/json', ...rateLimitHeaders(rl, cfg.maxRequests) },
       });
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (term.length > MAX_Q_LENGTH) {
-      return apiErrors.badRequest('Query too long.');
+      return apiErrors.badRequest('検索キーワードが長すぎます。');
     }
 
     // Access filter reused across queries. The billing condition is the same one every

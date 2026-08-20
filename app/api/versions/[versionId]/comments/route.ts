@@ -74,7 +74,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       : { hasAccess: false, requiresPassword: false };
 
     if (!access.hasAccess && !shareAccess.hasAccess) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const { searchParams } = new URL(request.url);
@@ -174,7 +174,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-cache');
   } catch (error) {
     logError('Error fetching comments:', error);
-    return apiErrors.internalError('Failed to fetch comments');
+    return apiErrors.internalError('コメントの取得に失敗しました');
   }
 }
 
@@ -236,7 +236,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Check if user can comment
     const canComment = access.hasAccess || shareAccess.canComment;
     if (!canComment) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const body = await request.json();
@@ -264,7 +264,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     // Validate required fields
     if (timestamp === undefined || timestamp === null) {
-      return apiErrors.badRequest('Timestamp is required');
+      return apiErrors.badRequest('タイムスタンプを入力してください');
     }
 
     const maxTimestamp =
@@ -276,13 +276,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       const parsed = typeof value === 'number' ? value : Number(value);
       if (!Number.isFinite(parsed) || parsed < 0) {
         return {
-          error: apiErrors.badRequest(`${fieldName} must be a finite non-negative number`),
+          error: apiErrors.badRequest(`${fieldName} は 0 以上の有限な数値である必要があります`),
         };
       }
 
       if (maxTimestamp !== null && parsed > maxTimestamp) {
         return {
-          error: apiErrors.badRequest(`${fieldName} must be less than or equal to video duration`),
+          error: apiErrors.badRequest(`${fieldName} は動画の再生時間以下である必要があります`),
         };
       }
 
@@ -303,28 +303,28 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }
       parsedTimestampEnd = parsedTimestampEndResult.value;
       if (parsedTimestampEnd < parsedTimestamp) {
-        return apiErrors.badRequest('Timestamp end must be greater than or equal to timestamp');
+        return apiErrors.badRequest('終了タイムスタンプは開始タイムスタンプ以上である必要があります');
       }
     }
 
     if (!content && !voiceUrl && attachedImageUrls.length === 0 && !annotationData) {
       return apiErrors.badRequest(
-        'Either content, a voice recording, an image attachment, or an annotation is required'
+        'テキスト・音声・画像添付・注釈のいずれかを入力してください'
       );
     }
 
     // Length limits to prevent DB bloat and DoS on export/notification paths
     if (content !== undefined && content !== null && String(content).length > 10_000) {
-      return apiErrors.badRequest('Comment content must be 10,000 characters or fewer');
+      return apiErrors.badRequest('コメント本文は 10,000 文字以内で入力してください');
     }
     if (guestName !== undefined && guestName !== null && String(guestName).length > 100) {
-      return apiErrors.badRequest('Guest name must be 100 characters or fewer');
+      return apiErrors.badRequest('ゲスト名は 100 文字以内で入力してください');
     }
     let normalizedGuestEmail: string | null = null;
     if (guestEmail !== undefined && guestEmail !== null) {
       normalizedGuestEmail = normalizeEmail(String(guestEmail));
       if (!isValidEmailAddress(normalizedGuestEmail)) {
-        return apiErrors.badRequest('Guest email must be a valid email address');
+        return apiErrors.badRequest('ゲストのメールアドレスの形式が正しくありません');
       }
     }
 
@@ -334,11 +334,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     let serializedAnnotationData: string | null = null;
     if (annotationData !== undefined && annotationData !== null) {
       if (!Array.isArray(annotationData)) {
-        return apiErrors.badRequest('annotationData must be an array of valid stroke objects');
+        return apiErrors.badRequest('annotationData は有効なストロークオブジェクトの配列である必要があります');
       }
       const validStrokes = validateAnnotationStrokes(annotationData);
       if (validStrokes === null) {
-        return apiErrors.badRequest('annotationData must be an array of valid stroke objects');
+        return apiErrors.badRequest('annotationData は有効なストロークオブジェクトの配列である必要があります');
       }
       // Re-serialize to canonical JSON — strips any extra properties from the input.
       serializedAnnotationData = JSON.stringify(validStrokes);
@@ -350,17 +350,17 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         where: { id: parentId, versionId },
       });
       if (!parent) {
-        return apiErrors.badRequest('Parent comment not found');
+        return apiErrors.badRequest('親コメントが見つかりません');
       }
     }
 
     // Guest comment validation
     const isGuest = !session?.user?.id;
     if (isGuest && shareAccess.hasAccess && !shareAccess.allowGuests) {
-      return apiErrors.forbidden('This share link requires sign in to comment');
+      return apiErrors.forbidden('この共有リンクでコメントするにはサインインが必要です');
     }
     if (isGuest && !guestName) {
-      return apiErrors.badRequest('Guest name is required for guest comments');
+      return apiErrors.badRequest('ゲストコメントにはゲスト名が必要です');
     }
 
     // Verify tag belongs to this project to prevent cross-project tag leakage (IDOR)
@@ -369,18 +369,18 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         where: { id: tagId, projectId: project.id },
       });
       if (!tag) {
-        return apiErrors.badRequest('Tag not found');
+        return apiErrors.badRequest('タグが見つかりません');
       }
     }
 
     if (voiceUrl && !SAFE_AUDIO_PATH.test(voiceUrl)) {
-      return apiErrors.badRequest('Voice URL must reference an uploaded audio file');
+      return apiErrors.badRequest('音声 URL はアップロード済みの音声ファイルを指定する必要があります');
     }
     let voiceSizeBytes = BigInt(0);
     if (voiceUrl) {
       const voiceCheck = await isFreshAttachment(voiceUrl, 'audio');
       if (!voiceCheck.isFresh) {
-        return apiErrors.badRequest('Voice upload expired. Please upload again.');
+        return apiErrors.badRequest('音声のアップロードの有効期限が切れました。もう一度アップロードしてください。');
       }
       voiceSizeBytes = voiceCheck.sizeBytes;
     }
@@ -391,7 +391,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       attachedImageUrls.map(async (url) => ({ url, ...(await isFreshAttachment(url, 'image')) }))
     );
     if (imageChecks.some((check) => !check.isFresh)) {
-      return apiErrors.badRequest('Image upload expired. Please upload again.');
+      return apiErrors.badRequest('画像のアップロードの有効期限が切れました。もう一度アップロードしてください。');
     }
     const imageSizeBytes = imageChecks.reduce((total, check) => total + check.sizeBytes, BigInt(0));
 
@@ -591,6 +591,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       UPLOAD_RESERVATION_PURPOSES.ATTACHMENT
     );
     logError('Error creating comment:', error);
-    return apiErrors.internalError('Failed to create comment');
+    return apiErrors.internalError('コメントの作成に失敗しました');
   }
 }

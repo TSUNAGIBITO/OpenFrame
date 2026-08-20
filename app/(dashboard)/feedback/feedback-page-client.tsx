@@ -53,7 +53,7 @@ export default function FeedbackPage() {
     });
     const data = await response.json();
     if (!response.ok) {
-      throw new Error(data.error || 'Failed to upload screenshot');
+      throw new Error(data.error || 'スクリーンショットのアップロードに失敗しました');
     }
 
     return data.data.url as string;
@@ -65,7 +65,7 @@ export default function FeedbackPage() {
 
     const remainingSlots = 5 - feedbackScreenshotFiles.length;
     if (remainingSlots <= 0) {
-      setStatus({ type: 'error', message: 'You can upload up to 5 screenshots.' });
+      setStatus({ type: 'error', message: 'スクリーンショットは最大5枚までアップロードできます。' });
       return;
     }
 
@@ -78,12 +78,12 @@ export default function FeedbackPage() {
       if (!isImage) {
         setStatus({
           type: 'error',
-          message: 'Unsupported screenshot format. Use JPG, PNG, WEBP, or GIF.',
+          message: '対応していないスクリーンショット形式です。JPG・PNG・WEBP・GIFを使用してください。',
         });
         continue;
       }
       if (file.size > 10 * 1024 * 1024) {
-        setStatus({ type: 'error', message: 'Each screenshot must be smaller than 10MB.' });
+        setStatus({ type: 'error', message: 'スクリーンショットは1枚あたり10MB未満にしてください。' });
         continue;
       }
       nextFiles.push(file);
@@ -136,7 +136,7 @@ export default function FeedbackPage() {
 
       const data = await response.json();
       if (!response.ok) {
-        setStatus({ type: 'error', message: data.error || 'Failed to submit feedback' });
+        setStatus({ type: 'error', message: data.error || 'フィードバックの送信に失敗しました' });
         return;
       }
 
@@ -144,9 +144,9 @@ export default function FeedbackPage() {
       setFeedbackCategory('BUG');
       setFeedbackMessage('');
       clearFeedbackScreenshots();
-      setStatus({ type: 'success', message: 'Feedback submitted. Thank you.' });
+      setStatus({ type: 'success', message: 'フィードバックを送信しました。ありがとうございます。' });
     } catch {
-      setStatus({ type: 'error', message: 'Failed to submit feedback' });
+      setStatus({ type: 'error', message: 'フィードバックの送信に失敗しました' });
     } finally {
       setIsSubmittingFeedback(false);
     }
@@ -172,7 +172,7 @@ export default function FeedbackPage() {
 
       const data = await response.json();
       if (!response.ok) {
-        setStatus({ type: 'error', message: data.error || 'Failed to submit review' });
+        setStatus({ type: 'error', message: data.error || 'レビューの送信に失敗しました' });
         return;
       }
 
@@ -182,10 +182,10 @@ export default function FeedbackPage() {
       setAllowShowcase(false);
       setStatus({
         type: 'success',
-        message: 'Review submitted. Thank you for sharing your experience.',
+        message: 'レビューを送信しました。ご感想をお寄せいただきありがとうございます。',
       });
     } catch {
-      setStatus({ type: 'error', message: 'Failed to submit review' });
+      setStatus({ type: 'error', message: 'レビューの送信に失敗しました' });
     } finally {
       setIsSubmittingReview(false);
     }
@@ -199,15 +199,14 @@ export default function FeedbackPage() {
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="mr-1 h-4 w-4" />
-          Back to Dashboard
+          ダッシュボードに戻る
         </Link>
 
         <Card className="border-border/50 shadow-lg">
           <CardHeader>
-            <CardTitle className="text-2xl">Feedback & Review</CardTitle>
+            <CardTitle className="text-2xl">フィードバックとレビュー</CardTitle>
             <CardDescription>
-              Send product feedback, report bugs, or share a review we can feature on the landing
-              page.
+              製品へのフィードバックの送信、不具合の報告、またはランディングページに掲載できるレビューの投稿ができます。
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -231,23 +230,23 @@ export default function FeedbackPage() {
               <TabsList className="w-full">
                 <TabsTrigger value="feedback" className="gap-1.5">
                   <Bug className="h-3.5 w-3.5" />
-                  Feedback
+                  フィードバック
                 </TabsTrigger>
                 <TabsTrigger value="review" className="gap-1.5">
                   <MessageSquareQuote className="h-3.5 w-3.5" />
-                  Review
+                  レビュー
                 </TabsTrigger>
               </TabsList>
 
               <TabsContent value="feedback">
                 <form className="space-y-4 pt-2" onSubmit={handleFeedbackSubmit}>
                   <div className="space-y-2">
-                    <Label htmlFor="feedback-title">Title</Label>
+                    <Label htmlFor="feedback-title">タイトル</Label>
                     <Input
                       id="feedback-title"
                       value={feedbackTitle}
                       onChange={(event) => setFeedbackTitle(event.target.value)}
-                      placeholder="Short summary"
+                      placeholder="内容の概要"
                       minLength={3}
                       maxLength={120}
                       required
@@ -256,7 +255,7 @@ export default function FeedbackPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Category</Label>
+                    <Label>カテゴリ</Label>
                     <Select
                       value={feedbackCategory}
                       onValueChange={(value: FeedbackCategory) => setFeedbackCategory(value)}
@@ -266,22 +265,22 @@ export default function FeedbackPage() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="BUG">Bug report</SelectItem>
-                        <SelectItem value="FEATURE">Feature request</SelectItem>
-                        <SelectItem value="OTHER">Other feedback</SelectItem>
+                        <SelectItem value="BUG">不具合の報告</SelectItem>
+                        <SelectItem value="FEATURE">機能のリクエスト</SelectItem>
+                        <SelectItem value="OTHER">その他のフィードバック</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="feedback-message">Details</Label>
+                    <Label htmlFor="feedback-message">詳細</Label>
                     <Textarea
                       id="feedback-message"
                       value={feedbackMessage}
                       onChange={(event) => setFeedbackMessage(event.target.value)}
                       minLength={10}
                       maxLength={3000}
-                      placeholder="Tell us what happened, what you expected, or what you want to see."
+                      placeholder="何が起きたか、どうなると期待していたか、どんな機能が欲しいかをお聞かせください。"
                       required
                       disabled={isSubmittingFeedback}
                       rows={6}
@@ -289,7 +288,7 @@ export default function FeedbackPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="feedback-screenshot">Screenshots (optional, up to 5)</Label>
+                    <Label htmlFor="feedback-screenshot">スクリーンショット（任意・最大5枚）</Label>
                     <Input
                       id="feedback-screenshot"
                       type="file"
@@ -299,7 +298,7 @@ export default function FeedbackPage() {
                       disabled={isSubmittingFeedback || feedbackScreenshotFiles.length >= 5}
                     />
                     <p className="text-xs text-muted-foreground">
-                      {feedbackScreenshotFiles.length}/5 selected
+                      {feedbackScreenshotFiles.length}/5枚選択中
                     </p>
                     {feedbackScreenshotPreviewUrls.length > 0 && (
                       <div className="grid gap-2 sm:grid-cols-2">
@@ -307,7 +306,7 @@ export default function FeedbackPage() {
                           <div key={`${previewUrl}-${index}`} className="rounded-md border p-2">
                             <Image
                               src={previewUrl}
-                              alt={`Feedback screenshot preview ${index + 1}`}
+                              alt={`フィードバックのスクリーンショットプレビュー ${index + 1}`}
                               width={640}
                               height={360}
                               className="max-h-48 w-full rounded-sm object-contain"
@@ -321,7 +320,7 @@ export default function FeedbackPage() {
                               disabled={isSubmittingFeedback}
                             >
                               <X className="mr-1.5 h-3.5 w-3.5" />
-                              Remove
+                              削除
                             </Button>
                           </div>
                         ))}
@@ -335,7 +334,7 @@ export default function FeedbackPage() {
                     ) : (
                       <ImageIcon className="mr-2 h-4 w-4" />
                     )}
-                    Submit Feedback
+                    フィードバックを送信
                   </Button>
                 </form>
               </TabsContent>
@@ -343,12 +342,12 @@ export default function FeedbackPage() {
               <TabsContent value="review">
                 <form className="space-y-4 pt-2" onSubmit={handleReviewSubmit}>
                   <div className="space-y-2">
-                    <Label htmlFor="review-title">Title</Label>
+                    <Label htmlFor="review-title">タイトル</Label>
                     <Input
                       id="review-title"
                       value={reviewTitle}
                       onChange={(event) => setReviewTitle(event.target.value)}
-                      placeholder="Your headline"
+                      placeholder="見出し"
                       minLength={3}
                       maxLength={120}
                       required
@@ -357,7 +356,7 @@ export default function FeedbackPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Rating</Label>
+                    <Label>評価</Label>
                     <Select
                       value={reviewRating}
                       onValueChange={setReviewRating}
@@ -367,24 +366,24 @@ export default function FeedbackPage() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="5">5 - Excellent</SelectItem>
-                        <SelectItem value="4">4 - Very good</SelectItem>
-                        <SelectItem value="3">3 - Good</SelectItem>
-                        <SelectItem value="2">2 - Needs improvement</SelectItem>
-                        <SelectItem value="1">1 - Poor</SelectItem>
+                        <SelectItem value="5">5 - 非常に良い</SelectItem>
+                        <SelectItem value="4">4 - とても良い</SelectItem>
+                        <SelectItem value="3">3 - 良い</SelectItem>
+                        <SelectItem value="2">2 - 改善が必要</SelectItem>
+                        <SelectItem value="1">1 - 良くない</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="review-message">Experience</Label>
+                    <Label htmlFor="review-message">ご感想</Label>
                     <Textarea
                       id="review-message"
                       value={reviewMessage}
                       onChange={(event) => setReviewMessage(event.target.value)}
                       minLength={10}
                       maxLength={3000}
-                      placeholder="What has your experience been like using OpenFrame?"
+                      placeholder="つなぐレビューを使ってみていかがでしたか？"
                       required
                       disabled={isSubmittingReview}
                       rows={6}
@@ -400,7 +399,7 @@ export default function FeedbackPage() {
                       disabled={isSubmittingReview}
                     />
                     <span>
-                      I allow OpenFrame to potentially showcase this review on the landing page.
+                      つなぐレビューがこのレビューをランディングページで紹介することに同意します。
                     </span>
                   </label>
 
@@ -410,7 +409,7 @@ export default function FeedbackPage() {
                     ) : (
                       <MessageSquareQuote className="mr-2 h-4 w-4" />
                     )}
-                    Submit Review
+                    レビューを送信
                   </Button>
                 </form>
               </TabsContent>

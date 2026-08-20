@@ -49,7 +49,7 @@ export function CommentRichText({ text, onAssetMentionClick, assets = [] }: Comm
       nodes.push(...renderUrls(text.slice(lastIndex, mentionIndex), `s${lastIndex}`));
     }
 
-    const fallbackLabel = match[1] || 'asset';
+    const fallbackLabel = match[1] || 'アセット';
     const assetId = match[2] || '';
     const matchedAsset = assets.find((asset) => asset.id === assetId);
     const label = matchedAsset?.displayName || fallbackLabel;

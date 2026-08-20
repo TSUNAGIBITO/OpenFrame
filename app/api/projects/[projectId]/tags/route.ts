@@ -56,7 +56,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       }
 
       if (!hasGuestAccess) {
-        return apiErrors.forbidden('Access denied');
+        return apiErrors.forbidden('アクセスが拒否されました');
       }
     }
 
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, cacheControl);
   } catch (error) {
     logError('Error fetching tags:', error);
-    return apiErrors.internalError('Failed to fetch tags');
+    return apiErrors.internalError('タグの取得に失敗しました');
   }
 }
 
@@ -99,19 +99,19 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const access = await checkProjectAccess(project, session.user.id);
     if (!access.canEdit) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const body = await request.json();
     const { name, color } = body;
 
     if (!name?.trim() || !color?.trim()) {
-      return apiErrors.badRequest('Name and color are required');
+      return apiErrors.badRequest('名前とカラーを入力してください');
     }
 
     // Hex color validation
     if (!/^#[0-9A-Fa-f]{6}$/.test(color)) {
-      return apiErrors.badRequest('Invalid color format');
+      return apiErrors.badRequest('カラーの形式が正しくありません');
     }
 
     // Get max position
@@ -134,8 +134,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   } catch (error) {
     logError('Error creating tag:', error);
     if ((error as { code?: string }).code === 'P2002') {
-      return apiErrors.conflict('Tag name already exists');
+      return apiErrors.conflict('同じ名前のタグがすでに存在します');
     }
-    return apiErrors.internalError('Failed to create tag');
+    return apiErrors.internalError('タグの作成に失敗しました');
   }
 }

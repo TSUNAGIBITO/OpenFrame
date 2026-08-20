@@ -12,7 +12,7 @@ export async function POST() {
   const cfg = RATE_LIMIT_CONFIGS['onboarding-complete'];
   const rl = await checkRateLimit(session.user.id, 'onboarding-complete', cfg);
   if (!rl.allowed) {
-    return new Response(JSON.stringify({ error: 'Too many requests. Please try again later.' }), {
+    return new Response(JSON.stringify({ error: 'リクエストが多すぎます。しばらくしてから再度お試しください。' }), {
       status: 429,
       headers: { 'Content-Type': 'application/json', ...rateLimitHeaders(rl, cfg.maxRequests) },
     });

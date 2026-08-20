@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 
     const session = await auth();
     if (!session?.user?.id) {
-      return apiErrors.unauthorized('You must be signed in to submit feedback');
+      return apiErrors.unauthorized('フィードバックを送信するにはサインインが必要です');
     }
 
     const body = (await request.json()) as FeedbackPayload;
@@ -42,23 +42,23 @@ export async function POST(request: NextRequest) {
         : [];
 
     if (type !== FeedbackEntryType.FEEDBACK && type !== FeedbackEntryType.REVIEW) {
-      return apiErrors.badRequest('Invalid entry type');
+      return apiErrors.badRequest('エントリーの種類が正しくありません');
     }
 
     if (title.length < 3 || title.length > 120) {
-      return apiErrors.badRequest('Title must be between 3 and 120 characters');
+      return apiErrors.badRequest('タイトルは 3〜120 文字で入力してください');
     }
 
     if (message.length < 10 || message.length > 3000) {
-      return apiErrors.badRequest('Message must be between 10 and 3000 characters');
+      return apiErrors.badRequest('メッセージは 10〜3000 文字で入力してください');
     }
 
     if (screenshotUrls.length > 5) {
-      return apiErrors.badRequest('You can upload up to 5 screenshots');
+      return apiErrors.badRequest('スクリーンショットは最大 5 枚までアップロードできます');
     }
 
     if (screenshotUrls.some((url) => !url.startsWith('/api/upload/image/'))) {
-      return apiErrors.badRequest('Invalid screenshot URL(s)');
+      return apiErrors.badRequest('スクリーンショットの URL が正しくありません');
     }
 
     if (type === FeedbackEntryType.FEEDBACK) {
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
         body.category !== FeedbackCategory.FEATURE &&
         body.category !== FeedbackCategory.OTHER
       ) {
-        return apiErrors.badRequest('Feedback category is required');
+        return apiErrors.badRequest('フィードバックのカテゴリーを選択してください');
       }
     }
 
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
         (body.rating as number) < 1 ||
         (body.rating as number) > 5
       ) {
-        return apiErrors.badRequest('Review rating must be between 1 and 5');
+        return apiErrors.badRequest('評価は 1〜5 の範囲で入力してください');
       }
     }
 
@@ -162,6 +162,6 @@ export async function POST(request: NextRequest) {
     return successResponse(entry, 201);
   } catch (error) {
     logError('Error submitting feedback:', error);
-    return apiErrors.internalError('Failed to submit feedback');
+    return apiErrors.internalError('フィードバックの送信に失敗しました');
   }
 }

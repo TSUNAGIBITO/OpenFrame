@@ -30,20 +30,20 @@ export const VersionDeleteDialog = memo(function VersionDeleteDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete this version?</AlertDialogTitle>
+          <AlertDialogTitle>このバージョンを削除しますか？</AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently delete this version and all its comments. This cannot be undone.
+            このバージョンとそのすべてのコメントを完全に削除します。この操作は元に戻せません。
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeletingVersion}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isDeletingVersion}>キャンセル</AlertDialogCancel>
           <AlertDialogAction
             onClick={onDelete}
             disabled={isDeletingVersion}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
             {isDeletingVersion && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-            Delete Version
+            バージョンを削除
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

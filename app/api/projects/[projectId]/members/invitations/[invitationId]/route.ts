@@ -35,7 +35,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const isAdmin = project.members[0]?.role === ProjectMemberRole.ADMIN;
 
     if (!access.canEdit || (!isOwner && !isAdmin)) {
-      return apiErrors.forbidden('Only project owners and admins can cancel invitations');
+      return apiErrors.forbidden('招待をキャンセルできるのはプロジェクトのオーナーと管理者のみです');
     }
 
     const invitation = await db.invitation.findFirst({
@@ -55,7 +55,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     if (invitation.status !== InvitationStatus.PENDING) {
-      return apiErrors.conflict('Only pending invitations can be canceled');
+      return apiErrors.conflict('保留中の招待のみキャンセルできます');
     }
 
     await db.invitation.update({
@@ -67,6 +67,6 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error canceling project invitation:', error);
-    return apiErrors.internalError('Failed to cancel invitation');
+    return apiErrors.internalError('招待のキャンセルに失敗しました');
   }
 }

@@ -17,13 +17,13 @@ export default async function ProjectMembersPage({ params }: ProjectMembersPageP
     <MembersManagementPage
       apiBasePath={`/api/projects/${projectId}`}
       backHref={`/projects/${projectId}`}
-      backLabel="Back to Project"
-      title="Project Members"
-      subtitle="Manage who has access to this project. Admins can manage settings and delete content. Commentators can only view and leave comments."
+      backLabel="プロジェクトに戻る"
+      title="プロジェクトメンバー"
+      subtitle="このプロジェクトへのアクセス権を管理します。管理者は設定の変更やコンテンツの削除ができます。コメント担当者は閲覧とコメントのみ可能です。"
       membersDescription={
         <>
-          <strong>Admin</strong> - can manage project settings, members, and delete content.{' '}
-          <strong>Commentator</strong> - can view and comment only.
+          <strong>管理者</strong> - プロジェクト設定・メンバーの管理、コンテンツの削除ができます。{' '}
+          <strong>コメント担当者</strong> - 閲覧とコメントのみ可能です。
         </>
       }
     />

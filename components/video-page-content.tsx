@@ -62,7 +62,7 @@ function formatBunnyQualityLabel(
   if (typeof level.bitrate === 'number' && level.bitrate > 0) {
     return `${Math.round(level.bitrate / 1000)} kbps`;
   }
-  return `Level ${index + 1}`;
+  return `レベル ${index + 1}`;
 }
 
 export type VideoPageMode = 'dashboard' | 'watch';
@@ -413,9 +413,9 @@ export function VideoPageContent({
   }, [videoDuration, activeVersion?.duration]);
 
   const selectedQualityLabel = useMemo(() => {
-    if (selectedQualityLevel === -2) return 'Original';
-    if (selectedQualityLevel === -1) return 'Auto';
-    return qualityOptions.find((option) => option.level === selectedQualityLevel)?.label ?? 'Auto';
+    if (selectedQualityLevel === -2) return 'オリジナル';
+    if (selectedQualityLevel === -1) return '自動';
+    return qualityOptions.find((option) => option.level === selectedQualityLevel)?.label ?? '自動';
   }, [qualityOptions, selectedQualityLevel]);
 
   useEffect(() => {
@@ -526,7 +526,7 @@ export function VideoPageContent({
       timestampEnd: comment.timestampEnd,
       color: comment.tag?.color || (comment.isResolved ? '#22C55E' : '#22D3EE'),
       annotationData: comment.annotationData,
-      preview: `${comment.tag ? ` [${comment.tag.name}]` : ''} - ${comment.content?.substring(0, 30) || '(voice note)'}...`,
+      preview: `${comment.tag ? ` [${comment.tag.name}]` : ''} - ${comment.content?.substring(0, 30) || '(音声メモ)'}...`,
     }));
   }, [filteredComments]);
 

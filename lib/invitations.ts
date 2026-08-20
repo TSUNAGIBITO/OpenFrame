@@ -38,11 +38,11 @@ function createSmtpTransport() {
 }
 
 function roleLabel(role: InvitationRole): string {
-  return role === 'ADMIN' ? 'Admin' : 'Commentator';
+  return role === 'ADMIN' ? '管理者' : 'コメント投稿者';
 }
 
 function scopeLabel(scope: InvitationScope): string {
-  return scope === 'WORKSPACE' ? 'workspace' : 'project';
+  return scope === 'WORKSPACE' ? 'ワークスペース' : 'プロジェクト';
 }
 
 export function buildInvitationUrl(token: string): string {
@@ -67,8 +67,8 @@ export async function sendInvitationEmail(input: {
   }
 
   const fromAddress =
-    process.env.SMTP_FROM || process.env.EMAIL_FROM || 'OpenFrame <info@open-frame.net>';
-  const subject = `[OpenFrame] You were invited to a ${scopeLabel(input.scope)}: ${input.targetName}`;
+    process.env.SMTP_FROM || process.env.EMAIL_FROM || 'つなぐレビュー <info@open-frame.net>';
+  const subject = `[つなぐレビュー] ${scopeLabel(input.scope)}への招待: ${input.targetName}`;
   const html = invitationEmailTemplate({
     inviterName: input.inviterName,
     role: roleLabel(input.role),
@@ -100,21 +100,21 @@ function invitationEmailTemplate(input: {
 }): string {
   return brandedEmailTemplate(
     `
-      <tr>${emailHeading('✓', `${input.scope.charAt(0).toUpperCase() + input.scope.slice(1)} Invitation`)}</tr>
+      <tr>${emailHeading('✓', `${input.scope}への招待`)}</tr>
       <tr><td style="padding:20px;">
-        ${emailHighlight('You were invited to join OpenFrame.')}
+        ${emailHighlight('つなぐレビューへの参加に招待されました。')}
         <table cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:16px;">
-          ${emailRow('Invited by', input.inviterName, true)}
-          ${emailRow('Target', `${input.targetName} (${input.scope})`, true)}
-          ${emailRow('Role', input.role)}
-          ${emailRow('Expires', `${INVITATION_TTL_DAYS} days`)}
+          ${emailRow('招待者', input.inviterName, true)}
+          ${emailRow('招待先', `${input.targetName}（${input.scope}）`, true)}
+          ${emailRow('権限', input.role)}
+          ${emailRow('有効期限', `${INVITATION_TTL_DAYS}日間`)}
         </table>
-        ${emailHighlight('Create an account (or sign in with this email) to accept this invitation.')}
-        ${emailButton('Accept Invitation →', input.invitationUrl)}
+        ${emailHighlight('アカウントを作成（またはこのメールアドレスでサインイン）して、招待を承諾してください。')}
+        ${emailButton('招待を承諾する →', input.invitationUrl)}
       </td></tr>
     `,
     {
-      footerText: `This invitation expires in ${INVITATION_TTL_DAYS} days.`,
+      footerText: `この招待は${INVITATION_TTL_DAYS}日後に期限切れになります。`,
     }
   );
 }
@@ -272,7 +272,7 @@ export async function getInvitationPreviewByToken(
     scopeLabel: scopeLabel(invitation.scope),
     status: invitation.status,
     isExpired: invitation.expiresAt <= new Date(),
-    inviterName: invitation.invitedBy?.name?.trim() || 'A team member',
+    inviterName: invitation.invitedBy?.name?.trim() || 'チームメンバー',
     targetName: invitation.workspace?.name ?? invitation.project?.name ?? null,
     hasAccount: Boolean(existingUser),
   };

@@ -13,10 +13,10 @@ function formatRelativeTime(date: Date): string {
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 1) return 'just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffMins < 1) return 'たった今';
+  if (diffMins < 60) return `${diffMins}分前`;
+  if (diffHours < 24) return `${diffHours}時間前`;
+  if (diffDays < 7) return `${diffDays}日前`;
   return date.toLocaleDateString();
 }
 
@@ -54,8 +54,8 @@ export function WorkspacesClient({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Workspaces</h1>
-          <p className="text-muted-foreground mt-1">Manage your workspaces and their projects</p>
+          <h1 className="text-3xl font-bold tracking-tight">ワークスペース</h1>
+          <p className="text-muted-foreground mt-1">ワークスペースとそのプロジェクトを管理します</p>
           {!workspaceCreation.canCreateWorkspace && workspaceCreation.reason ? (
             <p className="text-sm text-amber-700 dark:text-amber-400 mt-2">
               {workspaceCreation.reason}
@@ -66,12 +66,12 @@ export function WorkspacesClient({
           <Button asChild className="w-full sm:w-auto">
             <Link href="/workspaces/new">
               <Plus className="h-4 w-4 mr-2" />
-              New Workspace
+              新規ワークスペース
             </Link>
           </Button>
         ) : (
           <Button asChild className="w-full sm:w-auto">
-            <Link href="/settings">Upgrade to Create Workspace</Link>
+            <Link href="/settings">アップグレードして作成</Link>
           </Button>
         )}
       </div>
@@ -88,7 +88,7 @@ export function WorkspacesClient({
                     {workspace.name}
                   </CardTitle>
                   <CardDescription className="line-clamp-2">
-                    {workspace.description || 'No description'}
+                    {workspace.description || '説明なし'}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -99,7 +99,7 @@ export function WorkspacesClient({
                     </span>
                     <span className="flex items-center gap-1">
                       <FolderOpen className="h-3.5 w-3.5" />
-                      {workspace._count.projects} projects
+                      {workspace._count.projects}件のプロジェクト
                     </span>
                     <span className="flex items-center gap-1">
                       <Users className="h-3.5 w-3.5" />
@@ -115,20 +115,20 @@ export function WorkspacesClient({
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-16">
             <Building2 className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium mb-2">No workspaces yet</h3>
+            <h3 className="text-lg font-medium mb-2">ワークスペースがまだありません</h3>
             <p className="text-muted-foreground text-center mb-4">
-              Create a workspace to organize your projects and invite team members
+              ワークスペースを作成してプロジェクトを整理し、メンバーを招待しましょう
             </p>
             {workspaceCreation.canCreateWorkspace ? (
               <Button asChild>
                 <Link href="/workspaces/new">
                   <Plus className="h-4 w-4 mr-2" />
-                  Create Workspace
+                  ワークスペースを作成
                 </Link>
               </Button>
             ) : (
               <Button asChild>
-                <Link href="/settings">Upgrade to Create Workspace</Link>
+                <Link href="/settings">アップグレードして作成</Link>
               </Button>
             )}
           </CardContent>
@@ -149,10 +149,10 @@ export function WorkspacesClient({
               }
             }}
           >
-            Previous
+            前へ
           </Button>
           <span className="text-sm font-medium">
-            Page {currentPage} of {totalPages}
+            {totalPages}ページ中 {currentPage}ページ
           </span>
           <Button
             variant="outline"
@@ -165,7 +165,7 @@ export function WorkspacesClient({
               }
             }}
           >
-            Next
+            次へ
           </Button>
         </div>
       )}

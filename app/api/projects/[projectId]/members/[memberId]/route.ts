@@ -35,7 +35,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const isAdmin = project.members[0]?.role === ProjectMemberRole.ADMIN;
 
     if (!access.canEdit || (!isOwner && !isAdmin)) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const body = await request.json();
@@ -43,7 +43,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const validRoles = ['ADMIN', 'COMMENTATOR'];
     if (!validRoles.includes(role)) {
-      return apiErrors.badRequest('Invalid role. Must be ADMIN or COMMENTATOR.');
+      return apiErrors.badRequest('権限が正しくありません。ADMIN または COMMENTATOR である必要があります。');
     }
 
     const member = await db.projectMember.findFirst({
@@ -67,7 +67,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error updating member role:', error);
-    return apiErrors.internalError('Failed to update member role');
+    return apiErrors.internalError('メンバー権限の更新に失敗しました');
   }
 }
 
@@ -109,7 +109,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const isSelf = memberToRemove.userId === session.user.id;
 
     if ((!access.canEdit || (!isOwner && !isAdmin)) && !isSelf) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     await db.projectMember.delete({ where: { id: memberToRemove.id } });
@@ -118,6 +118,6 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error removing member:', error);
-    return apiErrors.internalError('Failed to remove member');
+    return apiErrors.internalError('メンバーの削除に失敗しました');
   }
 }

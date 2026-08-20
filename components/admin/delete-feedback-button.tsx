@@ -44,7 +44,7 @@ export function DeleteFeedbackButton({
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        setError((data as { error?: string }).error || 'Failed to delete feedback');
+        setError((data as { error?: string }).error || 'フィードバックの削除に失敗しました');
         return;
       }
 
@@ -54,7 +54,7 @@ export function DeleteFeedbackButton({
         router.refresh();
       }
     } catch {
-      setError('Failed to delete feedback');
+      setError('フィードバックの削除に失敗しました');
     } finally {
       setIsDeleting(false);
     }
@@ -69,21 +69,21 @@ export function DeleteFeedbackButton({
           ) : (
             <Trash2 className="mr-1.5 h-4 w-4" />
           )}
-          Delete
+          削除
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete this feedback?</AlertDialogTitle>
+          <AlertDialogTitle>このフィードバックを削除しますか?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently delete &quot;{feedbackTitle}&quot;. This action cannot be undone.
+            「{feedbackTitle}」を完全に削除します。この操作は取り消せません。
           </AlertDialogDescription>
           {error && <p className="mt-2 text-xs text-destructive">{error}</p>}
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isDeleting}>キャンセル</AlertDialogCancel>
           <AlertDialogAction variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-            {isDeleting ? 'Deleting...' : 'Delete'}
+            {isDeleting ? '削除中...' : '削除'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

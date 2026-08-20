@@ -217,20 +217,20 @@ export function ProjectContentClient({
 
         if (!response.ok) {
           const message =
-            typeof body?.error === 'string' ? body.error : 'Failed to prepare project download';
+            typeof body?.error === 'string' ? body.error : 'プロジェクトのダウンロード準備に失敗しました';
           toast.error(message);
           return;
         }
 
         const manifest = body?.data as ProjectDownloadManifest | undefined;
         if (!manifest?.files?.length) {
-          toast.error('No downloadable files found');
+          toast.error('ダウンロード可能なファイルが見つかりません');
           return;
         }
 
         progressToast = createDownloadProgressToast(`project-download-${projectId}`, {
-          title: `Downloading ${manifest.totalFiles} files`,
-          description: 'Starting…',
+          title: `${manifest.totalFiles}件のファイルをダウンロード中`,
+          description: '開始しています…',
         });
         await runProjectDownloadManifest(manifest, (p) => {
           const percent = downloadProgressPercent({
@@ -238,17 +238,17 @@ export function ProjectContentClient({
             totalBytes: p.totalBytes,
           });
           progressToast?.update({
-            title: `Downloading file ${p.index}/${p.total}`,
+            title: `ファイルをダウンロード中 ${p.index}/${p.total}`,
             description: `${p.fileName}${percent !== null ? ` · ${percent}%` : ''}`,
             percent,
           });
         });
-        progressToast.success(`Downloaded ${manifest.totalFiles} files`);
+        progressToast.success(`${manifest.totalFiles}件のファイルをダウンロードしました`);
       } catch {
         // The progress panel never expires on its own, so clear it before the
         // error toast replaces it.
         progressToast?.dismiss();
-        toast.error('Failed to start project download');
+        toast.error('プロジェクトのダウンロードを開始できませんでした');
       } finally {
         setIsDownloading(false);
       }
@@ -270,7 +270,7 @@ export function ProjectContentClient({
 
       if (!response.ok) {
         const message =
-          typeof body?.error === 'string' ? body.error : 'Failed to delete selected videos';
+          typeof body?.error === 'string' ? body.error : '選択した動画の削除に失敗しました';
         toast.error(message);
         return;
       }
@@ -281,7 +281,7 @@ export function ProjectContentClient({
       setSelectionMode(false);
       setShowDeleteSelectedDialog(false);
       toast.success(
-        typeof body?.data?.message === 'string' ? body.data.message : 'Selected videos deleted'
+        typeof body?.data?.message === 'string' ? body.data.message : '選択した動画を削除しました'
       );
 
       // The current page may now be out of range (e.g. we deleted every video
@@ -295,7 +295,7 @@ export function ProjectContentClient({
         router.refresh();
       }
     } catch {
-      toast.error('Failed to delete selected videos');
+      toast.error('選択した動画の削除に失敗しました');
     } finally {
       setIsDeletingSelected(false);
     }
@@ -364,12 +364,12 @@ export function ProjectContentClient({
             {sortOrder === 'desc' ? (
               <>
                 <ArrowDown className="h-4 w-4" />
-                Newest first
+                新しい順
               </>
             ) : (
               <>
                 <ArrowUp className="h-4 w-4" />
-                Oldest first
+                古い順
               </>
             )}
           </Button>
@@ -382,7 +382,7 @@ export function ProjectContentClient({
                   ) : (
                     <Download className="h-4 w-4 mr-2" />
                   )}
-                  Download project
+                  プロジェクトをダウンロード
                   <ChevronDown className="h-4 w-4 ml-1" />
                 </Button>
               </DropdownMenuTrigger>
@@ -392,7 +392,7 @@ export function ProjectContentClient({
                   onCheckedChange={(checked) => setIncludeAssetsInDownload(checked === true)}
                   onSelect={(event) => event.preventDefault()}
                 >
-                  Include assets
+                  アセットを含める
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
@@ -400,7 +400,7 @@ export function ProjectContentClient({
                     startProjectDownload(undefined, { includeAssets: includeAssetsInDownload })
                   }
                 >
-                  Latest version only
+                  最新バージョンのみ
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() =>
@@ -410,7 +410,7 @@ export function ProjectContentClient({
                     })
                   }
                 >
-                  All versions
+                  すべてのバージョン
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -419,7 +419,7 @@ export function ProjectContentClient({
             <Button variant="outline" size="sm" asChild>
               <Link href={`/projects/${projectId}/share`}>
                 <Share2 className="h-4 w-4 mr-2" />
-                Share
+                共有
               </Link>
             </Button>
           )}
@@ -428,13 +428,13 @@ export function ProjectContentClient({
               <Button variant="outline" size="sm" asChild>
                 <Link href={`/projects/${projectId}/members`}>
                   <Users className="h-4 w-4 mr-2" />
-                  Members
+                  メンバー
                 </Link>
               </Button>
               <Button variant="outline" size="sm" asChild>
                 <Link href={`/projects/${projectId}/settings`}>
                   <Settings className="h-4 w-4 mr-2" />
-                  Settings
+                  設定
                 </Link>
               </Button>
             </>
@@ -443,7 +443,7 @@ export function ProjectContentClient({
             <Button size="sm" asChild>
               <Link href={`/projects/${projectId}/videos/new`}>
                 <Plus className="h-4 w-4 mr-2" />
-                Add Video
+                動画を追加
               </Link>
             </Button>
           )}
@@ -452,9 +452,9 @@ export function ProjectContentClient({
 
       {selectionMode && (
         <div className="mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2">
-          <span className="text-sm font-medium">Selection mode</span>
+          <span className="text-sm font-medium">選択モード</span>
           <span className="text-sm text-muted-foreground">
-            {selectedCount > 0 ? `${selectedCount} selected` : 'None selected'}
+            {selectedCount > 0 ? `${selectedCount}件選択中` : '未選択'}
           </span>
           <div className="ml-auto flex flex-wrap items-center gap-2">
             <Button
@@ -464,14 +464,14 @@ export function ProjectContentClient({
             >
               {totalPages > 1
                 ? allSelected
-                  ? 'Deselect page'
-                  : 'Select page'
+                  ? 'このページの選択を解除'
+                  : 'このページを選択'
                 : allSelected
-                  ? 'Deselect all'
-                  : 'Select all'}
+                  ? 'すべて選択解除'
+                  : 'すべて選択'}
             </Button>
             <Button variant="ghost" size="sm" onClick={handleClearSelection}>
-              Cancel
+              キャンセル
             </Button>
             {canDownloadProject && (
               <DropdownMenu>
@@ -486,7 +486,7 @@ export function ProjectContentClient({
                     ) : (
                       <Download className="h-4 w-4 mr-2" />
                     )}
-                    Download selected
+                    選択項目をダウンロード
                     <ChevronDown className="h-4 w-4 ml-1" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -496,7 +496,7 @@ export function ProjectContentClient({
                     onCheckedChange={(checked) => setIncludeAssetsInDownload(checked === true)}
                     onSelect={(event) => event.preventDefault()}
                   >
-                    Include assets
+                    アセットを含める
                   </DropdownMenuCheckboxItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -506,7 +506,7 @@ export function ProjectContentClient({
                       })
                     }
                   >
-                    Latest version only
+                    最新バージョンのみ
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() =>
@@ -516,7 +516,7 @@ export function ProjectContentClient({
                       })
                     }
                   >
-                    All versions
+                    すべてのバージョン
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -529,7 +529,7 @@ export function ProjectContentClient({
                 disabled={selectedCount === 0 || isDeletingSelected}
               >
                 <FolderInput className="h-4 w-4 mr-2" />
-                Move to project
+                プロジェクトへ移動
               </Button>
             )}
             {canEdit && (
@@ -544,7 +544,7 @@ export function ProjectContentClient({
                 ) : (
                   <Trash2 className="h-4 w-4 mr-2" />
                 )}
-                Delete selected
+                選択項目を削除
               </Button>
             )}
           </div>
@@ -573,15 +573,15 @@ export function ProjectContentClient({
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-16">
             <Play className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium mb-2">No videos yet</h3>
+            <h3 className="text-lg font-medium mb-2">まだ動画がありません</h3>
             <p className="text-muted-foreground text-center mb-4">
-              Add your first video to start collecting feedback
+              最初の動画を追加してフィードバックの収集を始めましょう
             </p>
             {canEdit && (
               <Button asChild>
                 <Link href={`/projects/${projectId}/videos/new`}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Video
+                  動画を追加
                 </Link>
               </Button>
             )}
@@ -595,14 +595,14 @@ export function ProjectContentClient({
           <Button variant="outline" size="sm" disabled={currentPage <= 1} asChild={currentPage > 1}>
             {currentPage > 1 ? (
               <Link href={`?${createQueryString('page', (currentPage - 1).toString())}`}>
-                Previous
+                前へ
               </Link>
             ) : (
-              'Previous'
+              '前へ'
             )}
           </Button>
           <span className="text-sm font-medium">
-            Page {currentPage} of {totalPages}
+            {currentPage} / {totalPages} ページ
           </span>
           <Button
             variant="outline"
@@ -611,9 +611,9 @@ export function ProjectContentClient({
             asChild={currentPage < totalPages}
           >
             {currentPage < totalPages ? (
-              <Link href={`?${createQueryString('page', (currentPage + 1).toString())}`}>Next</Link>
+              <Link href={`?${createQueryString('page', (currentPage + 1).toString())}`}>次へ</Link>
             ) : (
-              'Next'
+              '次へ'
             )}
           </Button>
         </div>
@@ -623,15 +623,15 @@ export function ProjectContentClient({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              Delete {selectedCount} video{selectedCount === 1 ? '' : 's'}?
+              {selectedCount}件の動画を削除しますか？
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the selected videos, all of their versions, comments, and
-              stored media from Bunny and Cloudflare R2. This action cannot be undone.
+              選択した動画と、そのすべてのバージョン・コメント、およびBunny・Cloudflare
+              R2に保存されたメディアを完全に削除します。この操作は取り消せません。
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeletingSelected}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeletingSelected}>キャンセル</AlertDialogCancel>
             <AlertDialogAction
               onClick={(event) => {
                 event.preventDefault();
@@ -641,7 +641,7 @@ export function ProjectContentClient({
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isDeletingSelected && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Delete selected
+              選択項目を削除
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

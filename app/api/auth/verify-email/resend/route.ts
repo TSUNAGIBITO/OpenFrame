@@ -13,7 +13,7 @@ import { isValidEmailAddress, normalizeEmail } from '@/lib/email-validation';
 export async function POST(request: NextRequest) {
   try {
     if (!isEmailVerificationEnabled()) {
-      return apiErrors.badRequest('Email verification is not enabled');
+      return apiErrors.badRequest('メール認証は有効になっていません');
     }
 
     // Rate-limit by IP to prevent abuse
@@ -23,20 +23,20 @@ export async function POST(request: NextRequest) {
       'resend-verification'
     );
     if (!rateLimitResult.allowed) {
-      return apiErrors.rateLimited('Too many requests. Please try again later.');
+      return apiErrors.rateLimited('リクエストが多すぎます。しばらくしてから再度お試しください。');
     }
 
     const body = await request.json();
     const { email } = body;
 
     if (!email || typeof email !== 'string') {
-      return apiErrors.badRequest('Valid email is required');
+      return apiErrors.badRequest('有効なメールアドレスを入力してください');
     }
 
     const normalizedEmail = normalizeEmail(email);
 
     if (!isValidEmailAddress(normalizedEmail)) {
-      return apiErrors.badRequest('Valid email is required');
+      return apiErrors.badRequest('有効なメールアドレスを入力してください');
     }
 
     // Look up user — return a generic success regardless of whether the email
@@ -59,6 +59,6 @@ export async function POST(request: NextRequest) {
     );
   } catch (err) {
     logError('Resend verification error:', err);
-    return apiErrors.internalError('Failed to resend verification email');
+    return apiErrors.internalError('確認メールの再送信に失敗しました');
   }
 }

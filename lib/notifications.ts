@@ -85,7 +85,7 @@ function createSmtpTransport() {
 async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
   const transporter = createSmtpTransport();
   const fromAddress =
-    process.env.SMTP_FROM || process.env.EMAIL_FROM || 'OpenFrame <info@open-frame.net>';
+    process.env.SMTP_FROM || process.env.EMAIL_FROM || 'つなぐレビュー <info@open-frame.net>';
 
   if (!transporter) {
     console.warn('SMTP not configured — skipping email notification');
@@ -188,99 +188,99 @@ function formatTelegramMessage(event: NotificationEvent, timezone: string): Tele
     case 'new_video':
       return {
         text:
-          `🎬 New Video Added\n\n` +
-          `▸ Project: ${event.projectName}\n` +
-          `▸ Video: ${event.videoTitle}\n` +
-          `▸ Added by: ${event.addedBy}\n` +
+          `🎬 動画が追加されました\n\n` +
+          `▸ プロジェクト: ${event.projectName}\n` +
+          `▸ 動画: ${event.videoTitle}\n` +
+          `▸ 追加者: ${event.addedBy}\n` +
           `▸ ${now}`,
-        buttonLabel: 'View Video',
+        buttonLabel: '動画を見る',
         buttonUrl: event.url,
       };
     case 'new_version':
       return {
         text:
-          `🎬 New Version Added\n\n` +
-          `▸ Project: ${event.projectName}\n` +
-          `▸ Video: ${event.videoTitle}\n` +
-          `▸ Version: ${event.versionLabel}\n` +
-          `▸ Added by: ${event.addedBy}\n` +
+          `🎬 新しいバージョンが追加されました\n\n` +
+          `▸ プロジェクト: ${event.projectName}\n` +
+          `▸ 動画: ${event.videoTitle}\n` +
+          `▸ バージョン: ${event.versionLabel}\n` +
+          `▸ 追加者: ${event.addedBy}\n` +
           `▸ ${now}`,
-        buttonLabel: 'View Version',
+        buttonLabel: 'バージョンを見る',
         buttonUrl: event.url,
       };
     case 'new_comment':
       return {
         text:
-          `💬 New Comment\n\n` +
-          `▸ Project: ${event.projectName}\n` +
-          `▸ Video: ${event.videoTitle}\n` +
-          `▸ By: ${event.commentAuthor} at ${event.timestamp}\n` +
+          `💬 新しいコメント\n\n` +
+          `▸ プロジェクト: ${event.projectName}\n` +
+          `▸ 動画: ${event.videoTitle}\n` +
+          `▸ 投稿者: ${event.commentAuthor}（${event.timestamp}）\n` +
           `▸ ${now}\n\n` +
           `"${truncate(event.commentText, 200)}"`,
-        buttonLabel: 'View Comment',
+        buttonLabel: 'コメントを見る',
         buttonUrl: event.url,
       };
     case 'new_reply':
       return {
         text:
-          `↩️ New Reply\n\n` +
-          `▸ Project: ${event.projectName}\n` +
-          `▸ Video: ${event.videoTitle}\n` +
-          `▸ ${event.replyAuthor} replied to ${event.parentAuthor}\n` +
+          `↩️ 新しい返信\n\n` +
+          `▸ プロジェクト: ${event.projectName}\n` +
+          `▸ 動画: ${event.videoTitle}\n` +
+          `▸ ${event.replyAuthor} さんが ${event.parentAuthor} さんに返信\n` +
           `▸ ${now}\n\n` +
           `"${truncate(event.replyText, 200)}"`,
-        buttonLabel: 'View Reply',
+        buttonLabel: '返信を見る',
         buttonUrl: event.url,
       };
     case 'approval_requested':
       return {
         text:
-          `✅ Approval Requested\n\n` +
-          `▸ Project: ${event.projectName}\n` +
-          `▸ Video: ${event.videoTitle}\n` +
-          `▸ Version: ${event.versionLabel}\n` +
-          `▸ Requested by: ${event.requestedBy}\n` +
+          `✅ 承認依頼\n\n` +
+          `▸ プロジェクト: ${event.projectName}\n` +
+          `▸ 動画: ${event.videoTitle}\n` +
+          `▸ バージョン: ${event.versionLabel}\n` +
+          `▸ 依頼者: ${event.requestedBy}\n` +
           `▸ ${now}` +
           (event.message ? `\n\n"${truncate(event.message, 200)}"` : ''),
-        buttonLabel: 'Review Request',
+        buttonLabel: '依頼を確認',
         buttonUrl: event.url,
       };
     case 'approval_action':
       return {
         text:
-          `✅ Approval Update\n\n` +
-          `▸ Project: ${event.projectName}\n` +
-          `▸ Video: ${event.videoTitle}\n` +
-          `▸ Version: ${event.versionLabel}\n` +
-          `▸ ${event.actorName} ${event.action}\n` +
+          `✅ 承認の更新\n\n` +
+          `▸ プロジェクト: ${event.projectName}\n` +
+          `▸ 動画: ${event.videoTitle}\n` +
+          `▸ バージョン: ${event.versionLabel}\n` +
+          `▸ ${event.actorName}（${event.action === 'approved' ? '承認' : '却下'}）\n` +
           `▸ ${now}` +
           (event.note ? `\n\n"${truncate(event.note, 200)}"` : ''),
-        buttonLabel: 'Open Request',
+        buttonLabel: '依頼を開く',
         buttonUrl: event.url,
       };
     case 'approval_completed':
       return {
         text:
-          `✅ Approval Completed\n\n` +
-          `▸ Project: ${event.projectName}\n` +
-          `▸ Video: ${event.videoTitle}\n` +
-          `▸ Version: ${event.versionLabel}\n` +
-          `▸ Approved by: ${event.approvedByCount}\n` +
+          `✅ 承認が完了しました\n\n` +
+          `▸ プロジェクト: ${event.projectName}\n` +
+          `▸ 動画: ${event.videoTitle}\n` +
+          `▸ バージョン: ${event.versionLabel}\n` +
+          `▸ 承認者数: ${event.approvedByCount}\n` +
           `▸ ${now}`,
-        buttonLabel: 'Open Version',
+        buttonLabel: 'バージョンを開く',
         buttonUrl: event.url,
       };
     case 'approval_rejected':
       return {
         text:
-          `⛔ Approval Rejected\n\n` +
-          `▸ Project: ${event.projectName}\n` +
-          `▸ Video: ${event.videoTitle}\n` +
-          `▸ Version: ${event.versionLabel}\n` +
-          `▸ Rejected by: ${event.rejectedBy}\n` +
+          `⛔ 承認が却下されました\n\n` +
+          `▸ プロジェクト: ${event.projectName}\n` +
+          `▸ 動画: ${event.videoTitle}\n` +
+          `▸ バージョン: ${event.versionLabel}\n` +
+          `▸ 却下者: ${event.rejectedBy}\n` +
           `▸ ${now}` +
           (event.note ? `\n\n"${truncate(event.note, 200)}"` : ''),
-        buttonLabel: 'Open Request',
+        buttonLabel: '依頼を開く',
         buttonUrl: event.url,
       };
   }
@@ -293,8 +293,8 @@ function formatTelegramMessage(event: NotificationEvent, timezone: string): Tele
 function emailTemplate(body: string): string {
   const baseUrl = process.env.NEXTAUTH_URL || '';
   return brandedEmailTemplate(body, {
-    footerText: 'You received this because email notifications are enabled.',
-    footerLinkText: 'Unsubscribe · Manage notification settings',
+    footerText: 'メール通知が有効になっているため、このメールが送信されています。',
+    footerLinkText: '配信停止・通知設定の管理',
     footerLinkUrl: `${baseUrl}/settings`,
   });
 }
@@ -310,148 +310,148 @@ function formatEmail(
   switch (event.type) {
     case 'new_video':
       return {
-        subject: `[OpenFrame] New video in ${event.projectName}: ${event.videoTitle}`,
+        subject: `[つなぐレビュー] ${event.projectName} に新しい動画: ${event.videoTitle}`,
         html: emailTemplate(`
-                    <tr>${emailHeading('▶', 'New Video Added')}</tr>
+                    <tr>${emailHeading('▶', '動画が追加されました')}</tr>
                     <tr><td style="padding:20px;">
                       <table cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:20px;">
-                        ${emailRow('Project', event.projectName, true)}
-                        ${emailRow('Video', event.videoTitle, true)}
-                        ${emailRow('Added by', event.addedBy)}
-                        ${emailRow('When', now)}
+                        ${emailRow('プロジェクト', event.projectName, true)}
+                        ${emailRow('動画', event.videoTitle, true)}
+                        ${emailRow('追加者', event.addedBy)}
+                        ${emailRow('日時', now)}
                       </table>
-                      ${emailButton('View Video  →', event.url)}
+                      ${emailButton('動画を見る  →', event.url)}
                     </td></tr>
                 `),
       };
     case 'new_version':
       return {
-        subject: `[OpenFrame] New version of ${event.videoTitle} in ${event.projectName}`,
+        subject: `[つなぐレビュー] ${event.projectName} の ${event.videoTitle} に新しいバージョン`,
         html: emailTemplate(`
-                    <tr>${emailHeading('▶', 'New Version Added')}</tr>
+                    <tr>${emailHeading('▶', '新しいバージョンが追加されました')}</tr>
                     <tr><td style="padding:20px;">
                       <table cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:20px;">
-                        ${emailRow('Project', event.projectName, true)}
-                        ${emailRow('Video', event.videoTitle, true)}
-                        ${emailRow('Version', event.versionLabel)}
-                        ${emailRow('Added by', event.addedBy)}
-                        ${emailRow('When', now)}
+                        ${emailRow('プロジェクト', event.projectName, true)}
+                        ${emailRow('動画', event.videoTitle, true)}
+                        ${emailRow('バージョン', event.versionLabel)}
+                        ${emailRow('追加者', event.addedBy)}
+                        ${emailRow('日時', now)}
                       </table>
-                      ${emailButton('View Version  →', event.url)}
+                      ${emailButton('バージョンを見る  →', event.url)}
                     </td></tr>
                 `),
       };
     case 'new_comment':
       return {
-        subject: `[OpenFrame] New comment on ${event.videoTitle}`,
+        subject: `[つなぐレビュー] ${event.videoTitle} に新しいコメント`,
         html: emailTemplate(`
-                    <tr>${emailHeading('●', 'New Comment')}</tr>
+                    <tr>${emailHeading('●', '新しいコメント')}</tr>
                     <tr><td style="padding:20px;">
                       <table cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:16px;">
-                        ${emailRow('Project', event.projectName, true)}
-                        ${emailRow('Video', event.videoTitle, true)}
-                        ${emailRow('From', event.commentAuthor)}
-                        ${emailRow('At', event.timestamp)}
-                        ${emailRow('When', now)}
+                        ${emailRow('プロジェクト', event.projectName, true)}
+                        ${emailRow('動画', event.videoTitle, true)}
+                        ${emailRow('投稿者', event.commentAuthor)}
+                        ${emailRow('位置', event.timestamp)}
+                        ${emailRow('日時', now)}
                       </table>
                       <div style="border-left:2px solid #7aa7ff;padding:10px 14px;margin:0 0 20px;background-color:#2f2f2f;color:#c6c6cc;font-size:13px;line-height:1.6;">
                         ${escapeHtml(truncate(event.commentText, 300))}
                       </div>
-                      ${emailButton('View Comment  →', event.url)}
+                      ${emailButton('コメントを見る  →', event.url)}
                     </td></tr>
                 `),
       };
     case 'new_reply':
       return {
-        subject: `[OpenFrame] ${event.replyAuthor} replied on ${event.videoTitle}`,
+        subject: `[つなぐレビュー] ${event.replyAuthor} さんが ${event.videoTitle} に返信`,
         html: emailTemplate(`
-                    <tr>${emailHeading('↵', 'New Reply')}</tr>
+                    <tr>${emailHeading('↵', '新しい返信')}</tr>
                     <tr><td style="padding:20px;">
                       <table cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:16px;">
-                        ${emailRow('Project', event.projectName, true)}
-                        ${emailRow('Video', event.videoTitle, true)}
-                        ${emailRow('From', rawEmailHtml(`<span style="color:${EMAIL_COLORS.text};font-weight:500;">${escapeHtml(event.replyAuthor)}</span> <span style="color:${EMAIL_COLORS.textDim};">&#8594;</span> ${escapeHtml(event.parentAuthor)}`))}
-                        ${emailRow('When', now)}
+                        ${emailRow('プロジェクト', event.projectName, true)}
+                        ${emailRow('動画', event.videoTitle, true)}
+                        ${emailRow('返信元', rawEmailHtml(`<span style="color:${EMAIL_COLORS.text};font-weight:500;">${escapeHtml(event.replyAuthor)}</span> <span style="color:${EMAIL_COLORS.textDim};">&#8594;</span> ${escapeHtml(event.parentAuthor)}`))}
+                        ${emailRow('日時', now)}
                       </table>
                       <div style="border-left:2px solid #7aa7ff;padding:10px 14px;margin:0 0 20px;background-color:#2f2f2f;color:#c6c6cc;font-size:13px;line-height:1.6;">
                         ${escapeHtml(truncate(event.replyText, 300))}
                       </div>
-                      ${emailButton('View Reply  →', event.url)}
+                      ${emailButton('返信を見る  →', event.url)}
                     </td></tr>
                 `),
       };
     case 'approval_requested':
       return {
-        subject: `[OpenFrame] Approval requested for ${event.versionLabel} in ${event.projectName}`,
+        subject: `[つなぐレビュー] ${event.projectName} の ${event.versionLabel} に承認依頼`,
         html: emailTemplate(`
-                    <tr>${emailHeading('✓', 'Approval Requested')}</tr>
+                    <tr>${emailHeading('✓', '承認依頼')}</tr>
                     <tr><td style="padding:20px;">
-                      ${emailHighlight(`A new approval request is waiting for your response.`)}
+                      ${emailHighlight(`新しい承認依頼があなたの対応を待っています。`)}
                       <table cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:16px;">
-                        ${emailRow('Project', event.projectName, true)}
-                        ${emailRow('Video', event.videoTitle, true)}
-                        ${emailRow('Version', event.versionLabel)}
-                        ${emailRow('Requested by', event.requestedBy)}
-                        ${emailRow('When', now)}
+                        ${emailRow('プロジェクト', event.projectName, true)}
+                        ${emailRow('動画', event.videoTitle, true)}
+                        ${emailRow('バージョン', event.versionLabel)}
+                        ${emailRow('依頼者', event.requestedBy)}
+                        ${emailRow('日時', now)}
                       </table>
                       ${event.message ? `<div style="border-left:2px solid #7aa7ff;padding:10px 14px;margin:0 0 20px;background-color:#2f2f2f;color:#c6c6cc;font-size:13px;line-height:1.6;">${escapeHtml(truncate(event.message, 300))}</div>` : ''}
-                      ${emailButton('Review Request  →', event.url)}
+                      ${emailButton('依頼を確認  →', event.url)}
                     </td></tr>
                 `),
       };
     case 'approval_action':
       return {
-        subject: `[OpenFrame] Approval ${event.action} by ${event.actorName}`,
+        subject: `[つなぐレビュー] ${event.actorName} さんが承認依頼を${event.action === 'approved' ? '承認' : '却下'}`,
         html: emailTemplate(`
-                    <tr>${emailHeading('✓', 'Approval Update')}</tr>
+                    <tr>${emailHeading('✓', '承認の更新')}</tr>
                     <tr><td style="padding:20px;">
-                      ${emailHighlight(`${event.actorName} ${event.action} this request.`)}
+                      ${emailHighlight(`${event.actorName} さんがこの依頼を${event.action === 'approved' ? '承認' : '却下'}しました。`)}
                       <table cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:16px;">
-                        ${emailRow('Project', event.projectName, true)}
-                        ${emailRow('Video', event.videoTitle, true)}
-                        ${emailRow('Version', event.versionLabel)}
-                        ${emailRow('Action', `${event.actorName} ${event.action}`)}
-                        ${emailRow('When', now)}
+                        ${emailRow('プロジェクト', event.projectName, true)}
+                        ${emailRow('動画', event.videoTitle, true)}
+                        ${emailRow('バージョン', event.versionLabel)}
+                        ${emailRow('操作', `${event.actorName}（${event.action === 'approved' ? '承認' : '却下'}）`)}
+                        ${emailRow('日時', now)}
                       </table>
                       ${event.note ? `<div style="border-left:2px solid #7aa7ff;padding:10px 14px;margin:0 0 20px;background-color:#2f2f2f;color:#c6c6cc;font-size:13px;line-height:1.6;">${escapeHtml(truncate(event.note, 300))}</div>` : ''}
-                      ${emailButton('Open Request  →', event.url)}
+                      ${emailButton('依頼を開く  →', event.url)}
                     </td></tr>
                 `),
       };
     case 'approval_completed':
       return {
-        subject: `[OpenFrame] Approval completed for ${event.versionLabel}`,
+        subject: `[つなぐレビュー] ${event.versionLabel} の承認が完了`,
         html: emailTemplate(`
-                    <tr>${emailHeading('✓', 'Approval Completed')}</tr>
+                    <tr>${emailHeading('✓', '承認が完了しました')}</tr>
                     <tr><td style="padding:20px;">
-                      ${emailHighlight(`All approvers accepted this request.`)}
+                      ${emailHighlight(`すべての承認者がこの依頼を承認しました。`)}
                       <table cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:20px;">
-                        ${emailRow('Project', event.projectName, true)}
-                        ${emailRow('Video', event.videoTitle, true)}
-                        ${emailRow('Version', event.versionLabel)}
-                        ${emailRow('Approvals', String(event.approvedByCount))}
-                        ${emailRow('When', now)}
+                        ${emailRow('プロジェクト', event.projectName, true)}
+                        ${emailRow('動画', event.videoTitle, true)}
+                        ${emailRow('バージョン', event.versionLabel)}
+                        ${emailRow('承認数', String(event.approvedByCount))}
+                        ${emailRow('日時', now)}
                       </table>
-                      ${emailButton('Open Version  →', event.url)}
+                      ${emailButton('バージョンを開く  →', event.url)}
                     </td></tr>
                 `),
       };
     case 'approval_rejected':
       return {
-        subject: `[OpenFrame] Approval rejected by ${event.rejectedBy}`,
+        subject: `[つなぐレビュー] ${event.rejectedBy} さんが承認依頼を却下`,
         html: emailTemplate(`
-                    <tr>${emailHeading('⛔', 'Approval Rejected')}</tr>
+                    <tr>${emailHeading('⛔', '承認が却下されました')}</tr>
                     <tr><td style="padding:20px;">
-                      ${emailHighlight(`${event.rejectedBy} rejected this request.`)}
+                      ${emailHighlight(`${event.rejectedBy} さんがこの依頼を却下しました。`)}
                       <table cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:16px;">
-                        ${emailRow('Project', event.projectName, true)}
-                        ${emailRow('Video', event.videoTitle, true)}
-                        ${emailRow('Version', event.versionLabel)}
-                        ${emailRow('Rejected by', event.rejectedBy)}
-                        ${emailRow('When', now)}
+                        ${emailRow('プロジェクト', event.projectName, true)}
+                        ${emailRow('動画', event.videoTitle, true)}
+                        ${emailRow('バージョン', event.versionLabel)}
+                        ${emailRow('却下者', event.rejectedBy)}
+                        ${emailRow('日時', now)}
                       </table>
                       ${event.note ? `<div style="border-left:2px solid #7aa7ff;padding:10px 14px;margin:0 0 20px;background-color:#2f2f2f;color:#c6c6cc;font-size:13px;line-height:1.6;">${escapeHtml(truncate(event.note, 300))}</div>` : ''}
-                      ${emailButton('Open Request  →', event.url)}
+                      ${emailButton('依頼を開く  →', event.url)}
                     </td></tr>
                 `),
       };
@@ -463,10 +463,10 @@ function formatEmail(
  */
 export function testEmailHtml(): string {
   return emailTemplate(`
-        <tr>${emailHeading('✓', 'Test Notification')}</tr>
+        <tr>${emailHeading('✓', 'テスト通知')}</tr>
         <tr><td style="padding:20px;">
-          <p style="margin:0 0 8px;font-size:14px;color:${EMAIL_COLORS.text};">Email notifications are working.</p>
-          <p style="margin:0;font-size:13px;color:${EMAIL_COLORS.textSecondary};">You&rsquo;ll receive emails when there&rsquo;s activity on your projects.</p>
+          <p style="margin:0 0 8px;font-size:14px;color:${EMAIL_COLORS.text};">メール通知は正常に動作しています。</p>
+          <p style="margin:0;font-size:13px;color:${EMAIL_COLORS.textSecondary};">プロジェクトで動きがあると、メールが届きます。</p>
         </td></tr>
     `);
 }
@@ -569,25 +569,25 @@ export async function notifyProjectOwner(ownerId: string, event: NotificationEve
  */
 function formatNow(timezone: string): string {
   try {
-    return new Date().toLocaleString('en-US', {
+    return new Date().toLocaleString('ja-JP', {
       timeZone: timezone,
-      month: 'short',
-      day: 'numeric',
       year: 'numeric',
+      month: 'long',
+      day: 'numeric',
       hour: 'numeric',
       minute: '2-digit',
-      hour12: true,
+      hour12: false,
     });
   } catch {
     // Invalid timezone — fall back to UTC
-    return new Date().toLocaleString('en-US', {
+    return new Date().toLocaleString('ja-JP', {
       timeZone: 'UTC',
-      month: 'short',
-      day: 'numeric',
       year: 'numeric',
+      month: 'long',
+      day: 'numeric',
       hour: 'numeric',
       minute: '2-digit',
-      hour12: true,
+      hour12: false,
     });
   }
 }

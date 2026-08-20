@@ -63,7 +63,7 @@ export default function WorkspaceSettingsPageClient({
         description: workspace.description || '',
       });
     } catch {
-      setError('Failed to load workspace');
+      setError('ワークスペースの読み込みに失敗しました');
     } finally {
       setIsLoading(false);
     }
@@ -88,13 +88,13 @@ export default function WorkspaceSettingsPageClient({
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || 'Failed to update workspace');
+        setError(data.error || 'ワークスペースの更新に失敗しました');
         return;
       }
 
-      setSuccess('Workspace updated successfully');
+      setSuccess('ワークスペースを更新しました');
     } catch {
-      setError('Something went wrong');
+      setError('問題が発生しました');
     } finally {
       setIsSaving(false);
     }
@@ -112,13 +112,13 @@ export default function WorkspaceSettingsPageClient({
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || 'Failed to delete workspace');
+        setError(data.error || 'ワークスペースの削除に失敗しました');
         return;
       }
 
       router.push('/workspaces');
     } catch {
-      setError('Failed to delete workspace');
+      setError('ワークスペースの削除に失敗しました');
     } finally {
       setIsDeleting(false);
     }
@@ -142,26 +142,26 @@ export default function WorkspaceSettingsPageClient({
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to Workspace
+          ワークスペースに戻る
         </Link>
       </div>
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Workspace Settings</h1>
-        <p className="text-muted-foreground mt-1">Manage workspace configuration</p>
+        <h1 className="text-3xl font-bold tracking-tight">ワークスペース設定</h1>
+        <p className="text-muted-foreground mt-1">ワークスペースの構成を管理します</p>
       </div>
 
       <Card className="mb-8">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5" />
-            General
+            基本設定
           </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSave} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Workspace Name</Label>
+              <Label htmlFor="name">ワークスペース名</Label>
               <Input
                 id="name"
                 value={formData.name}
@@ -171,7 +171,7 @@ export default function WorkspaceSettingsPageClient({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">説明</Label>
               <Textarea
                 id="description"
                 value={formData.description}
@@ -196,10 +196,10 @@ export default function WorkspaceSettingsPageClient({
               {isSaving ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Saving...
+                  保存中...
                 </>
               ) : (
-                'Save Changes'
+                '変更を保存'
               )}
             </Button>
           </form>
@@ -212,37 +212,35 @@ export default function WorkspaceSettingsPageClient({
 
           <Card className="border-destructive/50">
             <CardHeader>
-              <CardTitle className="text-destructive">Danger Zone</CardTitle>
-              <CardDescription>Irreversible actions. Proceed with caution.</CardDescription>
+              <CardTitle className="text-destructive">危険な操作</CardTitle>
+              <CardDescription>取り消せない操作です。慎重に進めてください。</CardDescription>
             </CardHeader>
             <CardContent>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive">
                     <Trash2 className="h-4 w-4 mr-2" />
-                    Delete Workspace
+                    ワークスペースを削除
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Delete &quot;{workspace.name}&quot;?</AlertDialogTitle>
+                    <AlertDialogTitle>「{workspace.name}」を削除しますか？</AlertDialogTitle>
                     <AlertDialogDescription asChild>
                       <div className="space-y-4">
                         <p>
-                          This will permanently delete this workspace and everything inside it
-                          (projects, videos, comments, images, and voice notes). This action cannot
-                          be undone.
+                          このワークスペースと、その中のすべて（プロジェクト・動画・コメント・画像・ボイスメモ）が完全に削除されます。この操作は取り消せません。
                         </p>
                         <div className="space-y-2">
                           <Label htmlFor="delete-workspace-confirm">
-                            Type <strong className="text-foreground">{workspace.name}</strong> to
-                            confirm
+                            確認のため <strong className="text-foreground">{workspace.name}</strong>{' '}
+                            と入力してください
                           </Label>
                           <Input
                             id="delete-workspace-confirm"
                             value={deleteConfirmation}
                             onChange={(e) => setDeleteConfirmation(e.target.value)}
-                            placeholder="Workspace name"
+                            placeholder="ワークスペース名"
                             className="h-11"
                           />
                         </div>
@@ -251,7 +249,7 @@ export default function WorkspaceSettingsPageClient({
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel onClick={() => setDeleteConfirmation('')}>
-                      Cancel
+                      キャンセル
                     </AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleDelete}
@@ -259,7 +257,7 @@ export default function WorkspaceSettingsPageClient({
                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                     >
                       {isDeleting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                      Delete Workspace
+                      ワークスペースを削除
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>

@@ -22,19 +22,18 @@ export default function VideoError({
           <Film className="h-12 w-12 text-muted-foreground" />
           <AlertTriangle className="absolute -bottom-1 -right-1 h-6 w-6 text-destructive" />
         </div>
-        <h1 className="text-2xl font-bold">Video Player Error</h1>
+        <h1 className="text-2xl font-bold">動画プレーヤーのエラー</h1>
         <p className="text-muted-foreground max-w-md">
-          Something went wrong with the video player. This could be due to a network issue or a
-          problem with the video file.
+          動画プレーヤーで問題が発生しました。ネットワークの問題や動画ファイルの不具合が原因の可能性があります。
         </p>
-        {error.digest && <p className="text-muted-foreground text-xs">Error ID: {error.digest}</p>}
+        {error.digest && <p className="text-muted-foreground text-xs">エラーID: {error.digest}</p>}
       </div>
       <div className="flex gap-2">
         <Button onClick={reset} variant="default">
-          Reload video
+          動画を再読み込み
         </Button>
         <Button onClick={() => window.history.back()} variant="outline">
-          Go back
+          戻る
         </Button>
       </div>
     </div>

@@ -41,13 +41,13 @@ export default function NewWorkspacePage({
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Failed to create workspace');
+        setError(data.error || 'ワークスペースの作成に失敗しました');
         return;
       }
 
       router.push(`/workspaces/${data.data.id}`);
     } catch {
-      setError('Something went wrong. Please try again.');
+      setError('問題が発生しました。もう一度お試しください。');
     } finally {
       setIsLoading(false);
     }
@@ -62,7 +62,7 @@ export default function NewWorkspacePage({
             className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Workspaces
+            ワークスペース一覧に戻る
           </Link>
         </div>
 
@@ -76,12 +76,12 @@ export default function NewWorkspacePage({
               )}
             </div>
             <CardTitle className="text-2xl">
-              {workspaceCreation.canCreateWorkspace ? 'Create New Workspace' : 'Upgrade Required'}
+              {workspaceCreation.canCreateWorkspace ? '新規ワークスペースを作成' : 'アップグレードが必要です'}
             </CardTitle>
             <CardDescription className="text-base">
               {workspaceCreation.canCreateWorkspace
-                ? 'Set up a workspace to organize projects and invite your team'
-                : workspaceCreation.reason || 'Upgrade your account to create another workspace.'}
+                ? 'ワークスペースを設定してプロジェクトを整理し、チームを招待しましょう'
+                : workspaceCreation.reason || 'ワークスペースをもう1つ作成するにはアカウントをアップグレードしてください。'}
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
@@ -89,11 +89,11 @@ export default function NewWorkspacePage({
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="name" className="text-sm font-medium">
-                    Workspace Name
+                    ワークスペース名
                   </Label>
                   <Input
                     id="name"
-                    placeholder="e.g., My Studio"
+                    placeholder="例: My Studio"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     required
@@ -103,12 +103,12 @@ export default function NewWorkspacePage({
 
                 <div className="space-y-2">
                   <Label htmlFor="description" className="text-sm font-medium">
-                    Description{' '}
-                    <span className="text-muted-foreground font-normal">(optional)</span>
+                    説明{' '}
+                    <span className="text-muted-foreground font-normal">（任意）</span>
                   </Label>
                   <Textarea
                     id="description"
-                    placeholder="What is this workspace for?"
+                    placeholder="このワークスペースの用途は？"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={3}
@@ -126,21 +126,20 @@ export default function NewWorkspacePage({
                   {isLoading ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Creating...
+                      作成中...
                     </>
                   ) : (
-                    'Create Workspace'
+                    'ワークスペースを作成'
                   )}
                 </Button>
               </form>
             ) : (
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">
-                  You can still create and manage projects inside workspaces where you are already a
-                  member.
+                  すでにメンバーになっているワークスペース内であれば、引き続きプロジェクトの作成・管理ができます。
                 </p>
                 <Button asChild className="w-full">
-                  <Link href="/settings">Open Billing Settings</Link>
+                  <Link href="/settings">請求設定を開く</Link>
                 </Button>
               </div>
             )}

@@ -42,10 +42,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const access = await checkProjectAccess(approvalRequest.version.video.project, session.user.id);
     const canCancel = approvalRequest.requestedById === session.user.id || access.canEdit;
-    if (!canCancel) return apiErrors.forbidden('Access denied');
+    if (!canCancel) return apiErrors.forbidden('アクセスが拒否されました');
 
     if (approvalRequest.status !== 'PENDING') {
-      return apiErrors.conflict('Only pending approval requests can be canceled');
+      return apiErrors.conflict('保留中の承認リクエストのみキャンセルできます');
     }
 
     const updated = await db.$transaction(
@@ -84,16 +84,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   } catch (error) {
     if (error instanceof Error) {
       if (error.message === '__NOT_PENDING__') {
-        return apiErrors.conflict('Only pending approval requests can be canceled');
+        return apiErrors.conflict('保留中の承認リクエストのみキャンセルできます');
       }
       if (error.message === '__NOT_FOUND__') {
         return apiErrors.notFound('Approval request');
       }
     }
     if (isSerializableConflict(error)) {
-      return apiErrors.conflict('Request state changed. Please try again.');
+      return apiErrors.conflict('リクエストの状態が変わりました。もう一度お試しください。');
     }
     logError('Error canceling approval request:', error);
-    return apiErrors.internalError('Failed to cancel approval request');
+    return apiErrors.internalError('承認リクエストのキャンセルに失敗しました');
   }
 }

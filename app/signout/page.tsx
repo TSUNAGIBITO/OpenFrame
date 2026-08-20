@@ -22,15 +22,15 @@ export default function SignOutPage() {
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
             <LogOut className="h-6 w-6 text-muted-foreground" />
           </div>
-          <CardTitle className="text-2xl">Sign out</CardTitle>
-          <CardDescription>Are you sure you want to sign out?</CardDescription>
+          <CardTitle className="text-2xl">サインアウト</CardTitle>
+          <CardDescription>サインアウトしてもよろしいですか？</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
           <Button onClick={handleSignOut} disabled={loading} className="w-full">
-            {loading ? 'Signing out...' : 'Sign out'}
+            {loading ? 'サインアウトしています...' : 'サインアウト'}
           </Button>
           <Button variant="outline" asChild className="w-full">
-            <Link href="/dashboard">Cancel</Link>
+            <Link href="/dashboard">キャンセル</Link>
           </Button>
         </CardContent>
       </Card>

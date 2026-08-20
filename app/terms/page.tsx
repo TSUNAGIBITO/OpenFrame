@@ -3,8 +3,8 @@ import { Video } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | OpenFrame',
-  description: 'Terms of Service for OpenFrame by IPEK TECH LLC.',
+  title: '利用規約 | つなぐレビュー',
+  description: 'IPEK TECH LLC が提供する社内向け動画レビューツール「つなぐレビュー」の利用規約。',
 };
 
 export default function TermsOfServicePage() {
@@ -17,311 +17,211 @@ export default function TermsOfServicePage() {
             className="flex items-center gap-2 text-sm font-semibold hover:text-primary transition-colors"
           >
             <Video className="h-4 w-4 text-primary" />
-            OpenFrame
+            つなぐレビュー
           </Link>
           <Link
             href="/"
             className="text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            ← Back to Home
+            ← ホームに戻る
           </Link>
         </div>
       </header>
 
       <main className="mx-auto max-w-[900px] px-4 py-12 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-semibold tracking-tight mb-2">Terms of Service</h1>
-        <p className="text-sm text-muted-foreground mb-10">Last updated: July 30, 2026</p>
+        <h1 className="text-3xl font-semibold tracking-tight mb-2">利用規約</h1>
+        <p className="text-sm text-muted-foreground mb-10">最終更新日: 2026年7月30日</p>
 
         <div className="prose prose-sm prose-invert max-w-none space-y-8 text-sm leading-relaxed text-foreground/80">
           <section>
-            <h2 className="text-base font-semibold text-foreground mb-3">1. Agreement to Terms</h2>
+            <h2 className="text-base font-semibold text-foreground mb-3">1. 規約への同意</h2>
             <p>
-              These Terms of Service (&ldquo;Terms&rdquo;) constitute a legally binding agreement
-              between you (&ldquo;User&rdquo;, &ldquo;you&rdquo;, or &ldquo;your&rdquo;) and{' '}
-              <strong className="text-foreground">IPEK TECH LLC</strong>, a Wyoming limited
-              liability company (&ldquo;Company&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;, or
-              &ldquo;our&rdquo;), governing your access to and use of the OpenFrame platform,
-              available at open-frame.net (the &ldquo;Service&rdquo;).
+              本利用規約（以下「本規約」）は、
+              <strong className="text-foreground">IPEK TECH LLC</strong>
+              （以下「当社」）が提供する社内向け動画レビューツール「つなぐレビュー」（以下「本サービス」）の利用条件を定めるものです。
             </p>
             <p className="mt-3">
-              By creating an account or accessing the Service in any manner, you agree to be bound
-              by these Terms. If you do not agree to these Terms, you may not access or use the
-              Service.
+              本サービスを利用する方（以下「利用者」）は、本規約に同意したうえで本サービスを利用するものとします。本規約に同意いただけない場合、本サービスをご利用いただくことはできません。
             </p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-foreground mb-3">
-              2. Description of Service
+              2. 本サービスの内容
             </h2>
             <p>
-              OpenFrame is a video review and approval platform that enables creative professionals
-              and their clients to collaborate on video projects through timestamped comments,
-              annotations, version management, and approval workflows. The Service is offered on a
-              subscription basis with a free trial period that requires no payment details.
+              本サービスは、動画プロジェクトについて、タイムスタンプ付きコメント・注釈・バージョン管理・承認フローを通じてレビューと承認を行うための社内ツールです。当社の業務に関わるメンバーおよび当社が招待した関係者が利用します。
             </p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-foreground mb-3">3. Eligibility</h2>
+            <h2 className="text-base font-semibold text-foreground mb-3">3. 利用資格</h2>
             <p>
-              You must be at least 18 years old to use the Service. By using the Service, you
-              represent that you are at least 18 years of age and have the legal authority to enter
-              into these Terms. If you are using the Service on behalf of an organization, you
-              represent that you have authority to bind that organization to these Terms.
+              本サービスは、当社のメンバーおよび当社が明示的に招待した関係者のみが利用できます。利用者は、所属する組織を本規約に拘束する権限を有していることを表明するものとします。
             </p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-foreground mb-3">4. Accounts</h2>
+            <h2 className="text-base font-semibold text-foreground mb-3">4. アカウント</h2>
             <p>
-              To access most features of the Service, you must register for an account. You agree to
-              provide accurate, current, and complete information during registration and to keep
-              your account information updated. You are responsible for maintaining the
-              confidentiality of your account credentials and for all activities that occur under
-              your account.
+              本サービスの利用にはアカウント登録が必要です。利用者は、登録時に正確かつ最新の情報を提供し、常に最新の状態に保つものとします。アカウントの認証情報の管理は利用者の責任とし、当該アカウントで行われたすべての操作について利用者が責任を負います。
             </p>
             <p className="mt-3">
-              You agree to notify us immediately at{' '}
+              アカウントの不正利用に気づいた場合は、直ちに{' '}
               <a href="mailto:info@open-frame.net" className="text-primary hover:underline">
                 info@open-frame.net
               </a>{' '}
-              of any unauthorized use of your account. We are not liable for any losses arising from
-              unauthorized use of your account.
+              までご連絡ください。
             </p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-foreground mb-3">
-              5. Subscriptions and Free Trial
+              5. サブスクリプションと無料トライアル
             </h2>
             <p>
-              Certain features of the Service require a paid subscription. Every new account
-              receives a <strong className="text-foreground">7-day free trial</strong>, which starts
-              once the account&apos;s email address is verified and requires no credit card. The
-              trial does not convert into a paid plan on its own and nothing is charged while it
-              runs. When it ends, access to paid features stops until you choose to subscribe, and a
-              subscription is billed as soon as you complete checkout.
+              本サービスの一部の機能は、有料のサブスクリプションを必要とします。新規アカウントには
+              <strong className="text-foreground">7日間の無料トライアル</strong>
+              が付与されます。トライアルはメールアドレスの確認後に開始され、クレジットカードは不要です。トライアルが自動的に有料プランへ移行することはなく、期間中に課金されることもありません。トライアル終了時点で有料機能は停止し、利用者が申し込み手続きを完了した時点で初めて課金されます。
             </p>
             <p className="mt-3">
-              Subscription fees are billed in advance on a monthly or annual basis depending on the
-              plan you select. All fees are non-refundable except as expressly stated in our{' '}
+              サブスクリプション料金は、選択したプランに応じて月額または年額で前払い制により請求されます。すべての料金は、当社の{' '}
               <Link href="/refund" className="text-primary hover:underline">
-                Refund Policy
+                返金ポリシー
               </Link>
-              .
+              に明記されている場合を除き、返金されません。
             </p>
             <p className="mt-3">
-              We reserve the right to change subscription pricing with reasonable advance notice.
-              Continued use of the Service after a price change constitutes your agreement to the
-              new pricing.
+              当社は、合理的な事前の通知をもって、サブスクリプションの料金を変更する権利を留保します。料金変更後も本サービスの利用を継続した場合、利用者は新しい料金に同意したものとみなされます。
             </p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-foreground mb-3">6. User Content</h2>
+            <h2 className="text-base font-semibold text-foreground mb-3">6. 利用者コンテンツ</h2>
             <p>
-              You retain all ownership rights to the content you upload or create through the
-              Service (&ldquo;User Content&rdquo;). By uploading User Content, you grant us a
-              limited, non-exclusive, royalty-free license to store, process, and display your User
-              Content solely to provide the Service to you.
+              利用者が本サービスにアップロード・作成したコンテンツ（以下「利用者コンテンツ」）の権利は利用者に帰属します。当社は、本サービスを提供する目的の範囲でのみ、利用者コンテンツを保存・処理・表示します。
             </p>
             <p className="mt-3">
-              You are solely responsible for your User Content and represent that you have all
-              necessary rights to upload and share it. You agree not to upload content that: (a)
-              infringes any third-party intellectual property rights; (b) is unlawful, defamatory,
-              or harmful; (c) contains malware or malicious code; or (d) violates any applicable law
-              or regulation.
+              利用者は、利用者コンテンツについて必要な権利をすべて有していることを表明し、(a) 第三者の知的財産権を侵害するもの、(b) 違法・中傷的・有害なもの、(c) マルウェアや悪意あるコードを含むもの、(d) 適用される法令に違反するものをアップロードしないことに同意します。
             </p>
             <p className="mt-3">
-              We may remove or suspend access to User Content where we reasonably determine that it
-              violates these Terms.
+              当社は、利用者コンテンツが本規約に違反していると合理的に判断した場合、当該コンテンツを削除またはアクセスを停止することがあります。
             </p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-foreground mb-3">7. Acceptable Use</h2>
-            <p>You agree not to:</p>
+            <h2 className="text-base font-semibold text-foreground mb-3">7. 禁止事項</h2>
+            <p>利用者は、以下の行為を行ってはなりません。</p>
             <ul className="mt-3 list-disc pl-5 space-y-2">
-              <li>Use the Service in any manner that violates applicable laws or regulations.</li>
+              <li>適用される法令に違反する態様で本サービスを利用すること。</li>
               <li>
-                Attempt to gain unauthorized access to any part of the Service or its related
-                systems.
+                本サービスまたは関連システムへの不正アクセスを試みること。
               </li>
-              <li>Interfere with or disrupt the integrity or performance of the Service.</li>
+              <li>本サービスの完全性や動作を妨害・阻害すること。</li>
               <li>
-                Reverse engineer, decompile, or attempt to extract the source code of the Service
-                (except where permitted by the applicable source license, such as the Functional
-                Source License covering the platform code).
+                本サービスのリバースエンジニアリング、逆コンパイル、ソースコードの抽出を試みること。
               </li>
-              <li>Use the Service to send spam or unsolicited communications.</li>
+              <li>本サービスを通じてスパムや迷惑通信を送信すること。</li>
               <li>
-                Use the Service to collect or harvest any personally identifiable information
-                without authorization.
+                許可なく個人を特定できる情報を収集すること。
               </li>
               <li>
-                Resell or sublicense access to the Service without written authorization from us.
+                当社の書面による許可なく、本サービスへのアクセスを再販・再許諾すること。
               </li>
             </ul>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-foreground mb-3">
-              8. Intellectual Property
+              8. 知的財産権
             </h2>
             <p>
-              Excluding your User Content, the Service and all content, features, and functionality
-              thereof — including but not limited to software, text, graphics, logos, and design —
-              are owned by IPEK TECH LLC or its licensors and are protected by applicable
-              intellectual property laws.
-            </p>
-            <p className="mt-3">
-              The core platform code is made available under the Functional Source License
-              (FSL-1.1-ALv2): the source code is publicly available and may be self-hosted, and each
-              release becomes available under the Apache 2.0 license two years after its
-              publication. Please refer to the license in the GitHub repository for details on
-              permitted use.
+              利用者コンテンツを除き、本サービスおよびそのすべてのコンテンツ・機能（ソフトウェア、テキスト、グラフィック、ロゴ、デザインを含みますがこれらに限りません）に関する権利は、当社または当社にライセンスを許諾した者に帰属し、適用される知的財産権法によって保護されます。
             </p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-foreground mb-3">9. Privacy</h2>
+            <h2 className="text-base font-semibold text-foreground mb-3">9. プライバシー</h2>
             <p>
-              Your use of the Service is also governed by our{' '}
+              本サービスの利用には、当社の{' '}
               <Link href="/privacy" className="text-primary hover:underline">
-                Privacy Policy
+                プライバシーポリシー
               </Link>
-              , which is incorporated into these Terms by reference. By using the Service, you
-              consent to the collection and use of your information as described therein.
+              も適用され、本規約の一部として組み込まれます。本サービスを利用することで、利用者は同ポリシーに記載された情報の取り扱いに同意するものとします。
             </p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-foreground mb-3">10. Disclaimers</h2>
+            <h2 className="text-base font-semibold text-foreground mb-3">10. 免責事項</h2>
             <p>
-              THE SERVICE IS PROVIDED &ldquo;AS IS&rdquo; AND &ldquo;AS AVAILABLE&rdquo; WITHOUT
-              WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
-              NON-INFRINGEMENT. WE DO NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED,
-              ERROR-FREE, OR FREE OF VIRUSES OR OTHER HARMFUL COMPONENTS.
+              本サービスは「現状有姿」および「提供可能な範囲」で提供され、商品性、特定目的への適合性、非侵害性を含むいかなる明示または黙示の保証も行いません。当社は、本サービスが中断されないこと、エラーがないこと、ウイルスその他の有害な要素が含まれないことを保証しません。
             </p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-foreground mb-3">
-              11. Limitation of Liability
+              11. 責任の制限
             </h2>
             <p>
-              TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, IPEK TECH LLC AND ITS OFFICERS,
-              DIRECTORS, EMPLOYEES, AGENTS, AND LICENSORS SHALL NOT BE LIABLE FOR ANY INDIRECT,
-              INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES — INCLUDING LOST PROFITS, DATA
-              LOSS, OR BUSINESS INTERRUPTION — ARISING FROM YOUR USE OF OR INABILITY TO USE THE
-              SERVICE, EVEN IF WE HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-            </p>
-            <p className="mt-3">
-              OUR TOTAL CUMULATIVE LIABILITY TO YOU FOR ALL CLAIMS ARISING FROM OR RELATED TO THESE
-              TERMS OR THE SERVICE WILL NOT EXCEED THE GREATER OF (A) THE AMOUNT YOU PAID TO US IN
-              THE 12 MONTHS PRECEDING THE CLAIM OR (B) USD $50.
+              適用される法令が認める最大限の範囲において、当社は、本サービスの利用または利用不能から生じる間接的・付随的・特別・結果的・懲罰的損害（逸失利益、データの喪失、事業の中断を含む）について、その可能性を事前に通知されていた場合であっても、一切責任を負いません。
             </p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-foreground mb-3">12. Indemnification</h2>
+            <h2 className="text-base font-semibold text-foreground mb-3">12. 補償</h2>
             <p>
-              You agree to indemnify, defend, and hold harmless IPEK TECH LLC and its officers,
-              directors, employees, agents, and licensors from and against any claims, damages,
-              losses, liabilities, costs, and expenses (including reasonable attorneys&apos; fees)
-              arising from: (a) your use of the Service; (b) your User Content; (c) your violation
-              of these Terms; or (d) your violation of any third-party rights.
+              利用者は、(a) 本サービスの利用、(b) 利用者コンテンツ、(c) 本規約の違反、(d) 第三者の権利の侵害から生じる請求・損害・損失・責任・費用（合理的な弁護士費用を含む）について、当社を防御し、補償し、損害を与えないものとします。
             </p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-foreground mb-3">
-              13. Suspension and Termination
+              13. 利用停止および終了
             </h2>
-            <p>We may suspend or terminate your access to the Service if:</p>
+            <p>当社は、以下の場合に利用者のアクセスを停止または終了することがあります。</p>
             <ul className="mt-3 list-disc pl-5 space-y-2">
               <li>
-                you materially breach these Terms, including the Acceptable Use restrictions in
-                Section 7, and do not remedy the breach within ten (10) days of our written notice.
-                No cure period applies to a repeated breach of the same obligation;
+                利用者が本規約（第7条の禁止事項を含む）に重大な違反をし、当社の書面による通知から10日以内に是正しない場合。同一の義務に対する繰り返しの違反には是正期間を設けません。
               </li>
               <li>
-                your use of the Service is unlawful, infringes a third party&rsquo;s rights, or
-                exposes us or other users to legal liability or a security risk, in which case we
-                may act immediately and without prior notice;
+                利用者の利用が違法であるか、第三者の権利を侵害するか、当社や他の利用者を法的責任やセキュリティ上のリスクにさらす場合。この場合、当社は事前通知なく直ちに対応することがあります。
               </li>
-              <li>
-                your subscription fees remain unpaid fourteen (14) days after their due date and we
-                have notified you; or
-              </li>
-              <li>we are required to do so by law or by a competent authority.</li>
+              <li>法令または権限を有する当局の要請により必要となった場合。</li>
             </ul>
             <p className="mt-3">
-              Where we reasonably suspect the conduct described in the second bullet above, we may
-              suspend your account while we investigate. We will tell you why, and we will restore
-              access if the suspicion is not borne out.
-            </p>
-            <p className="mt-3">
-              If we terminate your account for any reason other than the ones listed above, or if we
-              discontinue the Service or your plan, we will give you at least thirty (30)
-              days&rsquo; written notice, refund the unused portion of any fees you have prepaid
-              (notwithstanding Section 5 and our{' '}
-              <Link href="/refund" className="text-primary hover:underline">
-                Refund Policy
-              </Link>
-              ), and keep your account accessible for export during that period.
-            </p>
-            <p className="mt-3">
-              Except where the law requires otherwise or the content itself is unlawful, your User
-              Content will remain available for export for fifteen (15) days after termination,
-              after which it may be permanently deleted. Write to us within that window if you need
-              a copy and can no longer reach it yourself.
-            </p>
-            <p className="mt-3">
-              You may cancel your account at any time through your billing settings or by contacting
-              us at{' '}
+              利用者は、いつでもアカウント設定または{' '}
               <a href="mailto:info@open-frame.net" className="text-primary hover:underline">
                 info@open-frame.net
-              </a>
-              . Upon termination, your right to access the Service will immediately cease. Sections
-              that by their nature should survive termination (including Sections 8, 10, 11, 12, 14,
-              and 15) will survive.
+              </a>{' '}
+              への連絡によりアカウントを解約できます。終了後、本サービスへのアクセス権は直ちに失われます。その性質上終了後も存続すべき条項（第8条、第10条、第11条、第12条、第14条、第15条を含む）は、終了後も有効に存続します。
             </p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-foreground mb-3">
-              14. Governing Law and Dispute Resolution
+              14. 準拠法および紛争解決
             </h2>
             <p>
-              These Terms are governed by the laws of the State of Wyoming, United States, without
-              regard to its conflict-of-law provisions. Any disputes arising from or relating to
-              these Terms or the Service shall be resolved exclusively in the state or federal
-              courts located in Wyoming, and you consent to personal jurisdiction in such courts.
+              本規約は日本法に準拠し、これに従って解釈されます。本規約または本サービスに関して生じる紛争については、東京地方裁判所を第一審の専属的合意管轄裁判所とします。
             </p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-foreground mb-3">15. Changes to Terms</h2>
+            <h2 className="text-base font-semibold text-foreground mb-3">15. 規約の変更</h2>
             <p>
-              We reserve the right to modify these Terms at any time. We will notify you of material
-              changes by posting the updated Terms on this page and updating the &ldquo;Last
-              updated&rdquo; date. Your continued use of the Service after any changes constitutes
-              your acceptance of the new Terms.
+              当社は、本規約をいつでも変更できるものとします。重要な変更を行う場合は、本ページに更新後の規約を掲載し、「最終更新日」を更新することで通知します。変更後も本サービスの利用を継続した場合、利用者は新しい規約に同意したものとみなされます。
             </p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-foreground mb-3">16. Contact</h2>
-            <p>If you have any questions about these Terms, please contact us:</p>
+            <h2 className="text-base font-semibold text-foreground mb-3">16. お問い合わせ</h2>
+            <p>本規約に関するご質問は、以下までお問い合わせください。</p>
             <div className="mt-3 border border-border bg-card/40 p-4 text-sm space-y-1">
               <p className="font-medium text-foreground">IPEK TECH LLC</p>
               <p>30 North Gould Street, Suite N</p>
               <p>Sheridan, WY 82801, United States</p>
               <p>
-                Email:{' '}
+                メール:{' '}
                 <a href="mailto:info@open-frame.net" className="text-primary hover:underline">
                   info@open-frame.net
                 </a>
@@ -341,13 +241,13 @@ export default function TermsOfServicePage() {
               href="/privacy"
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
-              Privacy Policy
+              プライバシーポリシー
             </Link>
             <Link
               href="/refund"
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
-              Refund Policy
+              返金ポリシー
             </Link>
           </div>
         </div>

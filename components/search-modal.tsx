@@ -90,9 +90,9 @@ function getItemSub(item: ResultItem): string | null {
 }
 
 const CATEGORY_LABELS: Record<ResultItem['kind'], string> = {
-  project: 'Projects',
-  workspace: 'Workspaces',
-  video: 'Videos',
+  project: 'プロジェクト',
+  workspace: 'ワークスペース',
+  video: '動画',
 };
 
 const CategoryIcon: Record<ResultItem['kind'], React.ComponentType<{ className?: string }>> = {
@@ -226,7 +226,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
         onKeyDown={handleKeyDown}
       >
         <VisuallyHidden>
-          <DialogTitle>Search</DialogTitle>
+          <DialogTitle>検索</DialogTitle>
         </VisuallyHidden>
         {/* Single flex-col wrapper keeps the grid from producing a stray gap row */}
         <div className="flex flex-col">
@@ -237,7 +237,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
               ref={inputRef}
               value={query}
               onChange={handleChange}
-              placeholder="Search projects, workspaces, videos…"
+              placeholder="プロジェクト・ワークスペース・動画を検索…"
               className="border-0 bg-transparent dark:bg-transparent shadow-none focus-visible:ring-0 h-14 text-base px-0"
             />
             {loading && (
@@ -249,13 +249,13 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
           <div className="h-[520px] overflow-y-auto">
             {showInitial && (
               <p className="text-sm text-muted-foreground text-center py-8 px-4">
-                Type at least 2 characters to search.
+                2文字以上入力すると検索できます。
               </p>
             )}
 
             {isEmpty && (
               <p className="text-sm text-muted-foreground text-center py-8 px-4">
-                No results for &ldquo;{query}&rdquo;
+                &ldquo;{query}&rdquo; に一致する結果はありません
               </p>
             )}
 
@@ -322,19 +322,19 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
               <kbd className="inline-flex h-5 items-center rounded border border-border bg-muted px-1 font-mono text-[10px]">
                 ↓
               </kbd>
-              navigate
+              移動
             </span>
             <span className="flex items-center gap-1.5">
               <kbd className="inline-flex h-5 items-center rounded border border-border bg-muted px-1 font-mono text-[10px]">
                 ↵
               </kbd>
-              open
+              開く
             </span>
             <span className="flex items-center gap-1.5">
               <kbd className="inline-flex h-5 items-center rounded border border-border bg-muted px-1 font-mono text-[10px]">
                 Esc
               </kbd>
-              close
+              閉じる
             </span>
           </div>
         </div>

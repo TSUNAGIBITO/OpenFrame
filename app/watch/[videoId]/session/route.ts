@@ -36,11 +36,11 @@ function baseCookieOptions(maxAge: number) {
 function validateSameOriginRequest(request: NextRequest): NextResponse | null {
   const origin = request.headers.get('origin');
   if (!origin) {
-    return NextResponse.json({ error: 'Missing Origin header' }, { status: 403 });
+    return NextResponse.json({ error: 'Origin ヘッダーがありません' }, { status: 403 });
   }
 
   if (!isTrustedSameOriginRequest(request)) {
-    return NextResponse.json({ error: 'Cross-origin requests are not allowed' }, { status: 403 });
+    return NextResponse.json({ error: 'クロスオリジンのリクエストは許可されていません' }, { status: 403 });
   }
 
   return null;
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   const { videoId } = await params;
   const video = await findVideo(videoId);
   if (!video) {
-    return NextResponse.json({ error: 'Video not found' }, { status: 404 });
+    return NextResponse.json({ error: '動画が見つかりません' }, { status: 404 });
   }
 
   const body = await request.json().catch(() => ({}));
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   const shareTokenFromBody = typeof body?.shareToken === 'string' ? body.shareToken.trim() : '';
 
   if (password.length > MAX_SHARE_PASSWORD_LENGTH) {
-    return NextResponse.json({ error: 'Password is too long' }, { status: 400 });
+    return NextResponse.json({ error: 'パスワードが長すぎます' }, { status: 400 });
   }
 
   const pendingToken = getPendingShareTokenFromRequest(request, video.id);
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
   if (!tokenForAttempt) {
     return NextResponse.json(
-      { error: 'Share session expired. Open the share link again.' },
+      { error: '共有セッションの有効期限が切れました。共有リンクをもう一度開いてください。' },
       { status: 401 }
     );
   }
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
   if (!tokenScopedLimit.allowed) {
     return NextResponse.json(
-      { error: 'Too many attempts. Please try again later.' },
+      { error: '試行回数が多すぎます。しばらくしてからもう一度お試しください。' },
       {
         status: 429,
         headers: rateLimitHeaders(tokenScopedLimit, 8),
@@ -129,7 +129,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
   if (!access.hasAccess) {
     const response = NextResponse.json(
-      { error: access.requiresPassword ? 'Invalid password' : 'Share session is invalid' },
+      { error: access.requiresPassword ? 'パスワードが正しくありません' : '共有セッションが無効です' },
       { status: 401 }
     );
     response.cookies.delete(getShareSessionCookieName(video.id));

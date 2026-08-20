@@ -144,13 +144,13 @@ export function VideoCard({
       });
       if (!res.ok) {
         const data = await res.json();
-        setEditError(data.error || 'Failed to update video');
+        setEditError(data.error || '動画の更新に失敗しました');
         return;
       }
       setShowEditDialog(false);
       router.refresh();
     } catch {
-      setEditError('An unexpected error occurred');
+      setEditError('予期しないエラーが発生しました');
     } finally {
       setIsSaving(false);
     }
@@ -168,7 +168,7 @@ export function VideoCard({
       setVersionSource(source);
     } else {
       setVersionSource(null);
-      if (url.length > 10) setVersionUrlError('Unsupported URL');
+      if (url.length > 10) setVersionUrlError('対応していないURLです');
     }
   };
 
@@ -232,7 +232,7 @@ export function VideoCard({
             type="button"
             role="checkbox"
             aria-checked={selected}
-            aria-label={`Select ${video.title}`}
+            aria-label={`${video.title} を選択`}
             onClick={(event) => {
               event.preventDefault();
               event.stopPropagation();
@@ -270,7 +270,7 @@ export function VideoCard({
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted/80">
                   <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mb-2" />
                   <span className="text-xs text-muted-foreground font-medium">
-                    Processing thumbnail...
+                    サムネイルを処理中...
                   </span>
                 </div>
               ) : resolvedThumbnailUrl ? (
@@ -289,7 +289,7 @@ export function VideoCard({
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center bg-muted/80 text-xs text-muted-foreground font-medium">
-                  Thumbnail unavailable
+                  サムネイルを表示できません
                 </div>
               )}
             </div>
@@ -301,10 +301,10 @@ export function VideoCard({
                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted/80">
                     <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mb-2" />
                     <span className="text-xs text-muted-foreground font-medium">
-                      Processing thumbnail...
+                      サムネイルを処理中...
                     </span>
                     <span className="text-[11px] text-muted-foreground/90">
-                      Video may already be playable
+                      動画はすでに再生できる場合があります
                     </span>
                   </div>
                 ) : resolvedThumbnailUrl ? (
@@ -324,7 +324,7 @@ export function VideoCard({
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center bg-muted/80 text-xs text-muted-foreground font-medium">
-                    Thumbnail unavailable
+                    サムネイルを表示できません
                   </div>
                 )}
                 {!imgError && (
@@ -397,33 +397,33 @@ export function VideoCard({
                     {canSelect && (
                       <DropdownMenuItem onSelect={() => onEnterSelectionMode?.()}>
                         <CheckSquare className="mr-2 h-4 w-4" />
-                        Select
+                        選択
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem asChild>
                       <Link href={`/projects/${projectId}/videos/${video.id}/share`}>
                         <Share2 className="mr-2 h-4 w-4" />
-                        Share
+                        共有
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem onSelect={() => setShowEditDialog(true)}>
                       <Pencil className="mr-2 h-4 w-4" />
-                      Edit
+                      編集
                     </DropdownMenuItem>
                     <DropdownMenuItem onSelect={() => setShowVersionDialog(true)}>
                       <Plus className="mr-2 h-4 w-4" />
-                      Add Version
+                      バージョンを追加
                     </DropdownMenuItem>
                     <DropdownMenuItem onSelect={() => setShowMoveDialog(true)}>
                       <FolderInput className="mr-2 h-4 w-4" />
-                      Move to project
+                      プロジェクトに移動
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       className="text-destructive"
                       onSelect={() => setShowDeleteDialog(true)}
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
-                      Delete
+                      削除
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -442,7 +442,7 @@ export function VideoCard({
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onSelect={() => onEnterSelectionMode?.()}>
                       <CheckSquare className="mr-2 h-4 w-4" />
-                      Select
+                      選択
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -455,7 +455,7 @@ export function VideoCard({
           <div className="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-background/60 backdrop-blur-[1px]">
             <div className="flex items-center gap-2 rounded-full border bg-card px-3 py-1.5 text-sm font-medium shadow-sm">
               <Loader2 className="h-4 w-4 animate-spin" />
-              Deleting...
+              削除中...
             </div>
           </div>
         )}
@@ -465,12 +465,12 @@ export function VideoCard({
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Video</DialogTitle>
-            <DialogDescription>Update the video title and description.</DialogDescription>
+            <DialogTitle>動画を編集</DialogTitle>
+            <DialogDescription>動画のタイトルと説明を更新します。</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 mt-2">
             <div className="space-y-2">
-              <Label>Title</Label>
+              <Label>タイトル</Label>
               <Input
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
@@ -478,7 +478,7 @@ export function VideoCard({
               />
             </div>
             <div className="space-y-2">
-              <Label>Description (optional)</Label>
+              <Label>説明(任意)</Label>
               <Textarea
                 value={editDescription}
                 onChange={(e) => setEditDescription(e.target.value)}
@@ -498,7 +498,7 @@ export function VideoCard({
               className="w-full"
             >
               {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Save Changes
+              変更を保存
             </Button>
           </div>
         </DialogContent>
@@ -508,14 +508,14 @@ export function VideoCard({
       <Dialog open={showVersionDialog} onOpenChange={setShowVersionDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add New Version</DialogTitle>
+            <DialogTitle>新しいバージョンを追加</DialogTitle>
             <DialogDescription>
-              Upload a new version of &quot;{video.title}&quot;. The new version will become active.
+              &quot;{video.title}&quot; の新しいバージョンをアップロードします。追加したバージョンが有効になります。
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 mt-2">
             <div className="space-y-2">
-              <Label>Video URL</Label>
+              <Label>動画URL</Label>
               <div className="relative">
                 <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -537,14 +537,14 @@ export function VideoCard({
                   <CheckCircle2 className="h-4 w-4" />
                   {versionSource.providerId.charAt(0).toUpperCase() +
                     versionSource.providerId.slice(1)}{' '}
-                  video detected
+                  の動画を検出しました
                 </p>
               )}
             </div>
             <div className="space-y-2">
-              <Label>Version Label (optional)</Label>
+              <Label>バージョン名(任意)</Label>
               <Input
-                placeholder="e.g. Final Cut, Review Round 2"
+                placeholder="例: 最終版、レビュー2回目"
                 value={versionLabel}
                 onChange={(e) => setVersionLabel(e.target.value)}
                 disabled={isCreatingVersion}
@@ -556,7 +556,7 @@ export function VideoCard({
               className="w-full"
             >
               {isCreatingVersion && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Add Version {video.currentVersion + 1}
+              バージョン {video.currentVersion + 1} を追加
             </Button>
           </div>
         </DialogContent>
@@ -566,21 +566,20 @@ export function VideoCard({
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete &quot;{video.title}&quot;?</AlertDialogTitle>
+            <AlertDialogTitle>&quot;{video.title}&quot; を削除しますか?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete this video, all its versions, and all comments. This
-              action cannot be undone.
+              この動画とすべてのバージョン、すべてのコメントが完全に削除されます。この操作は元に戻せません。
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>キャンセル</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isDeleting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Delete
+              削除
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

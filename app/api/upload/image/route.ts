@@ -34,14 +34,14 @@ export async function POST(request: NextRequest) {
     // Check Content-Length header BEFORE loading the file
     const contentLength = request.headers.get('content-length');
     if (!contentLength) {
-      return apiErrors.badRequest('Missing Content-Length header');
+      return apiErrors.badRequest('Content-Length ヘッダーがありません');
     }
     const bodySize = parseInt(contentLength, 10);
     if (isNaN(bodySize) || bodySize <= 0) {
-      return apiErrors.badRequest('Invalid Content-Length header');
+      return apiErrors.badRequest('Content-Length ヘッダーが正しくありません');
     }
     if (bodySize > MAX_MULTIPART_BODY_SIZE) {
-      return apiErrors.badRequest('File too large. Maximum size is 10MB.');
+      return apiErrors.badRequest('ファイルが大きすぎます。最大サイズは 10MB です。');
     }
 
     // Rate limit
@@ -53,17 +53,17 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const files = formData.getAll('image');
     if (files.length !== 1) {
-      return apiErrors.badRequest('No image file provided');
+      return apiErrors.badRequest('画像ファイルが指定されていません');
     }
     const file = files[0];
     const videoId = formData.get('videoId');
     const uploadToken = formData.get('uploadToken');
 
     if (!(file instanceof File)) {
-      return apiErrors.badRequest('No image file provided');
+      return apiErrors.badRequest('画像ファイルが指定されていません');
     }
     if (typeof videoId !== 'string' || !videoId.trim()) {
-      return apiErrors.badRequest('videoId is required');
+      return apiErrors.badRequest('videoId が必要です');
     }
 
     const safeVideoId = videoId.trim();
@@ -100,17 +100,17 @@ export async function POST(request: NextRequest) {
     const canCommentWithShareLink =
       shareAccess.canComment && (session?.user?.id ? true : shareAccess.allowGuests);
     if (!canCommentWithMembership && !canCommentWithShareLink) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     if (!session?.user?.id) {
       if (typeof uploadToken !== 'string' || !uploadToken.trim()) {
-        return apiErrors.badRequest('uploadToken is required for guest uploads');
+        return apiErrors.badRequest('ゲストのアップロードには uploadToken が必要です');
       }
 
       const expectedContext = deriveGuestUploadContext(request, shareSession?.token ?? null);
       if (!expectedContext) {
-        return apiErrors.forbidden('Missing trusted client IP header');
+        return apiErrors.forbidden('信頼できるクライアント IP ヘッダーがありません');
       }
 
       const isValidUploadToken = verifyGuestUploadToken(uploadToken.trim(), {
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
         context: expectedContext,
       });
       if (!isValidUploadToken) {
-        return apiErrors.forbidden('Invalid upload token');
+        return apiErrors.forbidden('アップロードトークンが無効です');
       }
 
       const quotaError = await enforceGuestUploadQuota(
@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
 
     // Double-check file size (defense in depth - Content-Length can be spoofed)
     if (file.size > MAX_FILE_SIZE) {
-      return apiErrors.badRequest('File too large. Maximum size is 10MB.');
+      return apiErrors.badRequest('ファイルが大きすぎます。最大サイズは 10MB です。');
     }
 
     // Enforce per-user storage quota before uploading.
@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
         workspaceOwnerId,
         UPLOAD_RESERVATION_PURPOSES.IMAGE
       );
-      return apiErrors.badRequest(`Unsupported image format: ${file.type}`);
+      return apiErrors.badRequest(`対応していない画像形式です: ${file.type}`);
     }
 
     // Convert to buffer
@@ -170,7 +170,7 @@ export async function POST(request: NextRequest) {
         workspaceOwnerId,
         UPLOAD_RESERVATION_PURPOSES.IMAGE
       );
-      return apiErrors.badRequest('Uploaded file content does not match an allowed image type');
+      return apiErrors.badRequest('アップロードされたファイルの内容が許可された画像形式と一致しません');
     }
 
     // Generate unique filename
@@ -204,6 +204,6 @@ export async function POST(request: NextRequest) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error uploading image:', error);
-    return apiErrors.internalError('Failed to upload image');
+    return apiErrors.internalError('画像のアップロードに失敗しました');
   }
 }

@@ -133,7 +133,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         };
 
     if (!access.hasAccess && !shareAccess.hasAccess) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     // Include auth context so the client knows if the viewer is a guest
@@ -224,6 +224,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-cache');
   } catch (error) {
     logError('Error fetching video:', error);
-    return apiErrors.internalError('Failed to fetch video');
+    return apiErrors.internalError('動画の取得に失敗しました');
   }
 }

@@ -13,7 +13,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const session = await auth();
 
     if (!session?.user?.id) {
-      return apiErrors.unauthorized('Authentication required');
+      return apiErrors.unauthorized('認証が必要です');
     }
 
     const { videoId } = await params;
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const access = computeProjectAccess(video.project, userId);
 
     if (!access.hasAccess) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const activeVersion = video.versions[0];
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     logError('Error fetching watch progress:', error);
-    return apiErrors.internalError('Failed to fetch watch progress');
+    return apiErrors.internalError('視聴進捗の取得に失敗しました');
   }
 }
 
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const session = await auth();
 
     if (!session?.user?.id) {
-      return apiErrors.unauthorized('Authentication required');
+      return apiErrors.unauthorized('認証が必要です');
     }
 
     const { videoId } = await params;
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       progress < 0 ||
       progress > MAX_VIDEO_SECONDS
     ) {
-      return apiErrors.badRequest('Invalid progress value');
+      return apiErrors.badRequest('進捗の値が正しくありません');
     }
 
     if (
@@ -103,11 +103,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         duration < 0 ||
         duration > MAX_VIDEO_SECONDS)
     ) {
-      return apiErrors.badRequest('Invalid duration value');
+      return apiErrors.badRequest('再生時間の値が正しくありません');
     }
 
     if (versionId !== undefined && typeof versionId !== 'string') {
-      return apiErrors.badRequest('Invalid versionId');
+      return apiErrors.badRequest('versionId が正しくありません');
     }
 
     // Always load the requested video and validate access before writing progress.
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const access = computeProjectAccess(video.project, userId);
     if (!access.hasAccess) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const targetVersion = video.versions[0];
@@ -172,6 +172,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     logError('Error saving watch progress:', error);
-    return apiErrors.internalError('Failed to save watch progress');
+    return apiErrors.internalError('視聴進捗の保存に失敗しました');
   }
 }

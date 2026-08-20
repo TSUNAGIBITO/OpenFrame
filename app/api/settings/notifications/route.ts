@@ -37,7 +37,7 @@ export async function GET() {
     return withCacheControl(response, 'private, max-age=30, stale-while-revalidate=60');
   } catch (error) {
     logError('Error fetching notification settings:', error);
-    return apiErrors.internalError('Failed to fetch settings');
+    return apiErrors.internalError('設定の取得に失敗しました');
   }
 }
 
@@ -67,10 +67,10 @@ export async function PUT(request: NextRequest) {
 
     // Validate: if enabling Telegram, chatId is required and must be a valid Telegram ID
     if (telegramChatId && !/^-?\d{1,20}$/.test(telegramChatId)) {
-      return apiErrors.badRequest('Invalid Chat ID format');
+      return apiErrors.badRequest('Chat ID の形式が正しくありません');
     }
     if (telegramEnabled && !telegramChatId) {
-      return apiErrors.badRequest('Chat ID is required to enable Telegram notifications');
+      return apiErrors.badRequest('Telegram 通知を有効にするには Chat ID が必要です');
     }
 
     const settings = await db.notificationSetting.upsert({
@@ -104,7 +104,7 @@ export async function PUT(request: NextRequest) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error updating notification settings:', error);
-    return apiErrors.internalError('Failed to update settings');
+    return apiErrors.internalError('設定の更新に失敗しました');
   }
 }
 
@@ -125,13 +125,13 @@ export async function POST(request: NextRequest) {
     if (channel === 'telegram') {
       const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
       if (!telegramBotToken) {
-        return apiErrors.internalError('Telegram bot not configured (TELEGRAM_BOT_TOKEN missing)');
+        return apiErrors.internalError('Telegram ボットが設定されていません(TELEGRAM_BOT_TOKEN がありません)');
       }
       if (!telegramChatId) {
-        return apiErrors.badRequest('Chat ID is required');
+        return apiErrors.badRequest('Chat ID を入力してください');
       }
       if (!/^-?\d{1,20}$/.test(telegramChatId)) {
-        return apiErrors.badRequest('Invalid Chat ID format');
+        return apiErrors.badRequest('Chat ID の形式が正しくありません');
       }
 
       const settingsUrl = `${process.env.NEXTAUTH_URL || ''}/settings`;
@@ -156,7 +156,7 @@ export async function POST(request: NextRequest) {
         const data = await res.json().catch(() => ({}));
         logError('Telegram test failed:', (data as { description?: string }).description);
         return apiErrors.badRequest(
-          'Telegram test failed: check that the Chat ID is correct and the bot has been started'
+          'Telegram のテストに失敗しました。Chat ID が正しいか、ボットが開始されているかを確認してください'
         );
       }
 
@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
       });
 
       if (!user?.email) {
-        return apiErrors.badRequest('No email address on your account');
+        return apiErrors.badRequest('アカウントにメールアドレスが登録されていません');
       }
 
       const smtpHost = process.env.SMTP_HOST;
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
       const smtpPass = process.env.SMTP_PASSWORD;
 
       if (!smtpHost || !smtpUser || !smtpPass) {
-        return apiErrors.internalError('Email service not configured (SMTP settings missing)');
+        return apiErrors.internalError('メールサービスが設定されていません(SMTP 設定がありません)');
       }
 
       const transporter = nodemailer.createTransport({
@@ -202,16 +202,16 @@ export async function POST(request: NextRequest) {
         });
       } catch (emailErr) {
         logError('SMTP test email failed:', emailErr);
-        return apiErrors.internalError('Failed to send test email — check SMTP settings');
+        return apiErrors.internalError('テストメールの送信に失敗しました。SMTP 設定を確認してください。');
       }
 
       const response = successResponse({ message: `Test email sent to ${user.email}` });
       return withCacheControl(response, 'private, no-store');
     }
 
-    return apiErrors.badRequest('Unknown channel');
+    return apiErrors.badRequest('不明なチャネルです');
   } catch (error) {
     logError('Error testing notification:', error);
-    return apiErrors.internalError('Failed to test notification');
+    return apiErrors.internalError('通知テストに失敗しました');
   }
 }

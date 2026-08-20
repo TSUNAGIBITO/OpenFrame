@@ -25,19 +25,19 @@ export async function GET(request: NextRequest) {
 
     const pageRaw = pageParam === null ? 1 : Number(pageParam);
     if (!Number.isSafeInteger(pageRaw) || pageRaw < 1 || pageRaw > MAX_PAGE) {
-      return apiErrors.badRequest('Invalid page. Must be a positive integer.');
+      return apiErrors.badRequest('page が正しくありません。正の整数で指定してください。');
     }
 
     const limitRaw = limitParam === null ? 20 : Number(limitParam);
     if (!Number.isSafeInteger(limitRaw) || limitRaw < 1 || limitRaw > MAX_LIMIT) {
-      return apiErrors.badRequest('Invalid limit. Must be a positive integer between 1 and 100.');
+      return apiErrors.badRequest('limit が正しくありません。1〜100 の正の整数で指定してください。');
     }
 
     const page = pageRaw;
     const limit = limitRaw;
     const skip = (page - 1) * limit;
     if (!Number.isSafeInteger(skip) || skip > MAX_OFFSET) {
-      return apiErrors.badRequest('Invalid page range. Offset must be 10000 or less.');
+      return apiErrors.badRequest('ページ範囲が正しくありません。オフセットは 10000 以下にしてください。');
     }
 
     const where = {
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
     return withCacheControl(response, 'private, max-age=60, stale-while-revalidate=120');
   } catch (error) {
     logError('Error fetching workspaces:', error);
-    return apiErrors.internalError('Failed to fetch workspaces');
+    return apiErrors.internalError('ワークスペースの取得に失敗しました');
   }
 }
 
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     const { name, description } = body;
 
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
-      return apiErrors.badRequest('Workspace name is required');
+      return apiErrors.badRequest('ワークスペース名を入力してください');
     }
 
     // Generate slug
@@ -147,6 +147,6 @@ export async function POST(request: NextRequest) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error creating workspace:', error);
-    return apiErrors.internalError('Failed to create workspace');
+    return apiErrors.internalError('ワークスペースの作成に失敗しました');
   }
 }

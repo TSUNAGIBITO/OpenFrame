@@ -147,7 +147,7 @@ export const VideoPageHeader = memo(function VideoPageHeader({
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors shrink-0"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
-          Back
+          戻る
         </Link>
         <Separator orientation="vertical" className="h-5 shrink-0" />
         <div className="hidden sm:flex min-w-0 items-center gap-2">
@@ -164,7 +164,7 @@ export const VideoPageHeader = memo(function VideoPageHeader({
               <Badge variant="secondary" className="mr-2">
                 v{activeVersion.versionNumber}
               </Badge>
-              {activeVersion.versionLabel || `Version ${activeVersion.versionNumber}`}
+              {activeVersion.versionLabel || `バージョン ${activeVersion.versionNumber}`}
               <ChevronDown className="h-4 w-4 ml-2" />
             </Button>
           </DropdownMenuTrigger>
@@ -177,9 +177,9 @@ export const VideoPageHeader = memo(function VideoPageHeader({
                 >
                   v{version.versionNumber}
                 </Badge>
-                {version.versionLabel || `Version ${version.versionNumber}`}
+                {version.versionLabel || `バージョン ${version.versionNumber}`}
                 <span className="ml-auto text-xs text-muted-foreground">
-                  {version._count.comments} comments
+                  {version._count.comments} 件のコメント
                 </span>
               </DropdownMenuItem>
             ))}
@@ -191,7 +191,7 @@ export const VideoPageHeader = memo(function VideoPageHeader({
                   onClick={onDeleteCurrentVersionClick}
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
-                  Delete Current Version
+                  現在のバージョンを削除
                 </DropdownMenuItem>
               </>
             )}
@@ -225,7 +225,7 @@ export const VideoPageHeader = memo(function VideoPageHeader({
                 className="hidden sm:inline-flex"
               >
                 <Plus className="h-4 w-4 mr-1" />
-                New Version
+                新規バージョン
               </Button>
             ) : null}
 
@@ -236,10 +236,10 @@ export const VideoPageHeader = memo(function VideoPageHeader({
               className="hidden sm:inline-flex"
             >
               <ListChecks className="h-4 w-4 mr-1" />
-              Approvals
+              承認
               {hasPendingApprovalRequest ? (
                 <Badge variant="default" className="ml-2 hidden xl:inline-flex">
-                  Pending
+                  保留中
                 </Badge>
               ) : null}
             </Button>
@@ -252,7 +252,7 @@ export const VideoPageHeader = memo(function VideoPageHeader({
                 className="hidden sm:inline-flex"
               >
                 <GitCompareArrows className="h-4 w-4 mr-1" />
-                Compare
+                比較
               </Button>
             )}
 
@@ -294,13 +294,13 @@ export const VideoPageHeader = memo(function VideoPageHeader({
                       <DropdownMenuItem asChild>
                         <Link href={`/projects/${projectId}/videos/${videoId}/share`}>
                           <Share2 className="h-4 w-4 mr-2" />
-                          Share Video
+                          動画を共有
                         </Link>
                       </DropdownMenuItem>
                     ) : (
                       <DropdownMenuItem disabled>
                         <Share2 className="h-4 w-4 mr-2" />
-                        Share Video
+                        動画を共有
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem
@@ -308,7 +308,7 @@ export const VideoPageHeader = memo(function VideoPageHeader({
                       disabled={!canRequestApproval}
                     >
                       <ShieldCheck className="h-4 w-4 mr-2" />
-                      Request Approval
+                      承認を依頼
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

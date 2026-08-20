@@ -80,12 +80,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     if (!isS3VideoUploadsEnabled()) {
-      return apiErrors.badRequest('S3 video uploads are disabled by this host');
+      return apiErrors.badRequest('このホストでは S3 への動画アップロードが無効になっています');
     }
 
     const project = await getProjectWithEditAccess(projectId, session.user.id);
     if (!project) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const body = await request.json().catch(() => null);
@@ -94,17 +94,17 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const sizeBytesRaw = body?.sizeBytes;
 
     if (!fileName) {
-      return apiErrors.badRequest('fileName is required');
+      return apiErrors.badRequest('fileName が必要です');
     }
 
     let sizeBytes: bigint;
     try {
       sizeBytes = BigInt(sizeBytesRaw);
       if (sizeBytes <= BigInt(0)) {
-        return apiErrors.badRequest('sizeBytes must be a positive integer');
+        return apiErrors.badRequest('sizeBytes は正の整数である必要があります');
       }
     } catch {
-      return apiErrors.badRequest('sizeBytes must be a positive integer');
+      return apiErrors.badRequest('sizeBytes は正の整数である必要があります');
     }
 
     const maxBytes = await getMaxVideoUploadBytesForUser(project.workspace.ownerId);
@@ -114,12 +114,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const contentType = resolveVideoContentType(fileName, contentTypeInput);
     if (!contentType) {
-      return apiErrors.badRequest('Unsupported video format');
+      return apiErrors.badRequest('対応していない動画形式です');
     }
 
     const ext = getVideoExtensionFromMime(contentType);
     if (!ext) {
-      return apiErrors.badRequest('Unsupported video format');
+      return apiErrors.badRequest('対応していない動画形式です');
     }
 
     const quotaError = await enforceStorageQuota(
@@ -197,7 +197,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         UPLOAD_RESERVATION_PURPOSES.R2_VIDEO
       );
       logError('Failed to create presigned video upload URL:', error);
-      return apiErrors.internalError('Failed to initialize video upload');
+      return apiErrors.internalError('動画アップロードの初期化に失敗しました');
     }
 
     const uploadJti = randomUUID();
@@ -241,7 +241,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error initializing R2 video upload:', error);
-    return apiErrors.internalError('Failed to initialize upload');
+    return apiErrors.internalError('アップロードの初期化に失敗しました');
   }
 }
 
@@ -259,12 +259,12 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     if (!isS3VideoUploadsEnabled()) {
-      return apiErrors.badRequest('S3 video uploads are disabled by this host');
+      return apiErrors.badRequest('このホストでは S3 への動画アップロードが無効になっています');
     }
 
     const project = await getProjectWithEditAccess(projectId, session.user.id);
     if (!project) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const body = await request.json().catch(() => null);
@@ -274,12 +274,12 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       typeof body?.thumbnailObjectKey === 'string' ? body.thumbnailObjectKey.trim() : '';
 
     if (!objectKey || !uploadToken) {
-      return apiErrors.badRequest('objectKey and uploadToken are required');
+      return apiErrors.badRequest('objectKey と uploadToken が必要です');
     }
 
     const tokenPayload = parseR2UploadToken(uploadToken);
     if (!tokenPayload) {
-      return apiErrors.forbidden('Invalid upload token');
+      return apiErrors.forbidden('アップロードトークンが無効です');
     }
 
     const isValidUploadToken = verifyR2UploadToken(uploadToken, {
@@ -290,7 +290,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       tokenId: tokenPayload.jti,
     });
     if (!isValidUploadToken) {
-      return apiErrors.forbidden('Invalid upload token');
+      return apiErrors.forbidden('アップロードトークンが無効です');
     }
 
     const uploadSession = await db.videoUploadSession.findFirst({
@@ -312,11 +312,11 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       },
     });
     if (!uploadSession) {
-      return apiErrors.forbidden('Invalid upload token');
+      return apiErrors.forbidden('アップロードトークンが無効です');
     }
 
     if (thumbnailObjectKey && thumbnailObjectKey !== uploadSession.thumbnailObjectKey) {
-      return apiErrors.badRequest('Invalid thumbnail object key');
+      return apiErrors.badRequest('サムネイルのオブジェクトキーが正しくありません');
     }
 
     const cancelled = await db.videoUploadSession.updateMany({
@@ -330,7 +330,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       },
     });
     if (cancelled.count !== 1) {
-      return apiErrors.forbidden('Invalid upload token');
+      return apiErrors.forbidden('アップロードトークンが無効です');
     }
 
     try {
@@ -357,6 +357,6 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error cleaning up pending R2 video upload:', error);
-    return apiErrors.internalError('Failed to cleanup pending upload');
+    return apiErrors.internalError('保留中のアップロードのクリーンアップに失敗しました');
   }
 }

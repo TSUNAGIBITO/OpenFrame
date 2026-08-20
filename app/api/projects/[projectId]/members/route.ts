@@ -41,7 +41,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const isAdmin = project.members[0]?.role === ProjectMemberRole.ADMIN;
 
     if (!access.hasAccess || (!isOwner && !isMember)) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const now = new Date();
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error fetching project members:', error);
-    return apiErrors.internalError('Failed to fetch members');
+    return apiErrors.internalError('メンバーの取得に失敗しました');
   }
 }
 
@@ -117,19 +117,19 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const isAdmin = project.members[0]?.role === ProjectMemberRole.ADMIN;
 
     if (!access.canEdit || (!isOwner && !isAdmin)) {
-      return apiErrors.forbidden('Only project owners and admins can invite members');
+      return apiErrors.forbidden('メンバーを招待できるのはプロジェクトのオーナーと管理者のみです');
     }
 
     const body = await request.json();
     const { email, role } = body;
 
     if (!email || typeof email !== 'string') {
-      return apiErrors.badRequest('Email is required');
+      return apiErrors.badRequest('メールアドレスを入力してください');
     }
 
     const normalizedEmail = normalizeEmail(email);
     if (!isValidEmailAddress(normalizedEmail)) {
-      return apiErrors.validationError('Invalid email format');
+      return apiErrors.validationError('メールアドレスの形式が正しくありません');
     }
 
     // Validate role
@@ -143,7 +143,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (userToInvite?.id === project.ownerId) {
-      return apiErrors.badRequest('Cannot invite the project owner as a member');
+      return apiErrors.badRequest('プロジェクトのオーナーをメンバーとして招待することはできません');
     }
 
     if (userToInvite) {
@@ -152,7 +152,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       });
 
       if (existingMember) {
-        return apiErrors.conflict('User is already a member of this project');
+        return apiErrors.conflict('このユーザーはすでにプロジェクトのメンバーです');
       }
     }
 
@@ -178,6 +178,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error inviting project member:', error);
-    return apiErrors.internalError('Failed to invite member');
+    return apiErrors.internalError('メンバーの招待に失敗しました');
   }
 }

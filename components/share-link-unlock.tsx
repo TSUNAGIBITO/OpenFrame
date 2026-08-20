@@ -32,14 +32,14 @@ export function ShareLinkUnlock({ videoId }: ShareLinkUnlockProps) {
 
       if (!response.ok) {
         const payload = (await response.json().catch(() => null)) as { error?: string } | null;
-        setError(payload?.error || 'Invalid password');
+        setError(payload?.error || 'パスワードが正しくありません');
         return;
       }
 
       router.replace(`/watch/${videoId}`);
       router.refresh();
     } catch {
-      setError('Failed to verify password');
+      setError('パスワードを確認できませんでした');
     } finally {
       setIsSubmitting(false);
     }
@@ -52,20 +52,20 @@ export function ShareLinkUnlock({ videoId }: ShareLinkUnlockProps) {
           <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 mb-3">
             <Lock className="h-6 w-6 text-primary" />
           </div>
-          <h1 className="text-xl font-semibold">Password Required</h1>
+          <h1 className="text-xl font-semibold">パスワードが必要です</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Enter the password to continue to the shared video.
+            共有された動画を見るにはパスワードを入力してください。
           </p>
         </div>
 
         <div className="space-y-3">
           <label htmlFor="share-link-password" className="sr-only">
-            Password
+            パスワード
           </label>
           <Input
             id="share-link-password"
             type="password"
-            placeholder="Password"
+            placeholder="パスワード"
             value={password}
             maxLength={128}
             onChange={(event) => setPassword(event.target.value)}
@@ -81,10 +81,10 @@ export function ShareLinkUnlock({ videoId }: ShareLinkUnlockProps) {
             {isSubmitting ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                <span className="sr-only">Unlocking</span>
+                <span className="sr-only">解除中</span>
               </>
             ) : (
-              'Continue'
+              '続ける'
             )}
           </Button>
 
@@ -92,11 +92,10 @@ export function ShareLinkUnlock({ videoId }: ShareLinkUnlockProps) {
         </div>
 
         <p className="text-xs text-muted-foreground text-center mt-4">
-          Or{' '}
+          または、アカウントで{' '}
           <Link href="/login" className="underline hover:text-foreground">
-            sign in
-          </Link>{' '}
-          with your account
+            ログイン
+          </Link>
         </p>
       </div>
     </div>

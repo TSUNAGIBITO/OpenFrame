@@ -41,18 +41,18 @@ export function GuestGate({ children }: { children: ReactNode }) {
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
             <User className="h-6 w-6 text-primary" />
           </div>
-          <h1 className="text-xl font-semibold mb-1">Welcome to OpenFrame</h1>
+          <h1 className="text-xl font-semibold mb-1">つなぐレビューへようこそ</h1>
           <p className="text-sm text-muted-foreground">
-            Enter your name to view and comment on this project
+            このプロジェクトを閲覧・コメントするにはお名前を入力してください
           </p>
         </div>
         <div className="space-y-3">
           <label htmlFor="guest-gate-name" className="sr-only">
-            Your name
+            お名前
           </label>
           <Input
             id="guest-gate-name"
-            placeholder="Your name"
+            placeholder="お名前"
             value={guestName}
             maxLength={100}
             onChange={(e) => setGuestName(e.target.value)}
@@ -62,15 +62,14 @@ export function GuestGate({ children }: { children: ReactNode }) {
             autoFocus
           />
           <Button className="w-full" disabled={!guestName.trim()} onClick={confirm}>
-            Continue
+            続ける
           </Button>
         </div>
         <p className="text-xs text-muted-foreground text-center mt-4">
-          Or{' '}
+          または、アカウントで{' '}
           <Link href="/login" className="underline hover:text-foreground">
-            sign in
-          </Link>{' '}
-          with your account
+            ログイン
+          </Link>
         </p>
       </div>
     </div>

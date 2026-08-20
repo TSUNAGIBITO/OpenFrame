@@ -31,7 +31,7 @@ export async function GET(
     const { filename } = await params;
 
     if (!SAFE_VIDEO_BASENAME.test(filename)) {
-      return apiErrors.badRequest('Invalid filename');
+      return apiErrors.badRequest('ファイル名が正しくありません');
     }
 
     const originalUrl = `/api/upload/video/${filename}`;
@@ -75,12 +75,12 @@ export async function GET(
       uniqueVideos.set(asset.video.id, asset.video);
     }
     if (uniqueVideos.size > 1) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const video = uniqueVideos.values().next().value ?? null;
     if (!video) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const access = await checkProjectAccess(video.project, session?.user?.id);
@@ -104,7 +104,7 @@ export async function GET(
           };
 
       if (!shareAccess.hasAccess) {
-        return apiErrors.forbidden('Access denied');
+        return apiErrors.forbidden('アクセスが拒否されました');
       }
     }
 
@@ -114,10 +114,10 @@ export async function GET(
       key,
       fallbackContentType: getVideoContentType(filename),
       cacheControl: 'private, max-age=3600',
-      internalErrorMessage: 'Failed to load video',
+      internalErrorMessage: '動画の読み込みに失敗しました',
     });
   } catch (error) {
     logError('Error serving video upload:', error);
-    return apiErrors.internalError('Failed to load video');
+    return apiErrors.internalError('動画の読み込みに失敗しました');
   }
 }

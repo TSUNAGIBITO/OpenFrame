@@ -6,13 +6,13 @@ export const MAX_IMAGE_UPLOAD_BYTES = 10 * 1024 * 1024;
 
 export async function validateImageFile(file: File): Promise<string | null> {
   if (file.size > MAX_IMAGE_UPLOAD_BYTES) {
-    return 'Image must be less than 10MB';
+    return '画像は10MB未満にしてください';
   }
 
   const header = await file.slice(0, 12).arrayBuffer();
   const detected = detectImageMime(new Uint8Array(header));
   if (!detected) {
-    return 'Unsupported image format. Allowed: JPEG, PNG, GIF, WEBP';
+    return '対応していない画像形式です。対応形式: JPEG, PNG, GIF, WEBP';
   }
 
   return null;

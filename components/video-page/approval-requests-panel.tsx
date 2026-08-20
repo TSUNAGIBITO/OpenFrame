@@ -39,7 +39,7 @@ function statusBadge(status: ApprovalRequest['status']) {
     return (
       <Badge variant="secondary" className="gap-1">
         <Clock3 className="h-3 w-3" />
-        Pending
+        保留中
       </Badge>
     );
   }
@@ -47,7 +47,7 @@ function statusBadge(status: ApprovalRequest['status']) {
     return (
       <Badge className="gap-1 bg-emerald-600 hover:bg-emerald-600">
         <CheckCircle2 className="h-3 w-3" />
-        Approved
+        承認済み
       </Badge>
     );
   }
@@ -55,14 +55,14 @@ function statusBadge(status: ApprovalRequest['status']) {
     return (
       <Badge variant="destructive" className="gap-1">
         <XCircle className="h-3 w-3" />
-        Rejected
+        却下
       </Badge>
     );
   }
   return (
     <Badge variant="outline" className="gap-1">
       <ShieldX className="h-3 w-3" />
-      Canceled
+      取消
     </Badge>
   );
 }
@@ -71,10 +71,10 @@ function decisionLabel(
   requestStatus: ApprovalRequest['status'],
   decisionStatus: 'PENDING' | 'APPROVED' | 'REJECTED'
 ) {
-  if (decisionStatus === 'APPROVED') return 'Approved';
-  if (decisionStatus === 'REJECTED') return 'Rejected';
-  if (requestStatus === 'CANCELED') return 'Canceled';
-  return 'Pending';
+  if (decisionStatus === 'APPROVED') return '承認済み';
+  if (decisionStatus === 'REJECTED') return '却下';
+  if (requestStatus === 'CANCELED') return '取消';
+  return '保留中';
 }
 
 export function ApprovalRequestsPanel({
@@ -128,15 +128,15 @@ export function ApprovalRequestsPanel({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-xl p-0">
         <SheetHeader>
-          <SheetTitle>Approvals</SheetTitle>
+          <SheetTitle>承認</SheetTitle>
           <SheetDescription>
-            Review request history and respond to pending approvals.
+            依頼の履歴を確認し、保留中の承認に対応します。
           </SheetDescription>
         </SheetHeader>
 
         <div className="px-4 pb-4 space-y-3 overflow-y-auto">
           <div className="flex items-center justify-between">
-            <p className="text-xs text-muted-foreground">{requests.length} request(s)</p>
+            <p className="text-xs text-muted-foreground">{requests.length}件の依頼</p>
             <div className="flex items-center gap-2">
               <Button
                 size="sm"
@@ -144,7 +144,7 @@ export function ApprovalRequestsPanel({
                 onClick={onOpenApprovalRequest}
                 disabled={!canRequestApproval || !!pendingRequest}
               >
-                Request Approval
+                承認を依頼
               </Button>
               <Button size="sm" variant="ghost" onClick={onRefresh} disabled={isLoadingRequests}>
                 {isLoadingRequests ? (
@@ -164,15 +164,15 @@ export function ApprovalRequestsPanel({
 
           {pendingRequest && myPendingDecision ? (
             <div className="rounded-md border p-3 space-y-2">
-              <p className="text-sm font-medium">Your response is required</p>
+              <p className="text-sm font-medium">あなたの対応が必要です</p>
               <p className="text-xs text-muted-foreground">
-                {pendingRequest.requestedBy.name || pendingRequest.requestedBy.email || 'A user'}{' '}
-                requested approval.
+                {pendingRequest.requestedBy.name || pendingRequest.requestedBy.email || 'ユーザー'}{' '}
+                さんが承認を依頼しました。
               </p>
               <Textarea
                 value={decisionNote}
                 onChange={(event) => setDecisionNote(event.target.value)}
-                placeholder="Optional note"
+                placeholder="メモ（任意）"
                 rows={3}
                 maxLength={2000}
               />
@@ -183,7 +183,7 @@ export function ApprovalRequestsPanel({
                   disabled={isSubmittingDecision}
                 >
                   {isSubmittingDecision ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                  Approve
+                  承認
                 </Button>
                 <Button
                   size="sm"
@@ -192,7 +192,7 @@ export function ApprovalRequestsPanel({
                   disabled={isSubmittingDecision}
                 >
                   {isSubmittingDecision ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                  Reject
+                  却下
                 </Button>
               </div>
             </div>
@@ -207,7 +207,7 @@ export function ApprovalRequestsPanel({
                 disabled={isCancelingRequest}
               >
                 {isCancelingRequest ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                Cancel Pending Request
+                保留中の依頼を取消
               </Button>
             </div>
           ) : null}
@@ -215,15 +215,15 @@ export function ApprovalRequestsPanel({
           <div className="space-y-2">
             {requests.length === 0 ? (
               <p className="text-sm text-muted-foreground py-4 text-center">
-                No approval requests yet.
+                まだ承認依頼はありません。
               </p>
             ) : (
               requests.map((request) => (
                 <div key={request.id} className="rounded-md border p-3 space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-sm font-medium">
-                      Requested by{' '}
-                      {request.requestedBy.name || request.requestedBy.email || 'Unknown'}
+                      依頼者:{' '}
+                      {request.requestedBy.name || request.requestedBy.email || '不明'}
                     </p>
                     {statusBadge(request.status)}
                   </div>
@@ -242,7 +242,7 @@ export function ApprovalRequestsPanel({
                         className="flex items-center justify-between gap-2 text-xs"
                       >
                         <span className="truncate">
-                          {decision.approver.name || decision.approver.email || 'Unknown'}
+                          {decision.approver.name || decision.approver.email || '不明'}
                         </span>
                         <span className="text-muted-foreground">
                           {decisionLabel(request.status, decision.status)}

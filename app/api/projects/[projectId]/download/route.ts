@@ -26,7 +26,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const includeAssets = request.nextUrl.searchParams.get('assets') === '1';
 
     if (requestedVideoIds && requestedVideoIds.length === 0) {
-      return apiErrors.badRequest('At least one video must be selected for download');
+      return apiErrors.badRequest('ダウンロードする動画を 1 本以上選択してください');
     }
 
     const project = await db.project.findUnique({
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     const access = await checkProjectAccess(project, session?.user?.id);
     if (!canDownloadProjectMedia(project, access)) {
-      return apiErrors.forbidden('Project downloads are disabled for viewers');
+      return apiErrors.forbidden('閲覧者はプロジェクトのダウンロードを利用できません');
     }
 
     const videos = await db.video.findMany({
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       const foundIds = new Set(videos.map((video) => video.id));
       const missing = requestedVideoIds.filter((id) => !foundIds.has(id));
       if (missing.length > 0) {
-        return apiErrors.badRequest('One or more selected videos do not belong to this project');
+        return apiErrors.badRequest('選択した動画の中にこのプロジェクトに属さないものがあります');
       }
     }
 
@@ -107,6 +107,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error creating project download manifest:', error);
-    return apiErrors.internalError('Failed to prepare project download');
+    return apiErrors.internalError('プロジェクトのダウンロード準備に失敗しました');
   }
 }

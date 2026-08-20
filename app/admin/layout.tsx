@@ -23,28 +23,28 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               className="flex items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium hover:bg-muted/50"
             >
               <LayoutDashboard className="h-4 w-4" />
-              Dashboard
+              ダッシュボード
             </Link>
             <Link
               href="/admin/users"
               className="flex items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium hover:bg-muted/50"
             >
               <Users className="h-4 w-4" />
-              Users
+              ユーザー
             </Link>
             <Link
               href="/admin/feedback"
               className="flex items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium hover:bg-muted/50"
             >
               <MessageSquareQuote className="h-4 w-4" />
-              Feedback
+              フィードバック
             </Link>
             <Link
               href="/admin/growth"
               className="flex items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium hover:bg-muted/50"
             >
               <TrendingUp className="h-4 w-4" />
-              Growth
+              グロース
             </Link>
           </nav>
         </div>
@@ -57,28 +57,28 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted/50 transition-colors"
               >
                 <LayoutDashboard className="h-4 w-4" />
-                Dashboard
+                ダッシュボード
               </Link>
               <Link
                 href="/admin/users"
                 className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted/50 transition-colors"
               >
                 <Users className="h-4 w-4" />
-                Users
+                ユーザー
               </Link>
               <Link
                 href="/admin/feedback"
                 className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted/50 transition-colors"
               >
                 <MessageSquareQuote className="h-4 w-4" />
-                Feedback
+                フィードバック
               </Link>
               <Link
                 href="/admin/growth"
                 className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted/50 transition-colors"
               >
                 <TrendingUp className="h-4 w-4" />
-                Growth
+                グロース
               </Link>
             </nav>
           </div>

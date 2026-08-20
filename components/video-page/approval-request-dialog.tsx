@@ -71,13 +71,13 @@ export function ApprovalRequestDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Request Approval</DialogTitle>
-          <DialogDescription>Select one or more approvers for this version.</DialogDescription>
+          <DialogTitle>承認を依頼</DialogTitle>
+          <DialogDescription>このバージョンの承認者を1名以上選択してください。</DialogDescription>
         </DialogHeader>
 
         {isBlockedByPendingRequest ? (
           <div className="rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-700 dark:text-amber-300">
-            A pending approval request already exists for this version.
+            このバージョンには保留中の承認依頼がすでに存在します。
           </div>
         ) : null}
 
@@ -90,7 +90,7 @@ export function ApprovalRequestDialog({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <p className="text-xs text-muted-foreground">
-              Approvers ({selectedApproverIds.length} selected)
+              承認者（{selectedApproverIds.length}名選択中）
             </p>
             <Button
               size="sm"
@@ -98,13 +98,13 @@ export function ApprovalRequestDialog({
               onClick={onRefreshCandidates}
               disabled={isLoadingCandidates}
             >
-              {isLoadingCandidates ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Refresh'}
+              {isLoadingCandidates ? <Loader2 className="h-4 w-4 animate-spin" /> : '更新'}
             </Button>
           </div>
           <div className="max-h-56 overflow-y-auto rounded-md border p-2 space-y-1">
             {selectableCandidates.length === 0 ? (
               <p className="text-sm text-muted-foreground px-2 py-3">
-                No eligible approvers found.
+                対象となる承認者が見つかりません。
               </p>
             ) : (
               selectableCandidates.map((candidate) => {
@@ -127,17 +127,17 @@ export function ApprovalRequestDialog({
                         </Avatar>
                         <div className="min-w-0">
                           <p className="text-sm font-medium truncate">
-                            {candidate.name || 'Unnamed'}
+                            {candidate.name || '名前未設定'}
                           </p>
                           <p className="text-xs text-muted-foreground truncate">
-                            {candidate.email || 'No email'}
+                            {candidate.email || 'メールアドレスなし'}
                           </p>
                         </div>
                       </div>
                       {selected ? (
                         <Badge variant="default" className="gap-1">
                           <Check className="h-3 w-3" />
-                          Selected
+                          選択中
                         </Badge>
                       ) : null}
                     </div>
@@ -149,11 +149,11 @@ export function ApprovalRequestDialog({
         </div>
 
         <div className="space-y-2">
-          <p className="text-xs text-muted-foreground">Message (optional)</p>
+          <p className="text-xs text-muted-foreground">メッセージ（任意）</p>
           <Textarea
             value={message}
             onChange={(event) => setMessage(event.target.value)}
-            placeholder="Include context for the approvers..."
+            placeholder="承認者への補足を入力..."
             rows={3}
             maxLength={2000}
             disabled={isBlockedByPendingRequest}
@@ -168,7 +168,7 @@ export function ApprovalRequestDialog({
             }
           >
             {isSubmittingRequest ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-            Create Request
+            依頼を作成
           </Button>
         </DialogFooter>
       </DialogContent>

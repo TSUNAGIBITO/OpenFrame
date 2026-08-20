@@ -112,7 +112,7 @@ function getOrderBy(sortBy: SortBy, sortDirection: SortDirection): unknown {
 }
 
 export const metadata: Metadata = {
-  title: 'Feedback | Admin',
+  title: 'フィードバック | 管理',
 };
 
 export default async function AdminFeedbackPage({
@@ -277,24 +277,24 @@ export default async function AdminFeedbackPage({
   return (
     <div className="flex-1 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-3xl font-bold tracking-tight">Feedback & Reviews</h2>
+        <h2 className="text-3xl font-bold tracking-tight">フィードバック・レビュー</h2>
       </div>
 
       <div className="flex flex-wrap gap-2">
         <Button variant={typeFilter === 'ALL' ? 'default' : 'outline'} size="sm" asChild>
-          <Link href={buildFilterHref('ALL', statusFilter)}>All Types</Link>
+          <Link href={buildFilterHref('ALL', statusFilter)}>すべての種類</Link>
         </Button>
         <Button variant={typeFilter === 'FEEDBACK' ? 'default' : 'outline'} size="sm" asChild>
-          <Link href={buildFilterHref('FEEDBACK', statusFilter)}>Feedback</Link>
+          <Link href={buildFilterHref('FEEDBACK', statusFilter)}>フィードバック</Link>
         </Button>
         <Button variant={typeFilter === 'REVIEW' ? 'default' : 'outline'} size="sm" asChild>
-          <Link href={buildFilterHref('REVIEW', statusFilter)}>Reviews</Link>
+          <Link href={buildFilterHref('REVIEW', statusFilter)}>レビュー</Link>
         </Button>
       </div>
 
       <div className="flex flex-wrap gap-2">
         <Button variant={statusFilter === 'ALL' ? 'default' : 'outline'} size="sm" asChild>
-          <Link href={buildFilterHref(typeFilter, 'ALL')}>All Statuses</Link>
+          <Link href={buildFilterHref(typeFilter, 'ALL')}>すべてのステータス</Link>
         </Button>
         {(['NEW', 'IN_REVIEW', 'APPROVED', 'REJECTED', 'RESOLVED'] as const).map((status) => (
           <Button
@@ -310,8 +310,8 @@ export default async function AdminFeedbackPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>Submissions</CardTitle>
-          <CardDescription>{totalEntries} submission(s) found.</CardDescription>
+          <CardTitle>投稿</CardTitle>
+          <CardDescription>{totalEntries}件の投稿が見つかりました。</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="rounded-md border">
@@ -323,7 +323,7 @@ export default async function AdminFeedbackPage({
                       href={buildSortHref('submittedAt')}
                       className="inline-flex items-center gap-1 hover:underline"
                     >
-                      Submitted
+                      投稿日時
                       <span className="text-xs">
                         {getSortIndicator('submittedAt', sortBy, sortDirection)}
                       </span>
@@ -334,7 +334,7 @@ export default async function AdminFeedbackPage({
                       href={buildSortHref('user')}
                       className="inline-flex items-center gap-1 hover:underline"
                     >
-                      User
+                      ユーザー
                       <span className="text-xs">
                         {getSortIndicator('user', sortBy, sortDirection)}
                       </span>
@@ -345,21 +345,21 @@ export default async function AdminFeedbackPage({
                       href={buildSortHref('type')}
                       className="inline-flex items-center gap-1 hover:underline"
                     >
-                      Type
+                      種類
                       <span className="text-xs">
                         {getSortIndicator('type', sortBy, sortDirection)}
                       </span>
                     </Link>
                   </TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Message</TableHead>
-                  <TableHead className="text-center">Screenshot</TableHead>
+                  <TableHead>タイトル</TableHead>
+                  <TableHead>メッセージ</TableHead>
+                  <TableHead className="text-center">スクリーンショット</TableHead>
                   <TableHead className="text-center">
                     <Link
                       href={buildSortHref('rating')}
                       className="inline-flex items-center justify-center gap-1 hover:underline"
                     >
-                      Rating
+                      評価
                       <span className="text-xs">
                         {getSortIndicator('rating', sortBy, sortDirection)}
                       </span>
@@ -370,7 +370,7 @@ export default async function AdminFeedbackPage({
                       href={buildSortHref('status')}
                       className="inline-flex items-center justify-center gap-1 hover:underline"
                     >
-                      Status
+                      ステータス
                       <span className="text-xs">
                         {getSortIndicator('status', sortBy, sortDirection)}
                       </span>
@@ -381,7 +381,7 @@ export default async function AdminFeedbackPage({
                       href={buildSortHref('allowShowcase')}
                       className="inline-flex items-center justify-center gap-1 hover:underline"
                     >
-                      Consent
+                      掲載許可
                       <span className="text-xs">
                         {getSortIndicator('allowShowcase', sortBy, sortDirection)}
                       </span>
@@ -392,38 +392,38 @@ export default async function AdminFeedbackPage({
                       href={buildSortHref('showOnLanding')}
                       className="inline-flex items-center justify-center gap-1 hover:underline"
                     >
-                      Landing
+                      LP掲載
                       <span className="text-xs">
                         {getSortIndicator('showOnLanding', sortBy, sortDirection)}
                       </span>
                     </Link>
                   </TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="text-right">操作</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {paginatedEntries.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={11} className="h-24 text-center">
-                      No submissions found.
+                      投稿が見つかりません。
                     </TableCell>
                   </TableRow>
                 ) : (
                   paginatedEntries.map((entry) => (
                     <TableRow key={entry.id}>
                       <TableCell className="whitespace-nowrap text-xs">
-                        {format(new Date(entry.createdAt), 'MMM dd, yyyy HH:mm')}
+                        {format(new Date(entry.createdAt), 'yyyy年MM月dd日 HH:mm')}
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-col">
-                          <span className="font-medium">{entry.user.name || 'Anonymous'}</span>
+                          <span className="font-medium">{entry.user.name || '匿名'}</span>
                           <span className="text-xs text-muted-foreground">{entry.user.email}</span>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-col gap-1">
                           <Badge variant="outline">
-                            {entry.type === 'FEEDBACK' ? 'Feedback' : 'Review'}
+                            {entry.type === 'FEEDBACK' ? 'フィードバック' : 'レビュー'}
                           </Badge>
                           {entry.category && (
                             <Badge variant="secondary" className="w-fit">
@@ -439,10 +439,7 @@ export default async function AdminFeedbackPage({
                       <TableCell className="text-center">
                         {entry.screenshots.length > 0 || entry.screenshotUrl ? (
                           <Link href={`/admin/feedback/${entry.id}`} className="text-xs underline">
-                            {entry.screenshots.length || (entry.screenshotUrl ? 1 : 0)} image
-                            {(entry.screenshots.length || (entry.screenshotUrl ? 1 : 0)) > 1
-                              ? 's'
-                              : ''}
+                            {entry.screenshots.length || (entry.screenshotUrl ? 1 : 0)}枚
                           </Link>
                         ) : (
                           '-'
@@ -453,15 +450,15 @@ export default async function AdminFeedbackPage({
                         <Badge variant="outline">{entry.status}</Badge>
                       </TableCell>
                       <TableCell className="text-center">
-                        {entry.allowShowcase ? 'Yes' : 'No'}
+                        {entry.allowShowcase ? 'あり' : 'なし'}
                       </TableCell>
                       <TableCell className="text-center">
-                        {entry.showOnLanding ? 'Yes' : 'No'}
+                        {entry.showOnLanding ? 'あり' : 'なし'}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
                           <Button variant="outline" size="sm" asChild>
-                            <Link href={`/admin/feedback/${entry.id}`}>Open</Link>
+                            <Link href={`/admin/feedback/${entry.id}`}>開く</Link>
                           </Button>
                           <DeleteFeedbackButton
                             feedbackId={entry.id}
@@ -481,10 +478,10 @@ export default async function AdminFeedbackPage({
           {totalPages > 1 && (
             <div className="flex items-center justify-end gap-2 py-4">
               <Button variant="outline" size="sm" disabled={page <= 1} asChild={page > 1}>
-                {page > 1 ? <Link href={buildPageHref(page - 1)}>Previous</Link> : 'Previous'}
+                {page > 1 ? <Link href={buildPageHref(page - 1)}>前へ</Link> : '前へ'}
               </Button>
               <span className="text-sm font-medium">
-                Page {page} of {totalPages}
+                {totalPages}ページ中{page}ページ
               </span>
               <Button
                 variant="outline"
@@ -492,7 +489,7 @@ export default async function AdminFeedbackPage({
                 disabled={page >= totalPages}
                 asChild={page < totalPages}
               >
-                {page < totalPages ? <Link href={buildPageHref(page + 1)}>Next</Link> : 'Next'}
+                {page < totalPages ? <Link href={buildPageHref(page + 1)}>次へ</Link> : '次へ'}
               </Button>
             </div>
           )}

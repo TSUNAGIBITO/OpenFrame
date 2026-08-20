@@ -27,12 +27,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const body = await request.json().catch(() => ({}));
     const decision = body.decision;
     if (decision !== 'APPROVED' && decision !== 'REJECTED') {
-      return apiErrors.badRequest('Decision must be APPROVED or REJECTED');
+      return apiErrors.badRequest('判断は APPROVED または REJECTED である必要があります');
     }
 
     const note = typeof body.note === 'string' ? body.note.trim() : '';
     if (note.length > 2000) {
-      return apiErrors.badRequest('Note must be 2000 characters or fewer');
+      return apiErrors.badRequest('メモは 2000 文字以内で入力してください');
     }
 
     const approvalRequest = await db.approvalRequest.findUnique({
@@ -64,15 +64,15 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     if (!approvalRequest) return apiErrors.notFound('Approval request');
 
     const access = await checkProjectAccess(approvalRequest.version.video.project, session.user.id);
-    if (!access.hasAccess) return apiErrors.forbidden('Access denied');
+    if (!access.hasAccess) return apiErrors.forbidden('アクセスが拒否されました');
 
     const myDecision = approvalRequest.decisions[0];
-    if (!myDecision) return apiErrors.forbidden('You are not an approver on this request');
+    if (!myDecision) return apiErrors.forbidden('あなたはこのリクエストの承認者ではありません');
     if (approvalRequest.status !== 'PENDING') {
-      return apiErrors.conflict('This approval request is no longer pending');
+      return apiErrors.conflict('この承認リクエストはすでに保留中ではありません');
     }
     if (myDecision.status !== 'PENDING') {
-      return apiErrors.conflict('You have already responded to this request');
+      return apiErrors.conflict('このリクエストにはすでに回答済みです');
     }
 
     const updated = await db.$transaction(
@@ -238,17 +238,17 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   } catch (error) {
     if (error instanceof Error) {
       if (error.message === '__NOT_PENDING__')
-        return apiErrors.conflict('This approval request is no longer pending');
+        return apiErrors.conflict('この承認リクエストはすでに保留中ではありません');
       if (error.message === '__ALREADY_RESPONDED__')
-        return apiErrors.conflict('You have already responded to this request');
+        return apiErrors.conflict('このリクエストにはすでに回答済みです');
       if (error.message === '__NOT_APPROVER__')
-        return apiErrors.forbidden('You are not an approver on this request');
+        return apiErrors.forbidden('あなたはこのリクエストの承認者ではありません');
       if (error.message === '__NOT_FOUND__') return apiErrors.notFound('Approval request');
     }
     if (isSerializableConflict(error)) {
-      return apiErrors.conflict('Request state changed. Please try again.');
+      return apiErrors.conflict('リクエストの状態が変わりました。もう一度お試しください。');
     }
     logError('Error responding to approval request:', error);
-    return apiErrors.internalError('Failed to respond to approval request');
+    return apiErrors.internalError('承認リクエストへの回答に失敗しました');
   }
 }

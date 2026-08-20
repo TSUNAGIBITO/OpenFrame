@@ -57,14 +57,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { videoId } = await params;
     const context = await getVideoAssetAccessContext(request, videoId, 'COMMENT');
     if (!context) return apiErrors.notFound('Video');
-    if (!context.canUploadAssets) return apiErrors.forbidden('Access denied');
+    if (!context.canUploadAssets) return apiErrors.forbidden('アクセスが拒否されました');
 
     const body = await request.json().catch(() => null);
     const title = typeof body?.title === 'string' ? body.title.trim() : '';
-    if (!title) return apiErrors.badRequest('Title is required');
+    if (!title) return apiErrors.badRequest('タイトルを入力してください');
 
     if (!isBunnyUploadsEnabled()) {
-      return apiErrors.badRequest('Direct uploads are disabled by this host');
+      return apiErrors.badRequest('このホストでは直接アップロードが無効になっています');
     }
 
     // See the project video route for why the client's declared size is asked for
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         billedUserId,
         UPLOAD_RESERVATION_PURPOSES.BUNNY
       );
-      return apiErrors.internalError('Bunny Stream is not configured correctly');
+      return apiErrors.internalError('Bunny Stream が正しく設定されていません');
     }
 
     const bunnyRes = await fetch(`https://video.bunnycdn.com/library/${libraryId}/videos`, {
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         UPLOAD_RESERVATION_PURPOSES.BUNNY
       );
       logError('Failed to create Bunny Stream video asset', await bunnyRes.text());
-      return apiErrors.internalError('Failed to initialize Bunny upload');
+      return apiErrors.internalError('Bunny アップロードの初期化に失敗しました');
     }
 
     const bunnyVideo = await bunnyRes.json();
@@ -142,7 +142,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         billedUserId,
         UPLOAD_RESERVATION_PURPOSES.BUNNY
       );
-      return apiErrors.internalError('Upload provider did not return a valid video identifier');
+      return apiErrors.internalError('アップロードプロバイダーから有効な動画 ID が返されませんでした');
     }
 
     const expirationTime = Math.floor(Date.now() / 1000) + 3600;
@@ -170,7 +170,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           billedUserId,
           UPLOAD_RESERVATION_PURPOSES.BUNNY
         );
-        return apiErrors.forbidden('Missing trusted client IP header');
+        return apiErrors.forbidden('信頼できるクライアント IP ヘッダーがありません');
       }
 
       // The guest grant carries the same three claims the signed-in one does,
@@ -202,7 +202,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error initializing Bunny asset upload:', error);
-    return apiErrors.internalError('Failed to initialize asset upload');
+    return apiErrors.internalError('アセットアップロードの初期化に失敗しました');
   }
 }
 
@@ -215,13 +215,13 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const { videoId } = await params;
     const context = await getVideoAssetAccessContext(request, videoId, 'COMMENT');
     if (!context) return apiErrors.notFound('Video');
-    if (!context.canUploadAssets) return apiErrors.forbidden('Access denied');
+    if (!context.canUploadAssets) return apiErrors.forbidden('アクセスが拒否されました');
 
     const body = await request.json().catch(() => null);
     const bunnyVideoId = typeof body?.videoId === 'string' ? body.videoId.trim() : '';
     const uploadToken = typeof body?.uploadToken === 'string' ? body.uploadToken.trim() : '';
     if (!bunnyVideoId || !uploadToken || !SAFE_BUNNY_VIDEO_ID.test(bunnyVideoId)) {
-      return apiErrors.badRequest('videoId and uploadToken are required');
+      return apiErrors.badRequest('videoId と uploadToken が必要です');
     }
 
     // Both grants are read rather than merely checked, because both carry the
@@ -240,7 +240,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       const shareSession = getShareSessionFromRequest(request, context.video.id);
       const expectedContext = deriveGuestUploadContext(request, shareSession?.token ?? null);
       if (!expectedContext) {
-        return apiErrors.forbidden('Missing trusted client IP header');
+        return apiErrors.forbidden('信頼できるクライアント IP ヘッダーがありません');
       }
 
       grant = readGuestUploadGrant(
@@ -256,7 +256,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     if (!grant) {
-      return apiErrors.forbidden('Invalid Bunny upload token');
+      return apiErrors.forbidden('Bunny のアップロードトークンが無効です');
     }
 
     await releaseStorageReservation(
@@ -270,6 +270,6 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error cleaning up Bunny asset upload:', error);
-    return apiErrors.internalError('Failed to cleanup pending upload');
+    return apiErrors.internalError('保留中のアップロードのクリーンアップに失敗しました');
   }
 }

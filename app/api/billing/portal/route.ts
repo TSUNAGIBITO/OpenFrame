@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     if (limited) return limited;
 
     if (!isTrustedSameOriginRequest(request)) {
-      return apiErrors.forbidden('Invalid request origin');
+      return apiErrors.forbidden('リクエスト元が不正です');
     }
 
     const session = await auth();
@@ -34,16 +34,16 @@ export async function POST(request: NextRequest) {
     }
 
     if (!isStripeFeatureEnabled()) {
-      return apiErrors.badRequest('Stripe billing is disabled by this host');
+      return apiErrors.badRequest('このホストでは Stripe 決済が無効になっています');
     }
 
     if (!isStripeConfigured()) {
-      return apiErrors.internalError('Stripe billing is not configured');
+      return apiErrors.internalError('Stripe 決済が設定されていません');
     }
 
     const billing = await getBillingOverview(session.user.id);
     if (!billing.subscription.stripeCustomerId) {
-      return apiErrors.badRequest('No Stripe customer exists for this account');
+      return apiErrors.badRequest('このアカウントに紐づく Stripe 顧客が存在しません');
     }
 
     const stripe = getStripe();
@@ -56,6 +56,6 @@ export async function POST(request: NextRequest) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error creating Stripe portal session:', error);
-    return apiErrors.internalError('Failed to open billing portal');
+    return apiErrors.internalError('請求ポータルを開けませんでした');
   }
 }

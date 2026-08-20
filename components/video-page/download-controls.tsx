@@ -70,7 +70,7 @@ export const DownloadControls = memo(function DownloadControls({
             )}
             {!compact && (
               <>
-                Download
+                ダウンロード
                 <ChevronDown className="h-4 w-4 ml-1" />
               </>
             )}
@@ -89,7 +89,7 @@ export const DownloadControls = memo(function DownloadControls({
             ) : (
               <Download className="h-4 w-4 mr-2" />
             )}
-            Download Original
+            オリジナルをダウンロード
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={(event) => {
@@ -103,7 +103,7 @@ export const DownloadControls = memo(function DownloadControls({
             ) : (
               <Download className="h-4 w-4 mr-2" />
             )}
-            Download Compressed
+            圧縮版をダウンロード
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -143,7 +143,7 @@ export const DownloadControls = memo(function DownloadControls({
             ) : (
               <Download className="h-4 w-4 mr-2" />
             )}
-            Download
+            ダウンロード
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -166,7 +166,7 @@ export const DownloadControls = memo(function DownloadControls({
       ) : (
         <Download className="h-4 w-4 mr-1" />
       )}
-      Download
+      ダウンロード
     </Button>
   );
 });
@@ -234,7 +234,7 @@ export const DownloadMenuItems = memo(function DownloadMenuItems({
       ) : (
         <Download className="h-4 w-4 mr-2" />
       )}
-      Download
+      ダウンロード
     </DropdownMenuItem>
   );
 });

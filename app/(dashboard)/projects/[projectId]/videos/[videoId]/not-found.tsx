@@ -7,14 +7,14 @@ export default function VideoNotFound() {
     <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 p-4">
       <div className="flex flex-col items-center gap-2 text-center">
         <Film className="h-12 w-12 text-muted-foreground" />
-        <h1 className="text-2xl font-bold">Video Not Found</h1>
+        <h1 className="text-2xl font-bold">動画が見つかりません</h1>
         <p className="text-muted-foreground max-w-md">
-          The video you&apos;re looking for doesn&apos;t exist or has been deleted.
+          お探しの動画は存在しないか、削除されました。
         </p>
       </div>
       <div className="flex gap-2">
         <Button asChild variant="outline">
-          <Link href="/dashboard">Go to dashboard</Link>
+          <Link href="/dashboard">ダッシュボードへ</Link>
         </Button>
       </div>
     </div>

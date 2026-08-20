@@ -20,7 +20,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const { videoId, assetId } = await params;
     const context = await getVideoAssetAccessContext(request, videoId, 'COMMENT');
     if (!context) return apiErrors.notFound('Video');
-    if (!context.canUploadAssets) return apiErrors.forbidden('Access denied');
+    if (!context.canUploadAssets) return apiErrors.forbidden('アクセスが拒否されました');
 
     const asset = await db.videoAsset.findFirst({
       where: { id: assetId, videoId },
@@ -37,7 +37,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     if (!asset) return apiErrors.notFound('Asset');
     if (!canDeleteAssetForViewer(asset, context)) {
-      return apiErrors.forbidden('You can only delete assets you uploaded');
+      return apiErrors.forbidden('削除できるのは自分がアップロードしたアセットのみです');
     }
 
     let shouldDeleteImageObject = false;
@@ -128,6 +128,6 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error deleting video asset:', error);
-    return apiErrors.internalError('Failed to delete asset');
+    return apiErrors.internalError('アセットの削除に失敗しました');
   }
 }

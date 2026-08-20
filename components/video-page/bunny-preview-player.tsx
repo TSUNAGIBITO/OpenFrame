@@ -57,7 +57,7 @@ function formatBunnyQualityLabel(
   if (typeof level.bitrate === 'number' && level.bitrate > 0) {
     return `${Math.round(level.bitrate / 1000)} kbps`;
   }
-  return `Level ${index + 1}`;
+  return `画質 ${index + 1}`;
 }
 
 export const BunnyPreviewPlayer = forwardRef<BunnyPreviewPlayerHandle, BunnyPreviewPlayerProps>(
@@ -558,13 +558,13 @@ export const BunnyPreviewPlayer = forwardRef<BunnyPreviewPlayerHandle, BunnyPrev
     const showProcessingOverlay = bunnyPlaybackState !== 'error' && !isReady;
     const showErrorOverlay = bunnyPlaybackState === 'error';
     const loadingLabel =
-      isProcessing || bunnyPlaybackState === 'processing' ? 'Processing...' : 'Loading...';
+      isProcessing || bunnyPlaybackState === 'processing' ? '処理中...' : '読み込み中...';
 
     const selectedQualityLabel = useMemo(() => {
-      if (selectedQualityLevel === -2) return 'Original';
-      if (selectedQualityLevel === -1) return 'Auto';
+      if (selectedQualityLevel === -2) return 'オリジナル';
+      if (selectedQualityLevel === -1) return '自動';
       return (
-        qualityOptions.find((option) => option.level === selectedQualityLevel)?.label ?? 'Auto'
+        qualityOptions.find((option) => option.level === selectedQualityLevel)?.label ?? '自動'
       );
     }, [qualityOptions, selectedQualityLevel]);
 
@@ -593,7 +593,7 @@ export const BunnyPreviewPlayer = forwardRef<BunnyPreviewPlayerHandle, BunnyPrev
           {showErrorOverlay && (
             <div className="absolute inset-0 bg-black/65 flex items-center justify-center">
               <p className="text-xs text-white/85">
-                Unable to load Bunny preview. Please try again in a moment.
+                プレビューを読み込めませんでした。しばらくしてからもう一度お試しください。
               </p>
             </div>
           )}
@@ -639,10 +639,10 @@ export const BunnyPreviewPlayer = forwardRef<BunnyPreviewPlayerHandle, BunnyPrev
                 <DropdownMenuContent align="end">
                   {NATIVE_SPEED_OPTIONS.map((speed) => (
                     <DropdownMenuItem key={speed} onClick={() => handleSpeedChange(speed)}>
-                      {speed}x {speed === playbackSpeed ? '(Current)' : ''}
+                      {speed}x {speed === playbackSpeed ? '(現在)' : ''}
                       {speed > SILENT_ABOVE_SPEED && (
                         <span className="ml-auto pl-2 text-[10px] text-muted-foreground">
-                          no audio
+                          音声なし
                         </span>
                       )}
                     </DropdownMenuItem>
@@ -664,17 +664,17 @@ export const BunnyPreviewPlayer = forwardRef<BunnyPreviewPlayerHandle, BunnyPrev
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => handleQualityChange(-1)}>
-                    Auto {selectedQualityLevel === -1 ? '(Current)' : ''}
+                    自動 {selectedQualityLevel === -1 ? '(現在)' : ''}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleQualityChange(-2)}>
-                    Original {selectedQualityLevel === -2 ? '(Current)' : ''}
+                    オリジナル {selectedQualityLevel === -2 ? '(現在)' : ''}
                   </DropdownMenuItem>
                   {qualityOptions.map((option) => (
                     <DropdownMenuItem
                       key={option.level}
                       onClick={() => handleQualityChange(option.level)}
                     >
-                      {option.label} {option.level === selectedQualityLevel ? '(Current)' : ''}
+                      {option.label} {option.level === selectedQualityLevel ? '(現在)' : ''}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>

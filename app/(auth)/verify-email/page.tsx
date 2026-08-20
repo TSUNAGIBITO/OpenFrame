@@ -36,10 +36,10 @@ function VerifyEmailContent() {
       if (res.ok) {
         setSent(true);
       } else {
-        setError('Something went wrong. Please try again.');
+        setError('エラーが発生しました。もう一度お試しください。');
       }
     } catch {
-      setError('Something went wrong. Please try again.');
+      setError('エラーが発生しました。もう一度お試しください。');
     } finally {
       setLoading(false);
     }
@@ -50,29 +50,28 @@ function VerifyEmailContent() {
       <div className="w-full max-w-md">
         <Link href="/" className="flex items-center justify-center gap-2 mb-8">
           <Video className="h-8 w-8 text-primary" />
-          <span className="font-bold text-2xl">OpenFrame</span>
+          <span className="font-bold text-2xl">つなぐレビュー</span>
         </Link>
 
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="flex items-center justify-center gap-2">
               <Mail className="h-5 w-5" />
-              Check your email
+              メールをご確認ください
             </CardTitle>
             <CardDescription>
-              We sent a verification link to{' '}
-              {emailParam ? <strong>{emailParam}</strong> : 'your email address'}. Click the link to
-              activate your account.
+              {emailParam ? <strong>{emailParam}</strong> : 'ご登録のメールアドレス'}
+              宛に確認リンクを送信しました。リンクをクリックしてアカウントを有効化してください。
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground text-center">
-              The link expires in 2 hours. Check your spam folder if you don&apos;t see it.
+              リンクの有効期限は2時間です。届かない場合は迷惑メールフォルダもご確認ください。
             </p>
 
             {sent ? (
               <div className="p-3 rounded-md bg-green-500/10 text-green-600 text-sm text-center">
-                Verification email resent! Check your inbox.
+                確認メールを再送しました。受信トレイをご確認ください。
               </div>
             ) : (
               <>
@@ -82,7 +81,7 @@ function VerifyEmailContent() {
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
                     <span className="bg-card px-2 text-muted-foreground">
-                      Didn&apos;t receive it?
+                      メールが届かない場合
                     </span>
                   </div>
                 </div>
@@ -105,16 +104,16 @@ function VerifyEmailContent() {
                   />
                   <Button type="submit" variant="outline" disabled={loading || !resendEmail}>
                     {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                    Resend
+                    再送
                   </Button>
                 </form>
               </>
             )}
 
             <p className="text-center text-sm text-muted-foreground">
-              Already verified?{' '}
+              すでに確認済みの方は{' '}
               <Link href={loginHref} className="text-primary hover:underline">
-                Sign in
+                サインイン
               </Link>
             </p>
           </CardContent>

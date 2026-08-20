@@ -53,10 +53,10 @@ function formatRelativeTime(dateStr: string): string {
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 1) return 'just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffMins < 1) return 'たった今';
+  if (diffMins < 60) return `${diffMins}分前`;
+  if (diffHours < 24) return `${diffHours}時間前`;
+  if (diffDays < 7) return `${diffDays}日前`;
   return date.toLocaleDateString();
 }
 
@@ -68,6 +68,17 @@ function VisibilityIcon({ visibility }: { visibility: string }) {
       return <UserPlus className="h-3.5 w-3.5" />;
     default:
       return <Lock className="h-3.5 w-3.5" />;
+  }
+}
+
+function visibilityLabel(visibility: string): string {
+  switch (visibility) {
+    case 'PUBLIC':
+      return '公開';
+    case 'INVITE':
+      return '招待制';
+    default:
+      return '非公開';
   }
 }
 
@@ -111,7 +122,7 @@ export function ProjectFilter({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
+          <h1 className="text-3xl font-bold tracking-tight">プロジェクト</h1>
           {workspaces.length > 0 && (
             <Select
               value={selectedWorkspace}
@@ -120,10 +131,10 @@ export function ProjectFilter({
               }}
             >
               <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="All Workspaces" />
+                <SelectValue placeholder="すべてのワークスペース" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Workspaces</SelectItem>
+                <SelectItem value="all">すべてのワークスペース</SelectItem>
                 {workspaces.map((ws) => (
                   <SelectItem key={ws.id} value={ws.id}>
                     {ws.name}
@@ -146,12 +157,12 @@ export function ProjectFilter({
             {sortOrder === 'desc' ? (
               <>
                 <ArrowDown className="h-4 w-4" />
-                Newest first
+                新しい順
               </>
             ) : (
               <>
                 <ArrowUp className="h-4 w-4" />
-                Oldest first
+                古い順
               </>
             )}
           </Button>
@@ -159,7 +170,7 @@ export function ProjectFilter({
             <Button asChild>
               <Link href="/projects/new">
                 <Plus className="h-4 w-4 mr-2" />
-                New Project
+                新規プロジェクト
               </Link>
             </Button>
           )}
@@ -180,7 +191,7 @@ export function ProjectFilter({
                     </CardTitle>
                     <Badge variant="outline" className="flex items-center gap-1">
                       <VisibilityIcon visibility={project.visibility} />
-                      {project.visibility.toLowerCase()}
+                      {visibilityLabel(project.visibility)}
                     </Badge>
                   </div>
                   {project.workspaceName && (
@@ -192,7 +203,7 @@ export function ProjectFilter({
                     </div>
                   )}
                   <CardDescription className="line-clamp-2">
-                    {project.description || 'No description'}
+                    {project.description || '説明なし'}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -205,7 +216,7 @@ export function ProjectFilter({
                       <Users className="h-3.5 w-3.5" />
                       {project.memberCount}
                     </span>
-                    <span>{project.videoCount} videos</span>
+                    <span>動画 {project.videoCount} 件</span>
                   </div>
                 </CardContent>
               </Card>
@@ -217,18 +228,20 @@ export function ProjectFilter({
           <CardContent className="flex flex-col items-center justify-center py-16">
             <FolderOpen className="h-12 w-12 text-muted-foreground mb-4" />
             <h3 className="text-lg font-medium mb-2">
-              {selectedWorkspace === 'all' ? 'No projects yet' : 'No projects in this workspace'}
+              {selectedWorkspace === 'all'
+                ? 'プロジェクトはまだありません'
+                : 'このワークスペースにはプロジェクトがありません'}
             </h3>
             <p className="text-muted-foreground text-center mb-4">
               {selectedWorkspace === 'all'
-                ? 'Create your first project to start collecting video feedback'
-                : 'Create a project in this workspace to get started'}
+                ? '最初のプロジェクトを作成して、動画フィードバックの収集を始めましょう'
+                : 'このワークスペースにプロジェクトを作成して始めましょう'}
             </p>
             {canCreateProjects && (
               <Button asChild>
                 <Link href="/projects/new">
                   <Plus className="h-4 w-4 mr-2" />
-                  Create Project
+                  プロジェクトを作成
                 </Link>
               </Button>
             )}
@@ -250,10 +263,10 @@ export function ProjectFilter({
               }
             }}
           >
-            Previous
+            前へ
           </Button>
           <span className="text-sm font-medium">
-            Page {page} of {totalPages}
+            {totalPages} ページ中 {page} ページ
           </span>
           <Button
             variant="outline"
@@ -266,7 +279,7 @@ export function ProjectFilter({
               }
             }}
           >
-            Next
+            次へ
           </Button>
         </div>
       )}

@@ -32,20 +32,20 @@ const visibilityOptions: {
 }[] = [
   {
     value: 'PRIVATE',
-    label: 'Private',
-    description: 'Only workspace members and project members can access',
+    label: '非公開',
+    description: 'ワークスペースメンバーとプロジェクトメンバーのみアクセスできます',
     icon: <Lock className="h-5 w-5" />,
   },
   {
     value: 'INVITE',
-    label: 'Invite Only',
-    description: 'Share with specific people via email',
+    label: '招待制',
+    description: 'メールで特定の人に共有します',
     icon: <UserPlus className="h-5 w-5" />,
   },
   {
     value: 'PUBLIC',
-    label: 'Public',
-    description: 'Anyone with the link can view',
+    label: '公開',
+    description: 'リンクを知っている人は誰でも閲覧できます',
     icon: <Globe className="h-5 w-5" />,
   },
 ];
@@ -91,7 +91,7 @@ export default function NewProjectPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.workspaceId) {
-      setError('Please select a workspace');
+      setError('ワークスペースを選択してください');
       return;
     }
     setIsLoading(true);
@@ -107,13 +107,13 @@ export default function NewProjectPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Failed to create project');
+        setError(data.error || 'プロジェクトの作成に失敗しました');
         return;
       }
 
       router.push(`/projects/${data.data.id}`);
     } catch {
-      setError('Something went wrong. Please try again.');
+      setError('問題が発生しました。もう一度お試しください。');
     } finally {
       setIsLoading(false);
     }
@@ -128,7 +128,7 @@ export default function NewProjectPage() {
             className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Projects
+            プロジェクト一覧に戻る
           </Link>
         </div>
 
@@ -137,29 +137,29 @@ export default function NewProjectPage() {
             <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
               <FolderPlus className="h-7 w-7 text-primary" />
             </div>
-            <CardTitle className="text-2xl">Create New Project</CardTitle>
+            <CardTitle className="text-2xl">新規プロジェクトを作成</CardTitle>
             <CardDescription className="text-base">
-              Set up a new project to organize your videos and collect feedback
+              動画を整理してフィードバックを集めるための新しいプロジェクトを作成します
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Workspace selector */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium">Workspace</Label>
+                <Label className="text-sm font-medium">ワークスペース</Label>
                 {isLoadingWorkspaces ? (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground py-2">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Loading workspaces...
+                    ワークスペースを読み込み中...
                   </div>
                 ) : workspaces.length === 0 ? (
                   <div className="rounded-lg border border-dashed p-4 text-center">
                     <Building2 className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
                     <p className="text-sm text-muted-foreground mb-2">
-                      You need a workspace first. Every project belongs to a workspace.
+                      まずワークスペースが必要です。すべてのプロジェクトはワークスペースに属します。
                     </p>
                     <Button asChild size="sm" variant="outline">
-                      <Link href="/workspaces/new">Create Workspace</Link>
+                      <Link href="/workspaces/new">ワークスペースを作成</Link>
                     </Button>
                   </div>
                 ) : (
@@ -168,7 +168,7 @@ export default function NewProjectPage() {
                     onValueChange={(v) => setFormData((prev) => ({ ...prev, workspaceId: v }))}
                   >
                     <SelectTrigger className="h-11">
-                      <SelectValue placeholder="Select a workspace" />
+                      <SelectValue placeholder="ワークスペースを選択" />
                     </SelectTrigger>
                     <SelectContent>
                       {workspaces.map((ws) => (
@@ -186,11 +186,11 @@ export default function NewProjectPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium">
-                  Project Name
+                  プロジェクト名
                 </Label>
                 <Input
                   id="name"
-                  placeholder="e.g. Product Demo Q1"
+                  placeholder="例: 商品デモ 第1四半期"
                   value={formData.name}
                   onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
                   required
@@ -201,12 +201,12 @@ export default function NewProjectPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="description" className="text-sm font-medium">
-                  Description
-                  <span className="text-muted-foreground font-normal ml-1">(optional)</span>
+                  説明
+                  <span className="text-muted-foreground font-normal ml-1">（任意）</span>
                 </Label>
                 <Textarea
                   id="description"
-                  placeholder="Brief description of what this project is about..."
+                  placeholder="このプロジェクトの概要を簡単に入力..."
                   value={formData.description}
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, description: e.target.value }))
@@ -218,7 +218,7 @@ export default function NewProjectPage() {
               </div>
 
               <div className="space-y-3">
-                <Label className="text-sm font-medium">Who can access?</Label>
+                <Label className="text-sm font-medium">アクセスできる人</Label>
                 <div className="grid gap-3">
                   {visibilityOptions.map((option) => (
                     <button
@@ -274,7 +274,7 @@ export default function NewProjectPage() {
                   className="flex-1 h-11"
                 >
                   {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                  Create Project
+                  プロジェクトを作成
                 </Button>
                 <Button
                   type="button"
@@ -282,7 +282,7 @@ export default function NewProjectPage() {
                   onClick={() => router.back()}
                   className="h-11 px-6"
                 >
-                  Cancel
+                  キャンセル
                 </Button>
               </div>
             </form>

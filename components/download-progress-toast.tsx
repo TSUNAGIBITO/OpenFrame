@@ -26,8 +26,8 @@ export type DownloadProgressToastHandle = {
 let sessionMinimized = false;
 
 function minimizedLabel(state: DownloadToastState): string {
-  if (state.status === 'success') return 'Done';
-  return typeof state.percent === 'number' ? `${Math.round(state.percent)}%` : 'Downloading';
+  if (state.status === 'success') return '完了';
+  return typeof state.percent === 'number' ? `${Math.round(state.percent)}%` : 'ダウンロード中';
 }
 
 function DownloadProgressToast({
@@ -51,7 +51,7 @@ function DownloadProgressToast({
         <button
           type="button"
           onClick={onToggleMinimized}
-          aria-label="Expand download progress"
+          aria-label="ダウンロードの進捗を展開"
           className="pointer-events-auto flex items-center gap-1.5 rounded-full border bg-background/95 px-2.5 py-1 text-xs shadow-lg backdrop-blur transition-colors hover:bg-muted"
         >
           <StatusIcon
@@ -79,7 +79,7 @@ function DownloadProgressToast({
             <button
               type="button"
               onClick={onToggleMinimized}
-              aria-label="Minimize download progress"
+              aria-label="ダウンロードの進捗を最小化"
               className="-mt-1 -mr-1 shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               <ChevronDown className="h-4 w-4" aria-hidden="true" />

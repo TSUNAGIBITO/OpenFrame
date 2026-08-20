@@ -251,10 +251,10 @@ export const PlayerCore = memo(function PlayerCore({
               <div className="max-w-sm rounded-md border bg-background/95 px-4 py-3 text-center shadow-lg">
                 <div className="mb-2 flex items-center justify-center gap-2 text-sm font-medium">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Video Is Processing
+                  動画を処理しています
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  This video is still processing. We&apos;ll keep retrying every few seconds.
+                  この動画はまだ処理中です。数秒ごとに再試行を続けます。
                 </p>
               </div>
             </div>
@@ -265,12 +265,12 @@ export const PlayerCore = memo(function PlayerCore({
               <div className="max-w-sm rounded-md border bg-background/95 px-4 py-3 text-center shadow-lg">
                 <div className="mb-2 flex items-center justify-center gap-2 text-sm font-medium">
                   <AlertCircle className="h-4 w-4 text-destructive" />
-                  Unable To Load Video
+                  動画を読み込めません
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {activeProviderId === 'r2'
-                    ? 'This video file could not be loaded. Try refreshing the page or re-uploading the version.'
-                    : 'The Bunny stream is unavailable right now. Please refresh this page in a moment.'}
+                    ? 'この動画ファイルを読み込めませんでした。ページを再読み込みするか、バージョンをアップロードし直してください。'
+                    : 'Bunny ストリームが現在利用できません。しばらくしてからページを再読み込みしてください。'}
                 </p>
               </div>
             </div>
@@ -284,9 +284,9 @@ export const PlayerCore = memo(function PlayerCore({
                     <Clock className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <p className="font-medium text-sm">Continue watching?</p>
+                    <p className="font-medium text-sm">続きから再生しますか？</p>
                     <p className="text-xs text-muted-foreground">
-                      Resume from {formatTime(savedProgress)}
+                      {formatTime(savedProgress)} から再開
                     </p>
                   </div>
                 </div>
@@ -298,7 +298,7 @@ export const PlayerCore = memo(function PlayerCore({
                     className="flex-1"
                   >
                     <Play className="h-4 w-4 mr-1" />
-                    Resume
+                    再開
                   </Button>
                   <Button
                     size="sm"
@@ -306,7 +306,7 @@ export const PlayerCore = memo(function PlayerCore({
                     onClick={handleDismissResume}
                     className="flex-1"
                   >
-                    Start over
+                    最初から
                   </Button>
                 </div>
               </div>
@@ -372,7 +372,7 @@ export const PlayerCore = memo(function PlayerCore({
             size="icon"
             className="h-8 w-8"
             onClick={() => handleSkip(-10)}
-            title={isFrameMode ? `Back ${frameStepLabel}` : 'Back 10s'}
+            title={isFrameMode ? `${frameStepLabel} 戻る` : '10秒戻る'}
           >
             <SkipBack className="h-4 w-4" />
           </Button>
@@ -382,7 +382,7 @@ export const PlayerCore = memo(function PlayerCore({
             size="icon"
             className="h-8 w-8"
             onClick={() => handleSkip(10)}
-            title={isFrameMode ? `Forward ${frameStepLabel}` : 'Forward 10s'}
+            title={isFrameMode ? `${frameStepLabel} 進む` : '10秒進む'}
           >
             <SkipForward className="h-4 w-4" />
           </Button>
@@ -401,16 +401,16 @@ export const PlayerCore = memo(function PlayerCore({
               size="sm"
               className="h-8 gap-1 text-xs"
               onClick={handleFrameModeToggle}
-              title="Toggle frame step mode"
+              title="フレーム送りモードの切り替え"
             >
-              Frame {frameStepLabel}
+              フレーム {frameStepLabel}
             </Button>
 
             {activeProviderId === 'bunny' && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs">
-                    Quality {selectedQualityLabel}
+                    画質 {selectedQualityLabel}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="min-w-[120px]">
@@ -418,13 +418,13 @@ export const PlayerCore = memo(function PlayerCore({
                     onClick={() => handleQualityChange(-1)}
                     className={cn(selectedQualityLevel === -1 && 'font-bold text-primary')}
                   >
-                    Auto
+                    自動
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => handleQualityChange(-2)}
                     className={cn(selectedQualityLevel === -2 && 'font-bold text-primary')}
                   >
-                    Original
+                    オリジナル
                   </DropdownMenuItem>
                   {qualityOptions.length > 0 && <DropdownMenuSeparator />}
                   {qualityOptions.map((option) => (
@@ -462,7 +462,7 @@ export const PlayerCore = memo(function PlayerCore({
                     {speed}x
                     {speed > SILENT_ABOVE_SPEED && (
                       <span className="text-[10px] font-normal text-muted-foreground">
-                        no audio
+                        音声なし
                       </span>
                     )}
                   </DropdownMenuItem>
@@ -475,7 +475,7 @@ export const PlayerCore = memo(function PlayerCore({
               size="icon"
               className="h-8 w-8"
               onClick={toggleFullscreen}
-              title={isFullscreenMode ? 'Exit fullscreen (F)' : 'Fullscreen (F)'}
+              title={isFullscreenMode ? '全画面を終了 (F)' : '全画面 (F)'}
             >
               {isFullscreenMode ? (
                 <Minimize className="h-4 w-4" />
@@ -490,7 +490,7 @@ export const PlayerCore = memo(function PlayerCore({
                 size="icon"
                 className="h-8 w-8"
                 onClick={() => setShowComments(!showComments)}
-                title={showComments ? 'Hide comments' : 'Show comments'}
+                title={showComments ? 'コメントを隠す' : 'コメントを表示'}
               >
                 {showComments ? (
                   <MessageSquareOff className="h-4 w-4" />
@@ -504,7 +504,7 @@ export const PlayerCore = memo(function PlayerCore({
                 size="icon"
                 className="h-8 w-8 lg:hidden"
                 onClick={() => setIsMobileCommentsOpen(true)}
-                title="Show comments"
+                title="コメントを表示"
               >
                 <MessageSquare className="h-4 w-4" />
               </Button>

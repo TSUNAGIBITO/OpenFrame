@@ -74,7 +74,7 @@ export function brandedEmailTemplate(
   const footerLinkUrl = options?.footerLinkUrl || '';
 
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="color-scheme" content="dark"></head>
 <body style="margin:0;padding:0;background-color:${EMAIL_COLORS.bg};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:${EMAIL_COLORS.text};">
   <table width="100%" cellpadding="0" cellspacing="0" style="background-color:${EMAIL_COLORS.bg};padding:40px 16px;">
@@ -83,7 +83,7 @@ export function brandedEmailTemplate(
         <tr><td style="padding:0 0 24px;">
           <table cellpadding="0" cellspacing="0"><tr>
             <td style="padding-right:10px;vertical-align:middle;">${brandLogoSvg()}</td>
-            <td style="vertical-align:middle;font-size:16px;font-weight:700;color:${EMAIL_COLORS.text};letter-spacing:0.08em;">OpenFrame</td>
+            <td style="vertical-align:middle;font-size:16px;font-weight:700;color:${EMAIL_COLORS.text};letter-spacing:0.08em;">つなぐレビュー</td>
           </tr></table>
         </td></tr>
 

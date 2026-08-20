@@ -216,7 +216,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const { videoId } = await params;
     const context = await getVideoAssetAccessContext(request, videoId, 'VIEW');
     if (!context) return apiErrors.notFound('Video');
-    if (!context.hasViewAccess) return apiErrors.forbidden('Access denied');
+    if (!context.hasViewAccess) return apiErrors.forbidden('アクセスが拒否されました');
 
     const requestedLimit = parsePaginationParam(
       request.nextUrl.searchParams.get('limit'),
@@ -295,7 +295,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-cache');
   } catch (error) {
     logError('Error fetching video assets:', error);
-    return apiErrors.internalError('Failed to fetch assets');
+    return apiErrors.internalError('アセットの取得に失敗しました');
   }
 }
 
@@ -327,7 +327,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { videoId } = await params;
     const context = await getVideoAssetAccessContext(request, videoId, 'COMMENT');
     if (!context) return apiErrors.notFound('Video');
-    if (!context.canUploadAssets) return apiErrors.forbidden('Access denied');
+    if (!context.canUploadAssets) return apiErrors.forbidden('アクセスが拒否されました');
 
     const body = await request.json().catch(() => null);
     const provider = typeof body?.provider === 'string' ? body.provider.trim().toUpperCase() : '';
@@ -339,7 +339,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       provider !== VideoAssetProvider.R2_AUDIO &&
       provider !== VideoAssetProvider.R2_VIDEO
     ) {
-      return apiErrors.badRequest('Invalid provider');
+      return apiErrors.badRequest('プロバイダーが正しくありません');
     }
 
     const isGuest = !context.viewerUserId;
@@ -361,11 +361,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     if (provider === VideoAssetProvider.R2_IMAGE) {
       sourceUrl = typeof body?.sourceUrl === 'string' ? body.sourceUrl.trim() : '';
       if (!SAFE_IMAGE_PROXY_PATH.test(sourceUrl)) {
-        return apiErrors.badRequest('Image URL must reference an uploaded image file');
+        return apiErrors.badRequest('画像 URL はアップロード済みの画像ファイルを指定する必要があります');
       }
       const imageCheck = await isFreshImageAttachment(sourceUrl);
       if (!imageCheck.isFresh) {
-        return apiErrors.badRequest('Image upload expired. Please upload again.');
+        return apiErrors.badRequest('画像のアップロードの有効期限が切れました。もう一度アップロードしてください。');
       }
       assetSizeBytes = imageCheck.sizeBytes;
 
@@ -394,11 +394,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     if (provider === VideoAssetProvider.R2_AUDIO) {
       sourceUrl = typeof body?.sourceUrl === 'string' ? body.sourceUrl.trim() : '';
       if (!SAFE_AUDIO_PROXY_PATH.test(sourceUrl)) {
-        return apiErrors.badRequest('Audio URL must reference an uploaded audio file');
+        return apiErrors.badRequest('音声 URL はアップロード済みの音声ファイルを指定する必要があります');
       }
       const audioCheck = await isFreshAudioAttachment(sourceUrl);
       if (!audioCheck.isFresh) {
-        return apiErrors.badRequest('Audio upload expired. Please upload again.');
+        return apiErrors.badRequest('音声のアップロードの有効期限が切れました。もう一度アップロードしてください。');
       }
       assetSizeBytes = audioCheck.sizeBytes;
 
@@ -423,7 +423,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       sourceUrl = typeof body?.sourceUrl === 'string' ? body.sourceUrl.trim() : '';
       const parsedSource = parseVideoUrl(sourceUrl);
       if (!parsedSource || parsedSource.providerId !== 'youtube') {
-        return apiErrors.badRequest('Only YouTube URLs are allowed for this provider');
+        return apiErrors.badRequest('このプロバイダーでは YouTube の URL のみ使用できます');
       }
       const sourceUrlError = validateUrl(parsedSource.originalUrl, 'YouTube URL');
       if (sourceUrlError) return apiErrors.badRequest(sourceUrlError);
@@ -441,7 +441,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     if (provider === VideoAssetProvider.R2_VIDEO) {
       if (!context.viewerUserId) {
-        return apiErrors.forbidden('R2 video asset uploads require sign-in');
+        return apiErrors.forbidden('R2 の動画アセットのアップロードにはサインインが必要です');
       }
 
       sourceUrl = typeof body?.sourceUrl === 'string' ? body.sourceUrl.trim() : '';
@@ -450,13 +450,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       thumbnailUrl = typeof body?.thumbnailUrl === 'string' ? body.thumbnailUrl.trim() : null;
 
       if (!SAFE_VIDEO_PROXY_PATH.test(sourceUrl)) {
-        return apiErrors.badRequest('Video URL must reference an uploaded video file');
+        return apiErrors.badRequest('動画 URL はアップロード済みの動画ファイルを指定する必要があります');
       }
       if (!objectKey || !uploadToken) {
-        return apiErrors.badRequest('objectKey and uploadToken are required');
+        return apiErrors.badRequest('objectKey と uploadToken が必要です');
       }
       if (thumbnailUrl && !SAFE_IMAGE_PROXY_PATH.test(thumbnailUrl)) {
-        return apiErrors.badRequest('Thumbnail URL must reference an uploaded image file');
+        return apiErrors.badRequest('サムネイル URL はアップロード済みの画像ファイルを指定する必要があります');
       }
 
       const finalizeResult = await finalizeR2VideoUpload({
@@ -501,7 +501,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       thumbnailUrl = typeof body?.thumbnailUrl === 'string' ? body.thumbnailUrl.trim() : null;
 
       if (!providerVideoId || !SAFE_BUNNY_VIDEO_ID.test(providerVideoId)) {
-        return apiErrors.badRequest('Invalid Bunny video id');
+        return apiErrors.badRequest('Bunny の動画 ID が正しくありません');
       }
 
       const sourceUrlError = validateUrl(sourceUrl, 'Bunny source URL');
@@ -509,14 +509,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       const thumbnailUrlError = validateOptionalUrl(thumbnailUrl, 'Bunny thumbnail URL');
       if (thumbnailUrlError) return apiErrors.badRequest(thumbnailUrlError);
       if (thumbnailUrl && !isAllowedBunnyMediaUrl(thumbnailUrl)) {
-        return apiErrors.badRequest('Bunny thumbnail URL must use an approved Bunny host');
+        return apiErrors.badRequest('Bunny のサムネイル URL は許可された Bunny ホストを使用する必要があります');
       }
       if (!isAllowedBunnyMediaUrl(sourceUrl)) {
-        return apiErrors.badRequest('Bunny source URL must use an approved Bunny host');
+        return apiErrors.badRequest('Bunny のソース URL は許可された Bunny ホストを使用する必要があります');
       }
 
       if (!uploadToken) {
-        return apiErrors.badRequest('uploadToken is required');
+        return apiErrors.badRequest('uploadToken が必要です');
       }
 
       if (context.viewerUserId) {
@@ -526,7 +526,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           videoId: providerVideoId,
         });
         if (!grant) {
-          return apiErrors.forbidden('Invalid Bunny upload token');
+          return apiErrors.forbidden('Bunny のアップロードトークンが無効です');
         }
 
         // Charged from now on the size the upload was admitted on: Bunny reports
@@ -540,7 +540,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         const shareSession = getShareSessionFromRequest(request, context.video.id);
         const expectedContext = deriveGuestUploadContext(request, shareSession?.token ?? null);
         if (!expectedContext) {
-          return apiErrors.forbidden('Missing trusted client IP header');
+          return apiErrors.forbidden('信頼できるクライアント IP ヘッダーがありません');
         }
 
         // Read rather than merely verified, for the same reason as above: a guest
@@ -559,7 +559,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           providerVideoId
         );
         if (!guestGrant) {
-          return apiErrors.forbidden('Invalid Bunny upload token');
+          return apiErrors.forbidden('Bunny のアップロードトークンが無効です');
         }
 
         assetSizeBytes = guestGrant.declaredSizeBytes ?? BigInt(0);
@@ -727,6 +727,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       reservationPurpose ?? undefined
     );
     logError('Error creating video asset:', error);
-    return apiErrors.internalError('Failed to create asset');
+    return apiErrors.internalError('アセットの作成に失敗しました');
   }
 }

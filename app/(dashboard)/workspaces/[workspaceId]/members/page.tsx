@@ -17,10 +17,10 @@ export default async function WorkspaceMembersPage({ params }: WorkspaceMembersP
     <MembersManagementPage
       apiBasePath={`/api/workspaces/${workspaceId}`}
       backHref={`/workspaces/${workspaceId}`}
-      backLabel="Back to Workspace"
-      title="Members"
-      subtitle="Manage who has access to this workspace and all its projects"
-      membersDescription="Admins can manage projects and members. Commentators can view and comment only."
+      backLabel="ワークスペースに戻る"
+      title="メンバー"
+      subtitle="このワークスペースとすべてのプロジェクトへのアクセス権を管理します"
+      membersDescription="管理者はプロジェクトとメンバーを管理できます。コメント担当者は閲覧とコメントのみ可能です。"
     />
   );
 }

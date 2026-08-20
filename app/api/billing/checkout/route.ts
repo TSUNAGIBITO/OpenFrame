@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     if (limited) return limited;
 
     if (!isTrustedSameOriginRequest(request)) {
-      return apiErrors.forbidden('Invalid request origin');
+      return apiErrors.forbidden('リクエスト元が不正です');
     }
 
     const session = await auth();
@@ -35,11 +35,11 @@ export async function POST(request: NextRequest) {
     }
 
     if (!isStripeFeatureEnabled()) {
-      return apiErrors.badRequest('Stripe billing is disabled by this host');
+      return apiErrors.badRequest('このホストでは Stripe 決済が無効になっています');
     }
 
     if (!isStripeConfigured()) {
-      return apiErrors.internalError('Stripe billing is not configured');
+      return apiErrors.internalError('Stripe 決済が設定されていません');
     }
 
     const checkoutState = await getStripeCheckoutState(session.user.id);
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     // of recovering it. They should manage the existing one via the billing portal.
     if (checkoutState.hasRecoverableSubscription) {
       return apiErrors.badRequest(
-        'A subscription already exists for this account. Manage it from the billing portal.'
+        'このアカウントにはすでにサブスクリプションが存在します。請求ポータルから管理してください。'
       );
     }
 
@@ -96,6 +96,6 @@ export async function POST(request: NextRequest) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error creating Stripe checkout session:', error);
-    return apiErrors.internalError('Failed to start checkout');
+    return apiErrors.internalError('チェックアウトの開始に失敗しました');
   }
 }

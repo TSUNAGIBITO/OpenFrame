@@ -248,7 +248,7 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
             <div className="relative aspect-[16/9] w-full overflow-hidden border border-border bg-card shadow-2xl rounded-lg">
               <Image
                 src="/landing/deep-dive-dashboard-2.webp"
-                alt="Product Interface Preview"
+                alt="製品画面のプレビュー"
                 fill
                 className="object-cover"
                 priority
@@ -360,7 +360,7 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
                 <div className="relative aspect-[16/10] w-full border border-border/50 bg-background overflow-hidden">
                   <Image
                     src="/landing/compare-v2.webp"
-                    alt="Comparison Mode"
+                    alt="バージョン比較モード"
                     fill
                     className="object-cover object-left-top"
                     sizes="(min-width: 1024px) 50vw, 100vw"
@@ -442,7 +442,7 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
                 <div className="relative h-full w-full border border-border/50 overflow-hidden bg-background">
                   <Image
                     src="https://images.unsplash.com/photo-1542204165-65bf26472b9b?auto=format&fit=crop&w=800&q=80"
-                    alt="Annotate"
+                    alt="注釈"
                     fill
                     className="object-cover opacity-70"
                   />

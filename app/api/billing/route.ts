@@ -44,6 +44,6 @@ export async function GET() {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error fetching billing overview:', error);
-    return apiErrors.internalError('Failed to fetch billing overview');
+    return apiErrors.internalError('請求概要の取得に失敗しました');
   }
 }

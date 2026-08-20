@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
   const config = RATE_LIMIT_CONFIGS['onboarding-source'];
   const limit = await checkRateLimit(session.user.id, 'onboarding-source', config);
   if (!limit.allowed) {
-    return new Response(JSON.stringify({ error: 'Too many requests. Please try again later.' }), {
+    return new Response(JSON.stringify({ error: 'リクエストが多すぎます。しばらくしてから再度お試しください。' }), {
       status: 429,
       headers: {
         'Content-Type': 'application/json',
@@ -36,13 +36,13 @@ export async function POST(request: NextRequest) {
   }
 
   if (!isProductAnalyticsEnabled()) {
-    return apiErrors.badRequest('Analytics are disabled by this host');
+    return apiErrors.badRequest('このホストでは分析機能が無効になっています');
   }
 
   const body = await request.json().catch(() => null);
   const source = body?.source;
   if (!isAcquisitionChannel(source)) {
-    return apiErrors.badRequest('Unknown source');
+    return apiErrors.badRequest('不明な流入元です');
   }
 
   const note = typeof body?.note === 'string' ? body.note : null;

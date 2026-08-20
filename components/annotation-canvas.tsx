@@ -214,7 +214,7 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, AnnotationCan
           ref={containerRef}
           className="absolute inset-0 z-[60] cursor-pointer"
           onClick={handleViewClick}
-          title="Click to dismiss annotation"
+          title="クリックで注釈を閉じる"
         >
           <canvas ref={canvasRef} className="w-full h-full pointer-events-none" />
         </div>
@@ -290,7 +290,7 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, AnnotationCan
               className="h-7 w-7"
               onClick={handleUndo}
               disabled={strokes.length === 0}
-              title="Undo"
+              title="元に戻す"
             >
               <Undo2 className="h-4 w-4" />
             </Button>
@@ -300,7 +300,7 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, AnnotationCan
               className="h-7 w-7 text-destructive hover:bg-destructive/10"
               onClick={handleClear}
               disabled={strokes.length === 0}
-              title="Clear all"
+              title="すべて消去"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -314,7 +314,7 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, AnnotationCan
             size="icon"
             className="h-7 w-7"
             onClick={onCancel}
-            title="Close annotation tool"
+            title="注釈ツールを閉じる"
           >
             <X className="h-4 w-4" />
           </Button>

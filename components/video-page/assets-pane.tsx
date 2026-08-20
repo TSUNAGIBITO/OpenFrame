@@ -47,7 +47,7 @@ import { resolvePublicBunnyCdnHostname } from '@/lib/bunny-cdn';
 import { cn } from '@/lib/utils';
 
 const MAX_AUDIO_UPLOAD_SIZE = 10 * 1024 * 1024; // 10MB
-const MAX_AUDIO_UPLOAD_SIZE_MESSAGE = 'File too large. Maximum size is 10MB.';
+const MAX_AUDIO_UPLOAD_SIZE_MESSAGE = 'ファイルが大きすぎます。最大サイズは10MBです。';
 
 function formatTime(seconds: number): string {
   const s = Math.floor(seconds);
@@ -375,7 +375,7 @@ export const AssetsPane = memo(function AssetsPane({
         } | null;
         const uploadedImageUrl = uploadPayload?.data?.url;
         if (!uploadRes.ok || !uploadedImageUrl) {
-          toastApiError(uploadPayload, 'Failed to upload image', { prefix: file.name });
+          toastApiError(uploadPayload, '画像のアップロードに失敗しました', { prefix: file.name });
           return false;
         }
 
@@ -388,7 +388,7 @@ export const AssetsPane = memo(function AssetsPane({
         return !!created;
       } catch (error) {
         console.error('Failed to upload image asset:', error);
-        toastApiError(error, 'Failed to upload image', { prefix: file.name });
+        toastApiError(error, '画像のアップロードに失敗しました', { prefix: file.name });
         return false;
       }
     },
@@ -418,9 +418,9 @@ export const AssetsPane = memo(function AssetsPane({
         }
 
         if (successCount > 0 && failCount === 0) {
-          toast.success(successCount === 1 ? 'Image uploaded' : `${successCount} images uploaded`);
+          toast.success(successCount === 1 ? '画像をアップロードしました' : `${successCount}件の画像をアップロードしました`);
         } else if (successCount > 0 && failCount > 0) {
-          toast.warning(`${successCount} uploaded, ${failCount} failed`);
+          toast.warning(`${successCount}件成功、${failCount}件失敗`);
         }
       } finally {
         setIsUploadingImage(false);
@@ -457,8 +457,8 @@ export const AssetsPane = memo(function AssetsPane({
 
     toast.success(
       validFiles.length === 1
-        ? 'Image attached. Click Upload to send.'
-        : `${validFiles.length} images attached. Click Upload to send.`
+        ? '画像を添付しました。「アップロード」を押して送信してください。'
+        : `${validFiles.length}件の画像を添付しました。「アップロード」を押して送信してください。`
     );
   }, []);
 
@@ -494,7 +494,7 @@ export const AssetsPane = memo(function AssetsPane({
   const handleBunnyFileUpload = useCallback(
     async (file: File, options?: { index?: number; total?: number }) => {
       if (!file.type.startsWith('video/')) {
-        toast.error(`${file.name}: Please select a video file`);
+        toast.error(`${file.name}: 動画ファイルを選択してください`);
         return false;
       }
 
@@ -504,7 +504,7 @@ export const AssetsPane = memo(function AssetsPane({
         setIsUploadingBunny(true);
         setBunnyProgress(0);
         if (options?.total && options.total > 1) {
-          setBunnyUploadLabel(`Uploading ${options.index ?? 1} of ${options.total}: ${file.name}`);
+          setBunnyUploadLabel(`アップロード中 ${options.index ?? 1}/${options.total}: ${file.name}`);
         } else {
           setBunnyUploadLabel('');
         }
@@ -530,7 +530,7 @@ export const AssetsPane = memo(function AssetsPane({
         } | null;
 
         if (!initRes.ok || !initPayload?.data) {
-          toastApiError(initPayload, 'Failed to initialize Bunny upload', { prefix: file.name });
+          toastApiError(initPayload, 'アップロードの初期化に失敗しました', { prefix: file.name });
           return false;
         }
 
@@ -582,7 +582,7 @@ export const AssetsPane = memo(function AssetsPane({
         return true;
       } catch (error) {
         console.error('Failed to upload Bunny asset:', error);
-        toastApiError(error, 'Failed to upload Bunny video', { prefix: file.name });
+        toastApiError(error, '動画のアップロードに失敗しました', { prefix: file.name });
         if (uploadedVideoId && uploadToken) {
           await fetch(`/api/videos/${videoId}/assets/bunny-init`, {
             method: 'DELETE',
@@ -603,7 +603,7 @@ export const AssetsPane = memo(function AssetsPane({
   const handleR2FileUpload = useCallback(
     async (file: File, options?: { index?: number; total?: number }) => {
       if (!file.type.startsWith('video/')) {
-        toast.error(`${file.name}: Please select a video file`);
+        toast.error(`${file.name}: 動画ファイルを選択してください`);
         return false;
       }
 
@@ -611,7 +611,7 @@ export const AssetsPane = memo(function AssetsPane({
         setIsUploadingBunny(true);
         setBunnyProgress(0);
         if (options?.total && options.total > 1) {
-          setBunnyUploadLabel(`Uploading ${options.index ?? 1} of ${options.total}: ${file.name}`);
+          setBunnyUploadLabel(`アップロード中 ${options.index ?? 1}/${options.total}: ${file.name}`);
         } else {
           setBunnyUploadLabel('');
         }
@@ -635,7 +635,7 @@ export const AssetsPane = memo(function AssetsPane({
         return true;
       } catch (error) {
         console.error('Failed to upload R2 asset video:', error);
-        toastApiError(error, 'Failed to upload video', { prefix: file.name });
+        toastApiError(error, '動画のアップロードに失敗しました', { prefix: file.name });
         return false;
       } finally {
         setIsUploadingBunny(false);
@@ -676,9 +676,9 @@ export const AssetsPane = memo(function AssetsPane({
       if (successCount > 0) setBunnyTitle('');
 
       if (successCount > 0 && failCount === 0) {
-        toast.success(successCount === 1 ? 'Video uploaded' : `${successCount} videos uploaded`);
+        toast.success(successCount === 1 ? '動画をアップロードしました' : `${successCount}件の動画をアップロードしました`);
       } else if (successCount > 0 && failCount > 0) {
-        toast.warning(`${successCount} uploaded, ${failCount} failed`);
+        toast.warning(`${successCount}件成功、${failCount}件失敗`);
       }
     },
     [handleVideoFileUpload]
@@ -689,7 +689,7 @@ export const AssetsPane = memo(function AssetsPane({
       file.type.startsWith('video/')
     );
     if (files.length === 0) {
-      toast.error('Please select valid video files');
+      toast.error('有効な動画ファイルを選択してください');
       return;
     }
     await handleVideoBatchUpload(files);
@@ -751,7 +751,7 @@ export const AssetsPane = memo(function AssetsPane({
         250
       );
     } catch {
-      toast.error('Could not access microphone');
+      toast.error('マイクにアクセスできませんでした');
     }
   }, []);
 
@@ -809,7 +809,7 @@ export const AssetsPane = memo(function AssetsPane({
             uploadPayload,
             uploadRes.status === 413
               ? MAX_AUDIO_UPLOAD_SIZE_MESSAGE
-              : 'Failed to upload voice recording',
+              : '音声のアップロードに失敗しました',
             { prefix: fileName }
           );
           return false;
@@ -819,13 +819,13 @@ export const AssetsPane = memo(function AssetsPane({
           provider: 'R2_AUDIO',
           sourceUrl: uploadedUrl,
           displayName:
-            displayName?.trim() || fileName.replace(/\.[^/.]+$/, '') || 'Voice Recording',
+            displayName?.trim() || fileName.replace(/\.[^/.]+$/, '') || '音声録音',
           reservationId: uploadPayload?.data?.reservationId ?? null,
         });
         return !!created;
       } catch (error) {
         console.error('Failed to upload voice asset:', error);
-        toastApiError(error, 'Failed to upload voice recording', { prefix: fileName });
+        toastApiError(error, '音声のアップロードに失敗しました', { prefix: fileName });
         return false;
       }
     },
@@ -860,8 +860,8 @@ export const AssetsPane = memo(function AssetsPane({
 
     toast.success(
       validFiles.length === 1
-        ? 'Audio file attached. Click Upload to send.'
-        : `${validFiles.length} audio files attached. Click Upload to send.`
+        ? '音声ファイルを添付しました。「アップロード」を押して送信してください。'
+        : `${validFiles.length}件の音声ファイルを添付しました。「アップロード」を押して送信してください。`
     );
   }, []);
 
@@ -880,7 +880,7 @@ export const AssetsPane = memo(function AssetsPane({
         const ok = await uploadSingleAudioAsset(
           audioBlob,
           'recording.webm',
-          voiceTitle.trim() || 'Voice Recording'
+          voiceTitle.trim() || '音声録音'
         );
         if (ok) {
           setVoiceTitle('');
@@ -918,10 +918,10 @@ export const AssetsPane = memo(function AssetsPane({
 
       if (successCount > 0 && failCount === 0) {
         toast.success(
-          successCount === 1 ? 'Audio uploaded' : `${successCount} audio files uploaded`
+          successCount === 1 ? '音声をアップロードしました' : `${successCount}件の音声ファイルをアップロードしました`
         );
       } else if (successCount > 0 && failCount > 0) {
-        toast.warning(`${successCount} uploaded, ${failCount} failed`);
+        toast.warning(`${successCount}件成功、${failCount}件失敗`);
       }
     } finally {
       setIsUploadingVoice(false);
@@ -972,7 +972,7 @@ export const AssetsPane = memo(function AssetsPane({
           audioFiles.push(file);
         } else {
           unsupportedCount += 1;
-          toast.error(`${file.name}: Unsupported file type`);
+          toast.error(`${file.name}: 対応していないファイル形式です`);
         }
       }
 
@@ -997,7 +997,7 @@ export const AssetsPane = memo(function AssetsPane({
         audioFiles.length === 0 &&
         unsupportedCount === 0
       ) {
-        toast.error('Drop an image, video, or audio file.');
+        toast.error('画像・動画・音声ファイルをドロップしてください。');
       }
     },
     [canUploadAssets, handleVideoBatchUpload, stageAudioFiles, stageImageFiles]
@@ -1008,7 +1008,7 @@ export const AssetsPane = memo(function AssetsPane({
       return (
         <div className="h-24 w-36 rounded border bg-muted flex flex-col items-center justify-center gap-1">
           <Volume2 className="h-6 w-6 text-muted-foreground" />
-          <span className="text-[10px] text-muted-foreground font-medium">Voice Recording</span>
+          <span className="text-[10px] text-muted-foreground font-medium">音声録音</span>
         </div>
       );
     }
@@ -1087,7 +1087,7 @@ export const AssetsPane = memo(function AssetsPane({
         ) : isReadyToPlay ? (
           <div className="h-full w-full bg-black/60 flex flex-col items-center justify-center gap-1">
             <Play className="h-4 w-4 text-emerald-300" />
-            <span className="text-[10px] text-emerald-100 font-medium">Ready to play</span>
+            <span className="text-[10px] text-emerald-100 font-medium">再生できます</span>
           </div>
         ) : (
           <FileVideo className="h-6 w-6 text-muted-foreground" />
@@ -1095,7 +1095,7 @@ export const AssetsPane = memo(function AssetsPane({
         {isProcessing && !isReadyToPlay && (
           <div className="absolute inset-0 bg-black/65 flex flex-col items-center justify-center gap-1">
             <Loader2 className="h-4 w-4 animate-spin text-white" />
-            <span className="text-[10px] text-white/90 font-medium">Processing...</span>
+            <span className="text-[10px] text-white/90 font-medium">処理中...</span>
           </div>
         )}
       </div>
@@ -1105,7 +1105,7 @@ export const AssetsPane = memo(function AssetsPane({
   const handleOpenAsset = (asset: VideoAsset) => {
     if (asset.kind === 'IMAGE') {
       if (!asset.sourceUrl) {
-        toast.error('Preview is unavailable for this asset');
+        toast.error('このアセットはプレビューを表示できません');
         return;
       }
       setPreviewImage(asset.sourceUrl);
@@ -1140,7 +1140,7 @@ export const AssetsPane = memo(function AssetsPane({
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="font-medium">Assets</span>
+          <span className="font-medium">アセット</span>
           <Badge variant="secondary">{assets.length}</Badge>
         </div>
       </div>
@@ -1155,9 +1155,9 @@ export const AssetsPane = memo(function AssetsPane({
           {isDragOver && (
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 rounded-lg bg-primary/10 border-2 border-dashed border-primary pointer-events-none">
               <UploadCloud className="h-8 w-8 text-primary" />
-              <span className="text-sm font-medium text-primary">Drop files to upload</span>
+              <span className="text-sm font-medium text-primary">ファイルをドロップしてアップロード</span>
               <span className="text-xs text-primary/80">
-                Multiple images, videos, or audio supported
+                複数の画像・動画・音声に対応しています
               </span>
             </div>
           )}
@@ -1168,25 +1168,25 @@ export const AssetsPane = memo(function AssetsPane({
             }
           >
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="image">Image</TabsTrigger>
+              <TabsTrigger value="image">画像</TabsTrigger>
               <TabsTrigger value="youtube">YouTube</TabsTrigger>
-              <TabsTrigger value="bunny">Video</TabsTrigger>
-              <TabsTrigger value="voice">Voice</TabsTrigger>
+              <TabsTrigger value="bunny">動画</TabsTrigger>
+              <TabsTrigger value="voice">音声</TabsTrigger>
             </TabsList>
           </Tabs>
 
           {uploadTab === 'image' && (
             <div className="space-y-2">
               <Input
-                placeholder="Optional name for mentions/tagging"
+                placeholder="メンション・タグ付け用の名前（任意）"
                 value={imageTitle}
                 onChange={(event) => setImageTitle(event.target.value)}
               />
               <p className="text-xs text-muted-foreground">
-                If set, this name will be used in @asset mentions.
+                設定すると、@asset メンションでこの名前が使われます。
               </p>
               <p className="text-xs text-muted-foreground">
-                Tip: paste an image with Ctrl/Cmd+V, or drop multiple files onto this panel.
+                ヒント: Ctrl/Cmd+V で画像を貼り付けるか、複数のファイルをこのパネルにドロップできます。
               </p>
               {pendingImageFiles.length > 0 ? (
                 <div className="space-y-1">
@@ -1195,7 +1195,7 @@ export const AssetsPane = memo(function AssetsPane({
                       key={`${file.name}-${file.size}-${file.lastModified}-${index}`}
                       className="rounded-md border px-2 py-1.5 text-xs flex items-center justify-between gap-2"
                     >
-                      <span className="truncate">Attached: {file.name}</span>
+                      <span className="truncate">添付済み: {file.name}</span>
                       <Button
                         type="button"
                         size="sm"
@@ -1205,7 +1205,7 @@ export const AssetsPane = memo(function AssetsPane({
                           setPendingImageFiles((prev) => prev.filter((_, i) => i !== index));
                         }}
                       >
-                        Remove
+                        削除
                       </Button>
                     </div>
                   ))}
@@ -1219,7 +1219,7 @@ export const AssetsPane = memo(function AssetsPane({
                       if (imageInputRef.current) imageInputRef.current.value = '';
                     }}
                   >
-                    Clear all
+                    すべてクリア
                   </Button>
                 </div>
               ) : null}
@@ -1241,14 +1241,14 @@ export const AssetsPane = memo(function AssetsPane({
                   <UploadCloud className="h-4 w-4 mr-2" />
                 )}
                 {isUploadingImage
-                  ? 'Uploading...'
+                  ? 'アップロード中...'
                   : isCreatingAsset
-                    ? 'Saving...'
+                    ? '保存中...'
                     : pendingImageFiles.length > 1
-                      ? `Upload ${pendingImageFiles.length} Images`
+                      ? `${pendingImageFiles.length}件の画像をアップロード`
                       : pendingImageFiles.length === 1
-                        ? 'Upload Image'
-                        : 'Select Images'}
+                        ? '画像をアップロード'
+                        : '画像を選択'}
               </Button>
               <input
                 ref={imageInputRef}
@@ -1269,7 +1269,7 @@ export const AssetsPane = memo(function AssetsPane({
                 onChange={(event) => setYoutubeUrl(event.target.value)}
               />
               <Input
-                placeholder="Optional display name"
+                placeholder="表示名（任意）"
                 value={youtubeTitle}
                 onChange={(event) => setYoutubeTitle(event.target.value)}
               />
@@ -1279,7 +1279,7 @@ export const AssetsPane = memo(function AssetsPane({
                 onClick={handleCreateYoutubeAsset}
               >
                 <Youtube className="h-4 w-4 mr-2" />
-                Add YouTube Asset
+                YouTubeアセットを追加
               </Button>
             </div>
           )}
@@ -1287,15 +1287,15 @@ export const AssetsPane = memo(function AssetsPane({
           {uploadTab === 'bunny' && (
             <div className="space-y-2">
               <Input
-                placeholder="Optional name for mentions/tagging"
+                placeholder="メンション・タグ付け用の名前（任意）"
                 value={bunnyTitle}
                 onChange={(event) => setBunnyTitle(event.target.value)}
               />
               <p className="text-xs text-muted-foreground">
-                If set, this name will be used in @asset mentions.
+                設定すると、@asset メンションでこの名前が使われます。
               </p>
               <p className="text-xs text-muted-foreground">
-                Drop multiple video files onto this panel to upload them in sequence.
+                複数の動画ファイルをこのパネルにドロップすると、順番にアップロードします。
               </p>
               <Button
                 variant="outline"
@@ -1308,7 +1308,7 @@ export const AssetsPane = memo(function AssetsPane({
                 ) : (
                   <UploadCloud className="h-4 w-4 mr-2" />
                 )}
-                {isUploadingBunny ? 'Uploading...' : 'Select Videos'}
+                {isUploadingBunny ? 'アップロード中...' : '動画を選択'}
               </Button>
               <input
                 ref={bunnyInputRef}
@@ -1337,7 +1337,7 @@ export const AssetsPane = memo(function AssetsPane({
           {uploadTab === 'voice' && (
             <div className="space-y-2">
               <Input
-                placeholder="Optional name for this recording"
+                placeholder="この録音の名前（任意）"
                 value={voiceTitle}
                 onChange={(e) => setVoiceTitle(e.target.value)}
                 disabled={isRecording || isUploadingVoice}
@@ -1349,7 +1349,7 @@ export const AssetsPane = memo(function AssetsPane({
                       key={`${file.name}-${file.size}-${file.lastModified}-${index}`}
                       className="rounded-md border px-2 py-1.5 text-xs flex items-center justify-between gap-2"
                     >
-                      <span className="truncate">Attached: {file.name}</span>
+                      <span className="truncate">添付済み: {file.name}</span>
                       <Button
                         type="button"
                         size="sm"
@@ -1359,7 +1359,7 @@ export const AssetsPane = memo(function AssetsPane({
                           setPendingAudioFiles((prev) => prev.filter((_, i) => i !== index));
                         }}
                       >
-                        Remove
+                        削除
                       </Button>
                     </div>
                   ))}
@@ -1373,7 +1373,7 @@ export const AssetsPane = memo(function AssetsPane({
                       if (voiceInputRef.current) voiceInputRef.current.value = '';
                     }}
                   >
-                    Clear all
+                    すべてクリア
                   </Button>
                   <Button
                     className="w-full"
@@ -1386,10 +1386,10 @@ export const AssetsPane = memo(function AssetsPane({
                       <UploadCloud className="h-4 w-4 mr-2" />
                     )}
                     {isUploadingVoice
-                      ? 'Uploading...'
+                      ? 'アップロード中...'
                       : pendingAudioFiles.length > 1
-                        ? `Upload ${pendingAudioFiles.length} Files`
-                        : 'Upload File'}
+                        ? `${pendingAudioFiles.length}件のファイルをアップロード`
+                        : 'ファイルをアップロード'}
                   </Button>
                 </div>
               ) : isRecording ? (
@@ -1399,7 +1399,7 @@ export const AssetsPane = memo(function AssetsPane({
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
                     </span>
-                    <span className="text-red-500 font-medium">Recording</span>
+                    <span className="text-red-500 font-medium">録音中</span>
                     <span className="ml-auto tabular-nums text-muted-foreground">
                       {String(Math.floor(recordingTime / 60)).padStart(2, '0')}:
                       {String(recordingTime % 60).padStart(2, '0')}
@@ -1409,7 +1409,7 @@ export const AssetsPane = memo(function AssetsPane({
                     size="icon"
                     variant="outline"
                     className="h-9 w-9 shrink-0"
-                    title="Stop recording"
+                    title="録音を停止"
                     onClick={stopRecording}
                   >
                     <Square className="h-3.5 w-3.5 fill-current" />
@@ -1418,7 +1418,7 @@ export const AssetsPane = memo(function AssetsPane({
                     size="icon"
                     variant="ghost"
                     className="h-9 w-9 shrink-0"
-                    title="Cancel recording"
+                    title="録音をキャンセル"
                     onClick={cancelRecording}
                   >
                     <X className="h-4 w-4" />
@@ -1475,13 +1475,13 @@ export const AssetsPane = memo(function AssetsPane({
                       ) : (
                         <UploadCloud className="h-4 w-4 mr-2" />
                       )}
-                      {isUploadingVoice ? 'Uploading...' : 'Upload Recording'}
+                      {isUploadingVoice ? 'アップロード中...' : '録音をアップロード'}
                     </Button>
                     <Button
                       variant="outline"
                       size="icon"
                       className="h-9 w-9 shrink-0"
-                      title="Discard and re-record"
+                      title="破棄して録り直す"
                       onClick={cancelRecording}
                     >
                       <X className="h-4 w-4" />
@@ -1497,7 +1497,7 @@ export const AssetsPane = memo(function AssetsPane({
                     disabled={isUploadingVoice || isCreatingAsset}
                   >
                     <Mic className="h-4 w-4 mr-2" />
-                    Start Recording
+                    録音を開始
                   </Button>
                   <Button
                     variant="outline"
@@ -1506,7 +1506,7 @@ export const AssetsPane = memo(function AssetsPane({
                     onClick={() => voiceInputRef.current?.click()}
                   >
                     <UploadCloud className="h-4 w-4 mr-2" />
-                    Select Audio Files
+                    音声ファイルを選択
                   </Button>
                   <input
                     ref={voiceInputRef}
@@ -1519,14 +1519,14 @@ export const AssetsPane = memo(function AssetsPane({
                 </div>
               )}
               <p className="text-xs text-muted-foreground">
-                Or drag multiple audio files anywhere onto this panel.
+                または、複数の音声ファイルをこのパネルのどこかにドラッグしてください。
               </p>
             </div>
           )}
         </div>
       ) : (
         <div className="rounded-lg border p-3 text-xs text-muted-foreground">
-          You do not have permission to upload assets.
+          アセットをアップロードする権限がありません。
         </div>
       )}
 
@@ -1569,7 +1569,7 @@ export const AssetsPane = memo(function AssetsPane({
         }}
       >
         <DialogContent className="max-w-sm">
-          <DialogTitle>{selectedAsset?.displayName || 'Voice Recording'}</DialogTitle>
+          <DialogTitle>{selectedAsset?.displayName || '音声録音'}</DialogTitle>
           {selectedAsset?.sourceUrl ? (
             <div className="flex items-center gap-2 p-2 bg-muted rounded">
               <Button
@@ -1607,7 +1607,7 @@ export const AssetsPane = memo(function AssetsPane({
               )}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">Audio preview unavailable.</p>
+            <p className="text-sm text-muted-foreground">音声プレビューを表示できません。</p>
           )}
         </DialogContent>
       </Dialog>
@@ -1629,7 +1629,7 @@ export const AssetsPane = memo(function AssetsPane({
           }}
         >
           <DialogTitle className="sr-only">
-            {selectedAsset?.displayName || 'Video Preview'}
+            {selectedAsset?.displayName || '動画プレビュー'}
           </DialogTitle>
 
           <div
@@ -1641,7 +1641,7 @@ export const AssetsPane = memo(function AssetsPane({
                 className="flex-1 min-w-0 text-sm text-foreground truncate"
                 title={selectedAsset?.displayName || undefined}
               >
-                {selectedAsset?.displayName || 'Video Preview'}
+                {selectedAsset?.displayName || '動画プレビュー'}
               </p>
               {selectedAsset?.provider === 'YOUTUBE' && selectedAsset.providerVideoId ? (
                 <Button asChild variant="outline" size="sm" className="h-8 shrink-0">
@@ -1650,7 +1650,7 @@ export const AssetsPane = memo(function AssetsPane({
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Open on YouTube
+                    YouTubeで開く
                   </a>
                 </Button>
               ) : selectedAsset?.provider === 'R2_VIDEO' && canDownloadAssets ? (
@@ -1658,8 +1658,8 @@ export const AssetsPane = memo(function AssetsPane({
                   variant="outline"
                   size="icon"
                   className="h-8 w-8 shrink-0"
-                  title="Download video"
-                  aria-label="Download video"
+                  title="動画をダウンロード"
+                  aria-label="動画をダウンロード"
                   disabled={activeDownloadAssetId === selectedAsset.id}
                   onClick={() => void downloadAsset(selectedAsset)}
                 >
@@ -1677,8 +1677,8 @@ export const AssetsPane = memo(function AssetsPane({
                       variant="outline"
                       size="icon"
                       className="h-8 w-8 shrink-0"
-                      title="Download Bunny video"
-                      aria-label="Download Bunny video"
+                      title="動画をダウンロード"
+                      aria-label="動画をダウンロード"
                       disabled={
                         activeDownloadAssetId === selectedAsset.id || isSelectedBunnyProcessing
                       }
@@ -1693,13 +1693,13 @@ export const AssetsPane = memo(function AssetsPane({
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => void downloadAsset(selectedAsset, 'original')}>
                       <Download className="h-3 w-3 mr-2" />
-                      Original
+                      オリジナル
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => void downloadAsset(selectedAsset, 'compressed')}
                     >
                       <Download className="h-3 w-3 mr-2" />
-                      Compressed
+                      圧縮版
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -1710,7 +1710,7 @@ export const AssetsPane = memo(function AssetsPane({
                 className="h-8 w-8 shrink-0"
                 onClick={() => setSelectedAsset(null)}
               >
-                <span className="sr-only">Close</span>
+                <span className="sr-only">閉じる</span>
                 <X className="h-4 w-4" />
               </Button>
             </div>

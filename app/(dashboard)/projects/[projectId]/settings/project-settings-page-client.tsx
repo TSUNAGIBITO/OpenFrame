@@ -44,20 +44,20 @@ const visibilityOptions: {
 }[] = [
   {
     value: 'PRIVATE',
-    label: 'Private',
-    description: 'Only you can access this project',
+    label: '非公開',
+    description: 'あなただけがこのプロジェクトにアクセスできます',
     icon: <Lock className="h-5 w-5" />,
   },
   {
     value: 'INVITE',
-    label: 'Invite Only',
-    description: 'Share with specific people via email',
+    label: '招待制',
+    description: 'メールで特定の人に共有します',
     icon: <UserPlus className="h-5 w-5" />,
   },
   {
     value: 'PUBLIC',
-    label: 'Public',
-    description: 'Anyone with the link can view',
+    label: '公開',
+    description: 'リンクを知っている人は誰でも閲覧できます',
     icon: <Globe className="h-5 w-5" />,
   },
 ];
@@ -114,7 +114,7 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
           });
         }
       })
-      .catch(() => setError('Failed to load project'))
+      .catch(() => setError('プロジェクトの読み込みに失敗しました'))
       .finally(() => setIsLoading(false));
 
     // Fetch tags
@@ -146,14 +146,14 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Failed to update project');
+        setError(data.error || 'プロジェクトの更新に失敗しました');
         return;
       }
 
-      setSuccess('Project settings saved successfully');
+      setSuccess('プロジェクト設定を保存しました');
       setTimeout(() => setSuccess(''), 3000);
     } catch {
-      setError('Something went wrong. Please try again.');
+      setError('問題が発生しました。もう一度お試しください。');
     } finally {
       setIsSaving(false);
     }
@@ -216,7 +216,7 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
 
   const handleDelete = async () => {
     if (deleteConfirmation !== formData.name) {
-      setError('Project name does not match');
+      setError('プロジェクト名が一致しません');
       return;
     }
 
@@ -230,13 +230,13 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
 
       if (!response.ok) {
         const data = await response.json();
-        setError(data.error || 'Failed to delete project');
+        setError(data.error || 'プロジェクトの削除に失敗しました');
         return;
       }
 
       router.push('/dashboard');
     } catch {
-      setError('Something went wrong. Please try again.');
+      setError('問題が発生しました。もう一度お試しください。');
     } finally {
       setIsDeleting(false);
     }
@@ -259,7 +259,7 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
             className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Project
+            プロジェクトに戻る
           </Link>
         </div>
 
@@ -270,16 +270,16 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
               <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <Settings className="h-7 w-7 text-primary" />
               </div>
-              <CardTitle className="text-2xl">Project Settings</CardTitle>
+              <CardTitle className="text-2xl">プロジェクト設定</CardTitle>
               <CardDescription className="text-base">
-                Update your project details and access settings
+                プロジェクトの詳細とアクセス設定を更新します
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
               <form onSubmit={handleSave} className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="name" className="text-sm font-medium">
-                    Project Name
+                    プロジェクト名
                   </Label>
                   <Input
                     id="name"
@@ -293,7 +293,7 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
 
                 <div className="space-y-2">
                   <Label htmlFor="description" className="text-sm font-medium">
-                    Description
+                    説明
                   </Label>
                   <Textarea
                     id="description"
@@ -308,7 +308,7 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
                 </div>
 
                 <div className="space-y-3">
-                  <Label className="text-sm font-medium">Who can access?</Label>
+                  <Label className="text-sm font-medium">アクセスできる人</Label>
                   <div className="grid gap-3">
                     {visibilityOptions.map((option) => (
                       <button
@@ -355,11 +355,9 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
 
                 <div className="space-y-3 rounded-xl border p-4">
                   <div>
-                    <Label className="text-sm font-medium">Project downloads</Label>
+                    <Label className="text-sm font-medium">プロジェクトのダウンロード</Label>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Allow viewers to download project files. Project admins can always download.
-                      When enabled on a public project, anyone with the link can download files
-                      without signing in.
+                      閲覧者がプロジェクトのファイルをダウンロードできるようにします。プロジェクト管理者は常にダウンロードできます。公開プロジェクトで有効にすると、リンクを知っている人は誰でもサインインせずにファイルをダウンロードできます。
                     </p>
                   </div>
                   <button
@@ -375,10 +373,9 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
                     }`}
                   >
                     <div>
-                      <div className="font-medium">Allow viewer downloads</div>
+                      <div className="font-medium">閲覧者のダウンロードを許可</div>
                       <div className="text-sm text-muted-foreground">
-                        Public and invited viewers can download files when enabled. On public
-                        projects this includes unauthenticated visitors.
+                        有効にすると、公開・招待された閲覧者がファイルをダウンロードできます。公開プロジェクトでは未認証の訪問者も含まれます。
                       </div>
                     </div>
                     <div
@@ -410,7 +407,7 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
 
                 <Button type="submit" disabled={isSaving || !formData.name.trim()} className="h-11">
                   {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                  Save Changes
+                  変更を保存
                 </Button>
               </form>
             </CardContent>
@@ -421,9 +418,9 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Tag className="h-5 w-5" />
-                Comment Tags
+                コメントタグ
               </CardTitle>
-              <CardDescription>Customize tags for categorizing comments on videos</CardDescription>
+              <CardDescription>動画のコメントを分類するタグをカスタマイズします</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Existing tags */}
@@ -438,13 +435,13 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
                         <input
                           type="color"
                           value={editTagColor}
-                          aria-label={`Tag colour for ${tag.name}`}
+                          aria-label={`${tag.name}のタグ色`}
                           onChange={(e) => setEditTagColor(e.target.value)}
                           className="w-8 h-8 rounded cursor-pointer border-0"
                         />
                         <Input
                           value={editTagName}
-                          aria-label={`Tag name for ${tag.name}`}
+                          aria-label={`${tag.name}のタグ名`}
                           onChange={(e) => setEditTagName(e.target.value)}
                           className="flex-1 h-8"
                           onKeyDown={(e) => e.key === 'Enter' && handleUpdateTag(tag.id)}
@@ -452,7 +449,7 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
                         <Button
                           size="sm"
                           variant="ghost"
-                          aria-label={`Save tag ${tag.name}`}
+                          aria-label={`タグ「${tag.name}」を保存`}
                           onClick={() => handleUpdateTag(tag.id)}
                         >
                           <Save className="h-4 w-4" aria-hidden="true" />
@@ -460,7 +457,7 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
                         <Button
                           size="sm"
                           variant="ghost"
-                          aria-label={`Cancel editing tag ${tag.name}`}
+                          aria-label={`タグ「${tag.name}」の編集をキャンセル`}
                           onClick={() => setEditingTagId(null)}
                         >
                           <X className="h-4 w-4" aria-hidden="true" />
@@ -482,13 +479,13 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
                             setEditTagColor(tag.color);
                           }}
                         >
-                          Edit
+                          編集
                         </Button>
                         <Button
                           size="sm"
                           variant="ghost"
                           className="text-destructive hover:text-destructive"
-                          aria-label={`Delete tag ${tag.name}`}
+                          aria-label={`タグ「${tag.name}」を削除`}
                           onClick={() => handleDeleteTag(tag.id)}
                         >
                           <Trash2 className="h-4 w-4" aria-hidden="true" />
@@ -508,7 +505,7 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
                   className="w-8 h-8 rounded cursor-pointer border-0"
                 />
                 <Input
-                  placeholder="New tag name..."
+                  placeholder="新しいタグ名..."
                   value={newTagName}
                   onChange={(e) => setNewTagName(e.target.value)}
                   className="flex-1 h-8"
@@ -534,44 +531,42 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
             <CardHeader className="pb-3">
               <CardTitle className="text-lg text-destructive flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5" />
-                Danger Zone
+                危険な操作
               </CardTitle>
               <CardDescription>
-                Irreversible actions that will permanently affect your project
+                プロジェクトに恒久的な影響を与える、取り消せない操作です
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between p-4 rounded-xl border border-destructive/20 bg-destructive/5">
                 <div>
-                  <h4 className="font-medium">Delete this project</h4>
-                  <p className="text-sm text-muted-foreground">This action cannot be undone</p>
+                  <h4 className="font-medium">このプロジェクトを削除</h4>
+                  <p className="text-sm text-muted-foreground">この操作は取り消せません</p>
                 </div>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="destructive" size="sm">
                       <Trash2 className="h-4 w-4 mr-2" />
-                      Delete
+                      削除
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Delete &quot;{formData.name}&quot;?</AlertDialogTitle>
+                      <AlertDialogTitle>「{formData.name}」を削除しますか？</AlertDialogTitle>
                       <AlertDialogDescription asChild>
                         <div className="space-y-4">
                           <p>
-                            This will permanently delete this project and all of its videos,
-                            versions, and comments. This action cannot be undone.
+                            このプロジェクトと、そのすべての動画・バージョン・コメントを完全に削除します。この操作は取り消せません。
                           </p>
                           <div className="space-y-2">
                             <Label htmlFor="delete-confirm">
-                              Type <strong className="text-foreground">{formData.name}</strong> to
-                              confirm
+                              確認のため <strong className="text-foreground">{formData.name}</strong> と入力してください
                             </Label>
                             <Input
                               id="delete-confirm"
                               value={deleteConfirmation}
                               onChange={(e) => setDeleteConfirmation(e.target.value)}
-                              placeholder="Project name"
+                              placeholder="プロジェクト名"
                               className="h-11"
                             />
                           </div>
@@ -580,7 +575,7 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel onClick={() => setDeleteConfirmation('')}>
-                        Cancel
+                        キャンセル
                       </AlertDialogCancel>
                       <AlertDialogAction
                         onClick={handleDelete}
@@ -588,7 +583,7 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
                         {isDeleting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                        Delete Project
+                        プロジェクトを削除
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>

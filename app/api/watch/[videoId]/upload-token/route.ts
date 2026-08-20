@@ -19,11 +19,11 @@ type RouteParams = { params: Promise<{ videoId: string }> };
 function validateSameOriginRequest(request: NextRequest): Response | null {
   const origin = request.headers.get('origin');
   if (!origin) {
-    return apiErrors.forbidden('Missing Origin header');
+    return apiErrors.forbidden('Origin ヘッダーがありません');
   }
 
   if (!isTrustedSameOriginRequest(request)) {
-    return apiErrors.forbidden('Cross-origin requests are not allowed');
+    return apiErrors.forbidden('クロスオリジンのリクエストは許可されていません');
   }
 
   return null;
@@ -42,14 +42,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const session = await auth();
     if (session?.user?.id) {
-      return apiErrors.badRequest('Upload token is only required for guest uploads');
+      return apiErrors.badRequest('アップロードトークンが必要なのはゲストのアップロードのみです');
     }
 
     const { videoId } = await params;
     const body = await request.json().catch(() => ({}));
     const intent = body?.intent;
     if (intent !== 'audio' && intent !== 'image') {
-      return apiErrors.badRequest('intent must be "audio" or "image"');
+      return apiErrors.badRequest('intent は "audio" または "image" である必要があります');
     }
 
     const video = await db.video.findUnique({
@@ -81,12 +81,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const canCommentWithMembership = !!session?.user?.id && access.hasAccess;
     const canCommentWithShareLink = shareAccess.canComment && shareAccess.allowGuests;
     if (!canCommentWithMembership && !canCommentWithShareLink) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const context = deriveGuestUploadContext(request, shareSession?.token ?? null);
     if (!context) {
-      return apiErrors.forbidden('Missing trusted client IP header');
+      return apiErrors.forbidden('信頼できるクライアント IP ヘッダーがありません');
     }
 
     const token = createGuestUploadToken({
@@ -104,6 +104,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error issuing guest upload token:', error);
-    return apiErrors.internalError('Failed to issue upload token');
+    return apiErrors.internalError('アップロードトークンの発行に失敗しました');
   }
 }

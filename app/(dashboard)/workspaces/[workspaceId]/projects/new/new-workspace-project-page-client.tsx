@@ -20,20 +20,20 @@ const visibilityOptions: {
 }[] = [
   {
     value: 'PRIVATE',
-    label: 'Private',
-    description: 'Only workspace members and project members can access',
+    label: '非公開',
+    description: 'ワークスペースメンバーとプロジェクトメンバーのみアクセスできます',
     icon: <Lock className="h-5 w-5" />,
   },
   {
     value: 'INVITE',
-    label: 'Invite Only',
-    description: 'Share with specific people via email',
+    label: '招待のみ',
+    description: 'メールで特定の相手にのみ共有します',
     icon: <UserPlus className="h-5 w-5" />,
   },
   {
     value: 'PUBLIC',
-    label: 'Public',
-    description: 'Anyone with the link can view',
+    label: '公開',
+    description: 'リンクを知っている人は誰でも閲覧できます',
     icon: <Globe className="h-5 w-5" />,
   },
 ];
@@ -63,13 +63,13 @@ export default function NewWorkspaceProjectPageClient({ workspaceId }: { workspa
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Failed to create project');
+        setError(data.error || 'プロジェクトの作成に失敗しました');
         return;
       }
 
       router.push(`/projects/${data.data.id}`);
     } catch {
-      setError('Something went wrong. Please try again.');
+      setError('問題が発生しました。もう一度お試しください。');
     } finally {
       setIsLoading(false);
     }
@@ -84,7 +84,7 @@ export default function NewWorkspaceProjectPageClient({ workspaceId }: { workspa
             className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Workspace
+            ワークスペースに戻る
           </Link>
         </div>
 
@@ -93,20 +93,20 @@ export default function NewWorkspaceProjectPageClient({ workspaceId }: { workspa
             <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
               <FolderPlus className="h-7 w-7 text-primary" />
             </div>
-            <CardTitle className="text-2xl">Create Project in Workspace</CardTitle>
+            <CardTitle className="text-2xl">ワークスペースにプロジェクトを作成</CardTitle>
             <CardDescription className="text-base">
-              This project will be accessible to all workspace members
+              このプロジェクトはすべてのワークスペースメンバーがアクセスできます
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium">
-                  Project Name
+                  プロジェクト名
                 </Label>
                 <Input
                   id="name"
-                  placeholder="e.g., Product Launch Video"
+                  placeholder="例: 製品ローンチ動画"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
@@ -116,11 +116,11 @@ export default function NewWorkspaceProjectPageClient({ workspaceId }: { workspa
 
               <div className="space-y-2">
                 <Label htmlFor="description" className="text-sm font-medium">
-                  Description <span className="text-muted-foreground font-normal">(optional)</span>
+                  説明 <span className="text-muted-foreground font-normal">（任意）</span>
                 </Label>
                 <Textarea
                   id="description"
-                  placeholder="What is this project about?"
+                  placeholder="このプロジェクトの内容は？"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
@@ -129,7 +129,7 @@ export default function NewWorkspaceProjectPageClient({ workspaceId }: { workspa
               </div>
 
               <div className="space-y-3">
-                <Label className="text-sm font-medium">Visibility</Label>
+                <Label className="text-sm font-medium">公開範囲</Label>
                 <div className="grid gap-2">
                   {visibilityOptions.map((option) => (
                     <label
@@ -170,10 +170,10 @@ export default function NewWorkspaceProjectPageClient({ workspaceId }: { workspa
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Creating...
+                    作成中...
                   </>
                 ) : (
-                  'Create Project'
+                  'プロジェクトを作成'
                 )}
               </Button>
             </form>

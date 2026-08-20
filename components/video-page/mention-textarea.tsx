@@ -160,7 +160,7 @@ export function MentionTextarea({
       {mentionRange && (
         <div className="absolute left-0 right-0 bottom-full mb-1 z-30 rounded-md border bg-popover shadow-md overflow-hidden">
           {filteredAssets.length === 0 ? (
-            <div className="px-2 py-1.5 text-xs text-muted-foreground">No asset found</div>
+            <div className="px-2 py-1.5 text-xs text-muted-foreground">アセットが見つかりません</div>
           ) : (
             filteredAssets.map((asset, index) => (
               <button

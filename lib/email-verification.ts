@@ -162,25 +162,25 @@ export async function sendVerificationEmail(
   // (and from there on the shared project) instead of a generic login page.
   const nextParam = options?.next ? `&next=${encodeURIComponent(options.next)}` : '';
   const verifyUrl = `${baseUrl}/api/auth/verify-email?token=${encodeURIComponent(token)}${nextParam}`;
-  const from = process.env.SMTP_FROM || process.env.EMAIL_FROM || 'OpenFrame <info@open-frame.net>';
+  const from = process.env.SMTP_FROM || process.env.EMAIL_FROM || 'つなぐレビュー <info@open-frame.net>';
 
   const html = brandedEmailTemplate(
     `
-        <tr>${emailHeading('✉', 'Verify your email address')}</tr>
+        <tr>${emailHeading('✉', 'メールアドレスの確認')}</tr>
         <tr><td style="padding:20px;">
           <table cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:20px;">
-            ${emailRow('Account', email, true)}
-            ${emailRow('Expires in', `${TOKEN_EXPIRY_HOURS} hours`)}
+            ${emailRow('アカウント', email, true)}
+            ${emailRow('有効期限', `${TOKEN_EXPIRY_HOURS}時間`)}
           </table>
           <p style="margin:0 0 20px;font-size:14px;color:${EMAIL_COLORS.textSecondary};line-height:1.6;">
-            Click the button below to verify your email address and activate your OpenFrame account.
-            If you did not create an account, you can safely ignore this email.
+            下のボタンをクリックして、メールアドレスを確認しつなぐレビューのアカウントを有効化してください。
+            心当たりのない場合は、このメールは破棄していただいて問題ありません。
           </p>
-          ${emailButton('Verify Email Address  →', verifyUrl)}
+          ${emailButton('メールアドレスを確認  →', verifyUrl)}
         </td></tr>
         `,
     {
-      footerText: `This link expires in ${TOKEN_EXPIRY_HOURS} hours.`,
+      footerText: `このリンクは${TOKEN_EXPIRY_HOURS}時間後に期限切れになります。`,
     }
   );
 
@@ -188,7 +188,7 @@ export async function sendVerificationEmail(
     await transporter.sendMail({
       from,
       to: email,
-      subject: 'Verify your OpenFrame email address',
+      subject: 'つなぐレビュー: メールアドレスの確認',
       html,
     });
   } catch (err) {

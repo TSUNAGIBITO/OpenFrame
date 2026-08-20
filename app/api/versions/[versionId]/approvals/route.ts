@@ -35,7 +35,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 
     const access = await checkProjectAccess(version.video.project, session.user.id);
     const hasMembership = access.isOwner || access.isProjectMember || access.isWorkspaceMember;
-    if (!hasMembership) return apiErrors.forbidden('Access denied');
+    if (!hasMembership) return apiErrors.forbidden('アクセスが拒否されました');
 
     const requests = await db.approvalRequest.findMany({
       where: { versionId },
@@ -56,7 +56,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error fetching approvals:', error);
-    return apiErrors.internalError('Failed to fetch approvals');
+    return apiErrors.internalError('承認情報の取得に失敗しました');
   }
 }
 
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     if (!version) return apiErrors.notFound('Version');
 
     const access = await checkProjectAccess(version.video.project, session.user.id);
-    if (!access.canEdit) return apiErrors.forbidden('Access denied');
+    if (!access.canEdit) return apiErrors.forbidden('アクセスが拒否されました');
 
     const body = (await request.json().catch(() => ({}))) as {
       approverIds?: unknown;
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     };
     const message = typeof body.message === 'string' ? body.message.trim() : '';
     if (message.length > 2000) {
-      return apiErrors.badRequest('Message must be 2000 characters or fewer');
+      return apiErrors.badRequest('メッセージは 2000 文字以内で入力してください');
     }
 
     const rawApproverIds = Array.isArray(body.approverIds) ? body.approverIds : [];
@@ -109,11 +109,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     );
 
     if (approverIds.length === 0) {
-      return apiErrors.badRequest('At least one approver is required');
+      return apiErrors.badRequest('承認者を 1 名以上指定してください');
     }
 
     if (approverIds.includes(session.user.id)) {
-      return apiErrors.badRequest('Requester cannot be an approver');
+      return apiErrors.badRequest('申請者を承認者にすることはできません');
     }
 
     const candidates = await getApprovalCandidatesForProject(version.video.project.id);
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const candidateIds = new Set(candidates.map((candidate) => candidate.id));
 
     if (approverIds.some((id) => !candidateIds.has(id))) {
-      return apiErrors.badRequest('One or more approvers are not eligible for this project');
+      return apiErrors.badRequest('このプロジェクトの承認者になれない方が含まれています');
     }
 
     const created = await db.$transaction(
@@ -186,12 +186,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     if (error instanceof Error && error.message === '__PENDING_REQUEST_EXISTS__') {
-      return apiErrors.conflict('An approval request is already pending for this version');
+      return apiErrors.conflict('このバージョンにはすでに保留中の承認リクエストがあります');
     }
     if (isSerializableConflict(error)) {
-      return apiErrors.conflict('Request state changed. Please try again.');
+      return apiErrors.conflict('リクエストの状態が変わりました。もう一度お試しください。');
     }
     logError('Error creating approval request:', error);
-    return apiErrors.internalError('Failed to create approval request');
+    return apiErrors.internalError('承認リクエストの作成に失敗しました');
   }
 }

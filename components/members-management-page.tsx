@@ -109,7 +109,7 @@ export function MembersManagementPage({
         // and "No pending invitations" on a workspace that has both, and the user's next
         // move was to re-invite somebody who is already a member, which answers 409 and
         // reads as a second, unrelated bug.
-        setError('Failed to load members. Please refresh to try again.');
+        setError('メンバーの読み込みに失敗しました。ページを更新してもう一度お試しください。');
         return;
       }
       const data = await res.json();
@@ -117,7 +117,7 @@ export function MembersManagementPage({
       setOwner(data.data.owner);
       setPendingInvitations(data.data.pendingInvitations || []);
     } catch {
-      setError('Failed to load members');
+      setError('メンバーの読み込みに失敗しました');
     } finally {
       setIsLoading(false);
     }
@@ -151,21 +151,21 @@ export function MembersManagementPage({
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Failed to invite member');
+        setError(data.error || 'メンバーの招待に失敗しました');
         return;
       }
 
       if (data.user) {
         setSuccess(
-          `Invited ${data.user.name || data.user.email || inviteEmail} as ${inviteRole.toLowerCase()}`
+          `${data.user.name || data.user.email || inviteEmail} さんを${inviteRole === 'ADMIN' ? '管理者' : 'コメンテーター'}として招待しました`
         );
       } else {
-        setSuccess(data.message || `Invitation sent to ${inviteEmail}`);
+        setSuccess(data.message || `${inviteEmail} に招待を送信しました`);
       }
       setInviteEmail('');
       fetchMembers();
     } catch {
-      setError('Something went wrong');
+      setError('問題が発生しました');
     } finally {
       setIsInviting(false);
     }
@@ -181,18 +181,18 @@ export function MembersManagementPage({
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || 'Failed to update role');
+        setError(data.error || 'ロールの変更に失敗しました');
         return;
       }
 
       fetchMembers();
     } catch {
-      setError('Failed to update role');
+      setError('ロールの変更に失敗しました');
     }
   };
 
   const handleRemove = async (memberId: string) => {
-    if (!confirm('Are you sure you want to remove this member?')) return;
+    if (!confirm('このメンバーを削除してもよろしいですか?')) return;
 
     try {
       const res = await fetch(`${apiBasePath}/members/${memberId}`, {
@@ -201,13 +201,13 @@ export function MembersManagementPage({
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || 'Failed to remove member');
+        setError(data.error || 'メンバーの削除に失敗しました');
         return;
       }
 
       fetchMembers();
     } catch {
-      setError('Failed to remove member');
+      setError('メンバーの削除に失敗しました');
     }
   };
 
@@ -223,14 +223,14 @@ export function MembersManagementPage({
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || 'Failed to cancel invitation');
+        setError(data.error || '招待のキャンセルに失敗しました');
         return;
       }
 
-      setSuccess('Invitation canceled');
+      setSuccess('招待をキャンセルしました');
       fetchMembers();
     } catch {
-      setError('Failed to cancel invitation');
+      setError('招待のキャンセルに失敗しました');
     } finally {
       setCancelingInvitationId(null);
     }
@@ -265,17 +265,17 @@ export function MembersManagementPage({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <UserPlus className="h-5 w-5" />
-            Invite Member
+            メンバーを招待
           </CardTitle>
           <CardDescription>
-            Invite someone by email. They must have an account to be added.
+            メールアドレスで招待します。追加するにはアカウントの登録が必要です。
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleInvite} className="flex flex-col sm:flex-row gap-3 sm:items-end">
             <div className="w-full sm:flex-1">
               <Label htmlFor="email" className="mb-2 block">
-                Email Address
+                メールアドレス
               </Label>
               <Input
                 id="email"
@@ -288,7 +288,7 @@ export function MembersManagementPage({
               />
             </div>
             <div className="w-full sm:w-40">
-              <Label className="mb-2 block">Role</Label>
+              <Label className="mb-2 block">ロール</Label>
               <Select
                 value={inviteRole}
                 onValueChange={(v) => setInviteRole(v as 'ADMIN' | 'COMMENTATOR')}
@@ -297,8 +297,8 @@ export function MembersManagementPage({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="ADMIN">Admin</SelectItem>
-                  <SelectItem value="COMMENTATOR">Commentator</SelectItem>
+                  <SelectItem value="ADMIN">管理者</SelectItem>
+                  <SelectItem value="COMMENTATOR">コメンテーター</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -308,7 +308,7 @@ export function MembersManagementPage({
               ) : (
                 <>
                   <Plus className="h-4 w-4 mr-1" />
-                  Invite
+                  招待
                 </>
               )}
             </Button>
@@ -329,7 +329,7 @@ export function MembersManagementPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>Current Members</CardTitle>
+          <CardTitle>現在のメンバー</CardTitle>
           <CardDescription>{membersDescription}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -341,13 +341,13 @@ export function MembersManagementPage({
                   <AvatarFallback>{owner.name?.charAt(0).toUpperCase() ?? 'U'}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="text-sm font-medium">{owner.name || 'Unnamed'}</p>
+                  <p className="text-sm font-medium">{owner.name || '名前未設定'}</p>
                   <p className="text-xs text-muted-foreground">{owner.email}</p>
                 </div>
               </div>
               <Badge variant="default" className="flex items-center gap-1">
                 <Crown className="h-3 w-3" />
-                Owner
+                オーナー
               </Badge>
             </div>
           )}
@@ -365,7 +365,7 @@ export function MembersManagementPage({
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="text-sm font-medium">{member.user.name || 'Unnamed'}</p>
+                  <p className="text-sm font-medium">{member.user.name || '名前未設定'}</p>
                   <p className="text-xs text-muted-foreground">{member.user.email}</p>
                 </div>
               </div>
@@ -378,13 +378,13 @@ export function MembersManagementPage({
                     <SelectItem value="ADMIN">
                       <span className="flex items-center gap-1.5">
                         <Shield className="h-3.5 w-3.5" />
-                        Admin
+                        管理者
                       </span>
                     </SelectItem>
                     <SelectItem value="COMMENTATOR">
                       <span className="flex items-center gap-1.5">
                         <MessageSquare className="h-3.5 w-3.5" />
-                        Commentator
+                        コメンテーター
                       </span>
                     </SelectItem>
                   </SelectContent>
@@ -403,7 +403,7 @@ export function MembersManagementPage({
 
           {members.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-4">
-              No members yet. Invite someone above.
+              まだメンバーがいません。上のフォームから招待してください。
             </p>
           )}
         </CardContent>
@@ -413,9 +413,9 @@ export function MembersManagementPage({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Clock3 className="h-5 w-5" />
-            Pending Invitations
+            保留中の招待
           </CardTitle>
-          <CardDescription>Invitations that were sent but not accepted yet.</CardDescription>
+          <CardDescription>送信済みで、まだ承諾されていない招待です。</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           {pendingInvitations.map((invitation) => (
@@ -426,11 +426,11 @@ export function MembersManagementPage({
               <div>
                 <p className="text-sm font-medium">{invitation.email}</p>
                 <p className="text-xs text-muted-foreground">
-                  {invitation.role === 'ADMIN' ? 'Admin' : 'Commentator'} · Sent by{' '}
-                  {invitation.invitedBy.name || invitation.invitedBy.email || 'Unknown'}
+                  {invitation.role === 'ADMIN' ? '管理者' : 'コメンテーター'} · 招待者:{' '}
+                  {invitation.invitedBy.name || invitation.invitedBy.email || '不明'}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Expires {new Date(invitation.expiresAt).toLocaleString()}
+                  有効期限 {new Date(invitation.expiresAt).toLocaleString()}
                 </p>
               </div>
               <Button
@@ -444,7 +444,7 @@ export function MembersManagementPage({
                 ) : (
                   <>
                     <MailX className="h-4 w-4 mr-2" />
-                    Cancel
+                    キャンセル
                   </>
                 )}
               </Button>
@@ -453,7 +453,7 @@ export function MembersManagementPage({
 
           {pendingInvitations.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-4">
-              No pending invitations.
+              保留中の招待はありません。
             </p>
           )}
         </CardContent>

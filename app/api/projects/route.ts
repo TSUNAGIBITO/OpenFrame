@@ -29,19 +29,19 @@ export async function GET(request: NextRequest) {
 
     const pageRaw = pageParam === null ? 1 : Number(pageParam);
     if (!Number.isSafeInteger(pageRaw) || pageRaw < 1 || pageRaw > MAX_PAGE) {
-      return apiErrors.badRequest('Invalid page. Must be a positive integer.');
+      return apiErrors.badRequest('page が正しくありません。正の整数で指定してください。');
     }
 
     const limitRaw = limitParam === null ? 10 : Number(limitParam);
     if (!Number.isSafeInteger(limitRaw) || limitRaw < 1 || limitRaw > MAX_LIMIT) {
-      return apiErrors.badRequest('Invalid limit. Must be a positive integer between 1 and 100.');
+      return apiErrors.badRequest('limit が正しくありません。1〜100 の正の整数で指定してください。');
     }
 
     const page = pageRaw;
     const limit = limitRaw;
     const skip = (page - 1) * limit;
     if (!Number.isSafeInteger(skip) || skip > MAX_OFFSET) {
-      return apiErrors.badRequest('Invalid page range. Offset must be 10000 or less.');
+      return apiErrors.badRequest('ページ範囲が正しくありません。オフセットは 10000 以下にしてください。');
     }
 
     // Build base filter: user is the project owner, a project member, or a member of the
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
     return withCacheControl(response, 'private, max-age=30, stale-while-revalidate=60');
   } catch (error) {
     logError('Error fetching projects:', error);
-    return apiErrors.internalError('Failed to fetch projects');
+    return apiErrors.internalError('プロジェクトの取得に失敗しました');
   }
 }
 
@@ -111,12 +111,12 @@ export async function POST(request: NextRequest) {
     const { name, description, visibility, workspaceId } = body;
 
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
-      return apiErrors.badRequest('Project name is required');
+      return apiErrors.badRequest('プロジェクト名を入力してください');
     }
 
     if (!workspaceId || typeof workspaceId !== 'string') {
       return apiErrors.badRequest(
-        'A workspace is required. Every project must belong to a workspace.'
+        'ワークスペースが必要です。すべてのプロジェクトはいずれかのワークスペースに属している必要があります。'
       );
     }
 
@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
     );
 
     if (!access.canEdit) {
-      return apiErrors.forbidden('Only workspace owners and admins can create projects');
+      return apiErrors.forbidden('プロジェクトを作成できるのはワークスペースのオーナーと管理者のみです');
     }
 
     // Counted against the workspace owner rather than the caller, because that is
@@ -177,7 +177,7 @@ export async function POST(request: NextRequest) {
 
       if (ownedProjectCount >= TRIAL_PROJECT_LIMIT) {
         return apiErrors.forbidden(
-          'Your free trial covers one project at a time. Delete the existing project or subscribe to run more in parallel.'
+          '無料トライアルでは同時に 1 つのプロジェクトのみ利用できます。既存のプロジェクトを削除するか、サブスクリプションに登録すると複数を並行して利用できます。'
         );
       }
     }
@@ -222,6 +222,6 @@ export async function POST(request: NextRequest) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error creating project:', error);
-    return apiErrors.internalError('Failed to create project');
+    return apiErrors.internalError('プロジェクトの作成に失敗しました');
   }
 }

@@ -3,8 +3,8 @@ import { Video } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | OpenFrame',
-  description: 'Privacy Policy for OpenFrame by IPEK TECH LLC.',
+  title: 'プライバシーポリシー | つなぐレビュー',
+  description: 'IPEK TECH LLC が提供する社内向け動画レビューツール「つなぐレビュー」のプライバシーポリシー。',
 };
 
 export default function PrivacyPolicyPage() {
@@ -17,282 +17,227 @@ export default function PrivacyPolicyPage() {
             className="flex items-center gap-2 text-sm font-semibold hover:text-primary transition-colors"
           >
             <Video className="h-4 w-4 text-primary" />
-            OpenFrame
+            つなぐレビュー
           </Link>
           <Link
             href="/"
             className="text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            ← Back to Home
+            ← ホームに戻る
           </Link>
         </div>
       </header>
 
       <main className="mx-auto max-w-[900px] px-4 py-12 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-semibold tracking-tight mb-2">Privacy Policy</h1>
-        <p className="text-sm text-muted-foreground mb-10">Last updated: April 10, 2026</p>
+        <h1 className="text-3xl font-semibold tracking-tight mb-2">プライバシーポリシー</h1>
+        <p className="text-sm text-muted-foreground mb-10">最終更新日: 2026年4月10日</p>
 
         <div className="prose prose-sm prose-invert max-w-none space-y-8 text-sm leading-relaxed text-foreground/80">
           <section>
-            <h2 className="text-base font-semibold text-foreground mb-3">1. Introduction</h2>
+            <h2 className="text-base font-semibold text-foreground mb-3">1. はじめに</h2>
             <p>
-              <strong className="text-foreground">IPEK TECH LLC</strong> (&ldquo;Company&rdquo;,
-              &ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;), a Wyoming limited liability
-              company, operates the OpenFrame platform at open-frame.net (the
-              &ldquo;Service&rdquo;). This Privacy Policy explains how we collect, use, share, and
-              protect information about you when you use our Service.
+              <strong className="text-foreground">IPEK TECH LLC</strong>（以下「当社」）は、社内向け動画レビューツール「つなぐレビュー」（以下「本サービス」）を運営しています。本プライバシーポリシーは、利用者が本サービスを利用する際に当社が情報をどのように収集・利用・共有・保護するかを説明するものです。
             </p>
             <p className="mt-3">
-              By using the Service, you agree to the collection and use of information in accordance
-              with this Privacy Policy.
+              本サービスを利用することで、利用者は本プライバシーポリシーに従った情報の収集・利用に同意するものとします。
             </p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-foreground mb-3">
-              2. Information We Collect
+              2. 収集する情報
             </h2>
 
             <h3 className="text-sm font-semibold text-foreground mb-2 mt-4">
-              2.1 Information You Provide
+              2.1 利用者が提供する情報
             </h3>
             <ul className="list-disc pl-5 space-y-2">
               <li>
-                <strong className="text-foreground">Account information:</strong> Name, email
-                address, and password when you register.
+                <strong className="text-foreground">アカウント情報:</strong> 登録時の氏名、メールアドレス、パスワード。
               </li>
               <li>
-                <strong className="text-foreground">Profile information:</strong> Avatar image and
-                display name.
+                <strong className="text-foreground">プロフィール情報:</strong> アバター画像、表示名。
               </li>
               <li>
-                <strong className="text-foreground">Billing information:</strong> Payment details
-                processed securely through Stripe. We do not store full card numbers on our servers.
+                <strong className="text-foreground">請求情報:</strong> Stripeを通じて安全に処理される支払い情報。カード番号の全桁を当社のサーバーに保存することはありません。
               </li>
               <li>
-                <strong className="text-foreground">User Content:</strong> Videos, comments,
-                annotations, and other content you upload or create within the Service.
+                <strong className="text-foreground">利用者コンテンツ:</strong> 本サービス内でアップロード・作成する動画、コメント、注釈などのコンテンツ。
               </li>
               <li>
-                <strong className="text-foreground">Communications:</strong> Messages you send us
-                via email or feedback forms.
+                <strong className="text-foreground">連絡内容:</strong> メールやフィードバックフォームから当社に送信されるメッセージ。
               </li>
             </ul>
 
             <h3 className="text-sm font-semibold text-foreground mb-2 mt-4">
-              2.2 Information Collected Automatically
+              2.2 自動的に収集される情報
             </h3>
             <ul className="list-disc pl-5 space-y-2">
               <li>
-                <strong className="text-foreground">Usage data:</strong> Pages viewed, features
-                used, actions taken within the Service, and timestamps.
+                <strong className="text-foreground">利用データ:</strong> 閲覧したページ、使用した機能、本サービス内での操作、タイムスタンプ。
               </li>
               <li>
-                <strong className="text-foreground">Device and browser data:</strong> IP address,
-                browser type, operating system, and referring URLs.
+                <strong className="text-foreground">デバイス・ブラウザ情報:</strong> IPアドレス、ブラウザの種類、OS、参照元URL。
               </li>
               <li>
-                <strong className="text-foreground">Cookies and similar technologies:</strong>{' '}
-                Session cookies for authentication and preference storage. We do not use third-party
-                advertising cookies.
+                <strong className="text-foreground">Cookieおよび類似技術:</strong>{' '}
+                認証と設定の保存のためのセッションCookie。第三者の広告Cookieは使用しません。
               </li>
             </ul>
 
             <h3 className="text-sm font-semibold text-foreground mb-2 mt-4">
-              2.3 Information from Third Parties
+              2.3 第三者から取得する情報
             </h3>
             <p>
-              If you sign in via a third-party OAuth provider (Google or GitHub), we receive basic
-              profile information (name, email, avatar) as permitted by your settings with that
-              provider.
+              第三者のOAuthプロバイダー（GoogleまたはGitHub）でサインインした場合、当該プロバイダーでの設定に応じて、基本的なプロフィール情報（氏名、メールアドレス、アバター）を取得します。
             </p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-foreground mb-3">
-              3. How We Use Your Information
+              3. 情報の利用目的
             </h2>
-            <p>We use the information we collect to:</p>
+            <p>当社は、収集した情報を以下の目的で利用します。</p>
             <ul className="mt-3 list-disc pl-5 space-y-2">
-              <li>Provide, operate, and improve the Service.</li>
-              <li>Process transactions and manage your subscription.</li>
+              <li>本サービスの提供、運用、改善のため。</li>
+              <li>決済の処理およびサブスクリプションの管理のため。</li>
               <li>
-                Send transactional emails (account confirmations, password resets, billing
-                notifications).
+                取引に関する通知メール（アカウントの確認、パスワードのリセット、請求に関する通知等）の送信のため。
               </li>
-              <li>Respond to your inquiries and support requests.</li>
-              <li>Send product updates or announcements (you may opt out at any time).</li>
-              <li>Monitor and analyze usage patterns to improve the Service.</li>
-              <li>Detect, investigate, and prevent fraudulent or abusive activity.</li>
-              <li>Comply with legal obligations.</li>
+              <li>お問い合わせやサポート依頼への対応のため。</li>
+              <li>製品の更新情報やお知らせの送信のため（いつでも配信停止できます）。</li>
+              <li>利用状況の監視・分析による本サービスの改善のため。</li>
+              <li>不正または不適切な行為の検知・調査・防止のため。</li>
+              <li>法令上の義務を遵守するため。</li>
             </ul>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-foreground mb-3">
-              4. How We Share Your Information
+              4. 情報の共有
             </h2>
-            <p>We do not sell your personal information. We may share your information with:</p>
+            <p>当社は、利用者の個人情報を販売しません。以下の場合に情報を共有することがあります。</p>
             <ul className="mt-3 list-disc pl-5 space-y-2">
               <li>
-                <strong className="text-foreground">Service providers:</strong> Third parties who
-                assist us in operating the Service (e.g., cloud storage, video delivery, payment
-                processing via Stripe). These providers are contractually bound to protect your
-                data.
+                <strong className="text-foreground">サービス提供事業者:</strong> 本サービスの運用を支援する第三者（クラウドストレージ、動画配信、Stripeによる決済処理など）。これらの事業者は、契約上、利用者のデータを保護する義務を負います。
               </li>
               <li>
-                <strong className="text-foreground">Other users:</strong> User Content you choose to
-                share via share links is accessible to recipients of those links per the permissions
-                you configure.
+                <strong className="text-foreground">他の利用者:</strong> 利用者が共有リンクで共有することを選んだ利用者コンテンツは、設定した権限に応じてリンクの受信者がアクセスできます。
               </li>
               <li>
-                <strong className="text-foreground">Legal requirements:</strong> We may disclose
-                information if required by law, court order, or governmental authority, or to
-                protect the rights and safety of IPEK TECH LLC or others.
+                <strong className="text-foreground">法令上の要請:</strong> 法令、裁判所の命令、政府機関の要請により必要な場合、または当社その他の者の権利や安全を守るために、情報を開示することがあります。
               </li>
               <li>
-                <strong className="text-foreground">Business transfers:</strong> In the event of a
-                merger, acquisition, or sale of assets, your information may be transferred as part
-                of the transaction.
+                <strong className="text-foreground">事業譲渡:</strong> 合併、買収、資産の譲渡が行われる場合、その取引の一環として利用者の情報が移転されることがあります。
               </li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-foreground mb-3">5. Data Retention</h2>
+            <h2 className="text-base font-semibold text-foreground mb-3">5. データの保持</h2>
             <p>
-              We retain your personal information for as long as your account is active or as needed
-              to provide the Service. If you delete your account, we will delete or anonymize your
-              personal information within a reasonable period, except where we are required to
-              retain it for legal, regulatory, or legitimate business purposes (such as billing
-              disputes).
+              当社は、アカウントが有効である間、または本サービスの提供に必要な間、利用者の個人情報を保持します。アカウントを削除した場合、当社は合理的な期間内に個人情報を削除または匿名化します。ただし、法令・規制上の理由や正当な事業上の目的（請求に関する紛争など）で保持が必要な場合を除きます。
             </p>
             <p className="mt-3">
-              User Content you delete from the Service will be removed from our active storage;
-              however, backup copies may persist for a limited time before being purged.
+              利用者が本サービスから削除した利用者コンテンツは、稼働中のストレージから削除されます。ただし、バックアップ用の複製は消去されるまで一定期間残ることがあります。
             </p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-foreground mb-3">6. Security</h2>
+            <h2 className="text-base font-semibold text-foreground mb-3">6. セキュリティ</h2>
             <p>
-              We implement industry-standard security measures to protect your information,
-              including encryption in transit (TLS) and access controls. However, no method of
-              transmission over the internet or electronic storage is 100% secure. We cannot
-              guarantee absolute security and encourage you to use strong, unique passwords and to
-              keep your account credentials confidential.
+              当社は、通信の暗号化（TLS）やアクセス制御など、業界標準のセキュリティ対策を講じて利用者の情報を保護します。ただし、インターネット上の送信や電子的な保存に完全な安全性はなく、当社は絶対的な安全性を保証できません。強固で固有のパスワードを使用し、アカウントの認証情報を秘密に保つことをお勧めします。
             </p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-foreground mb-3">
-              7. Your Rights and Choices
+              7. 利用者の権利と選択
             </h2>
             <p>
-              Depending on your location, you may have rights regarding your personal information,
-              including:
+              居住地域によっては、利用者は自身の個人情報について以下の権利を有する場合があります。
             </p>
             <ul className="mt-3 list-disc pl-5 space-y-2">
               <li>
-                <strong className="text-foreground">Access and portability:</strong> Request a copy
-                of the data we hold about you.
+                <strong className="text-foreground">アクセス・ポータビリティ:</strong> 当社が保有する利用者のデータの写しを請求すること。
               </li>
               <li>
-                <strong className="text-foreground">Correction:</strong> Request correction of
-                inaccurate data.
+                <strong className="text-foreground">訂正:</strong> 不正確なデータの訂正を請求すること。
               </li>
               <li>
-                <strong className="text-foreground">Deletion:</strong> Request deletion of your
-                personal information (subject to legal retention requirements).
+                <strong className="text-foreground">削除:</strong> 個人情報の削除を請求すること（法令上の保持義務に従います）。
               </li>
               <li>
-                <strong className="text-foreground">Opt-out of marketing:</strong> Unsubscribe from
-                marketing emails at any time via the unsubscribe link in any email or by contacting
-                us.
+                <strong className="text-foreground">配信停止:</strong> メール内の配信停止リンク、または当社への連絡により、いつでもマーケティングメールの受信を停止すること。
               </li>
             </ul>
             <p className="mt-3">
-              To exercise these rights, contact us at{' '}
-              <a href="mailto:info@open-frame.net" className="text-primary hover:underline">
-                info@open-frame.net
-              </a>
-              . We will respond within a reasonable timeframe.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-base font-semibold text-foreground mb-3">8. Cookies</h2>
-            <p>
-              We use cookies strictly necessary for the operation of the Service (authentication
-              sessions, CSRF protection) and limited analytics cookies to understand how the Service
-              is used. We do not use third-party advertising cookies or tracking pixels. You may
-              disable cookies in your browser settings, but doing so may affect your ability to use
-              the Service.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-base font-semibold text-foreground mb-3">
-              9. Children&apos;s Privacy
-            </h2>
-            <p>
-              The Service is not directed to individuals under the age of 18. We do not knowingly
-              collect personal information from minors. If you believe we have inadvertently
-              collected information from a minor, please contact us immediately at{' '}
+              これらの権利を行使するには、{' '}
               <a href="mailto:info@open-frame.net" className="text-primary hover:underline">
                 info@open-frame.net
               </a>{' '}
-              and we will take steps to delete such information.
+              までご連絡ください。合理的な期間内に対応します。
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-base font-semibold text-foreground mb-3">8. Cookie</h2>
+            <p>
+              当社は、本サービスの運用に不可欠なCookie（認証セッション、CSRF対策）と、本サービスの利用状況を把握するための限定的な分析Cookieを使用します。第三者の広告Cookieやトラッキングピクセルは使用しません。ブラウザの設定でCookieを無効にできますが、その場合、本サービスの一部が利用できなくなることがあります。
             </p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-foreground mb-3">
-              10. International Data Transfers
+              9. 未成年者のプライバシー
             </h2>
             <p>
-              Your information may be stored and processed in the United States or other countries
-              where our service providers operate. By using the Service, you consent to the transfer
-              of your information to these locations, which may have different data protection laws
-              than your country of residence.
+              本サービスは18歳未満の方を対象としていません。当社は、未成年者から意図的に個人情報を収集することはありません。誤って未成年者の情報を収集したと思われる場合は、直ちに{' '}
+              <a href="mailto:info@open-frame.net" className="text-primary hover:underline">
+                info@open-frame.net
+              </a>{' '}
+              までご連絡ください。当該情報を削除するための措置を講じます。
             </p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-foreground mb-3">
-              11. Third-Party Services
+              10. 情報の国際的な移転
             </h2>
             <p>
-              The Service may integrate with or link to third-party services (e.g., GitHub, Google,
-              Stripe, Bunny CDN). This Privacy Policy does not apply to those services, and we
-              encourage you to review their respective privacy policies.
+              利用者の情報は、当社のサービス提供事業者が運営する米国その他の国で保存・処理されることがあります。本サービスを利用することで、利用者は、居住国とは異なるデータ保護法が適用される可能性のあるこれらの国への情報の移転に同意するものとします。
             </p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-foreground mb-3">
-              12. Changes to This Policy
+              11. 第三者のサービス
             </h2>
             <p>
-              We may update this Privacy Policy from time to time. We will notify you of material
-              changes by posting the updated policy on this page and updating the &ldquo;Last
-              updated&rdquo; date. Your continued use of the Service after changes constitutes
-              acceptance of the updated policy.
+              本サービスは、第三者のサービス（GitHub、Google、Stripe、Bunny CDN など）と連携またはリンクする場合があります。本プライバシーポリシーはこれらのサービスには適用されません。各サービスのプライバシーポリシーをご確認ください。
             </p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-foreground mb-3">13. Contact Us</h2>
+            <h2 className="text-base font-semibold text-foreground mb-3">
+              12. 本ポリシーの変更
+            </h2>
             <p>
-              If you have any questions or concerns about this Privacy Policy or our data practices,
-              please contact us:
+              当社は、本プライバシーポリシーを随時更新することがあります。重要な変更を行う場合は、本ページに更新後のポリシーを掲載し、「最終更新日」を更新することで通知します。変更後も本サービスの利用を継続した場合、利用者は更新後のポリシーに同意したものとみなされます。
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-base font-semibold text-foreground mb-3">13. お問い合わせ</h2>
+            <p>
+              本プライバシーポリシーや当社のデータの取り扱いに関するご質問・ご懸念は、以下までお問い合わせください。
             </p>
             <div className="mt-3 border border-border bg-card/40 p-4 text-sm space-y-1">
               <p className="font-medium text-foreground">IPEK TECH LLC</p>
               <p>30 North Gould Street, Suite N</p>
               <p>Sheridan, WY 82801, United States</p>
               <p>
-                Email:{' '}
+                メール:{' '}
                 <a href="mailto:info@open-frame.net" className="text-primary hover:underline">
                   info@open-frame.net
                 </a>
@@ -312,13 +257,13 @@ export default function PrivacyPolicyPage() {
               href="/terms"
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
-              Terms of Service
+              利用規約
             </Link>
             <Link
               href="/refund"
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
-              Refund Policy
+              返金ポリシー
             </Link>
           </div>
         </div>

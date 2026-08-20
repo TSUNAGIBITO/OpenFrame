@@ -29,12 +29,12 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Admin Dashboard | OpenFrame',
-  description: 'Admin overview dashboard',
+  title: '管理ダッシュボード | つなぐレビュー',
+  description: '管理者向けの概要ダッシュボード',
 };
 
 function formatBytes(bytes: number, decimals = 2) {
-  if (bytes < 0) return 'Error Fetching';
+  if (bytes < 0) return '取得エラー';
   if (!+bytes) return '0 Bytes';
   const k = 1000;
   const dm = decimals < 0 ? 0 : decimals;
@@ -113,13 +113,13 @@ export default async function AdminDashboardPage() {
   return (
     <div className="flex-1 space-y-4 px-4 md:px-8">
       <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Dashboard Overview</h2>
+        <h2 className="text-3xl font-bold tracking-tight">ダッシュボード概要</h2>
         <RefreshR2StatsButton />
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+            <CardTitle className="text-sm font-medium">総ユーザー数</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -128,17 +128,17 @@ export default async function AdminDashboardPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Workspaces & Projects</CardTitle>
+            <CardTitle className="text-sm font-medium">ワークスペース・プロジェクト</CardTitle>
             <Folder className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalProjects}</div>
-            <p className="text-xs text-muted-foreground">Total active projects on the platform</p>
+            <p className="text-xs text-muted-foreground">プラットフォーム上のアクティブなプロジェクト総数</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Videos</CardTitle>
+            <CardTitle className="text-sm font-medium">アクティブな動画</CardTitle>
             <Video className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -147,7 +147,7 @@ export default async function AdminDashboardPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Comments</CardTitle>
+            <CardTitle className="text-sm font-medium">総コメント数</CardTitle>
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -156,7 +156,7 @@ export default async function AdminDashboardPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Voice Recordings</CardTitle>
+            <CardTitle className="text-sm font-medium">音声録音</CardTitle>
             <Mic className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -165,7 +165,7 @@ export default async function AdminDashboardPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Image Attachments</CardTitle>
+            <CardTitle className="text-sm font-medium">画像添付</CardTitle>
             <ImageIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -174,7 +174,7 @@ export default async function AdminDashboardPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Feedback Submissions</CardTitle>
+            <CardTitle className="text-sm font-medium">フィードバック投稿数</CardTitle>
             <MessageSquareQuote className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -183,7 +183,7 @@ export default async function AdminDashboardPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Review Submissions</CardTitle>
+            <CardTitle className="text-sm font-medium">レビュー投稿数</CardTitle>
             <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -192,7 +192,7 @@ export default async function AdminDashboardPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Cloudflare R2 Storage</CardTitle>
+            <CardTitle className="text-sm font-medium">Cloudflare R2 ストレージ</CardTitle>
             <HardDrive className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -201,14 +201,14 @@ export default async function AdminDashboardPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Bunny Stream Storage</CardTitle>
+            <CardTitle className="text-sm font-medium">Bunny Stream ストレージ</CardTitle>
             <Film className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {isBunnyUploadsFeatureEnabled()
                 ? formatBytes(bunnyStorageStats.totalBytes)
-                : 'Disabled'}
+                : '無効'}
             </div>
           </CardContent>
         </Card>
@@ -216,23 +216,23 @@ export default async function AdminDashboardPage() {
 
       {isStripeBillingEnabled() && stripeStats && (
         <>
-          <h3 className="text-xl font-semibold tracking-tight pt-2">Billing &amp; Revenue</h3>
+          <h3 className="text-xl font-semibold tracking-tight pt-2">請求・売上</h3>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Monthly Recurring Revenue</CardTitle>
+                <CardTitle className="text-sm font-medium">月次経常収益(MRR)</CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
                   {formatMrr(stripeStats.mrrCents, stripeStats.currency)}
                 </div>
-                <p className="text-xs text-muted-foreground">Based on active subscriptions</p>
+                <p className="text-xs text-muted-foreground">アクティブなサブスクリプションに基づく</p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Active Subscribers</CardTitle>
+                <CardTitle className="text-sm font-medium">有料会員数</CardTitle>
                 <UserCheck className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -241,7 +241,7 @@ export default async function AdminDashboardPage() {
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">On Trial</CardTitle>
+                <CardTitle className="text-sm font-medium">トライアル中</CardTitle>
                 <CreditCard className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -250,7 +250,7 @@ export default async function AdminDashboardPage() {
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Free Users</CardTitle>
+                <CardTitle className="text-sm font-medium">無料ユーザー</CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -259,7 +259,7 @@ export default async function AdminDashboardPage() {
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Past Due</CardTitle>
+                <CardTitle className="text-sm font-medium">支払い遅延</CardTitle>
                 <AlertCircle className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -268,7 +268,7 @@ export default async function AdminDashboardPage() {
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Canceled</CardTitle>
+                <CardTitle className="text-sm font-medium">解約済み</CardTitle>
                 <UserX className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -279,7 +279,7 @@ export default async function AdminDashboardPage() {
                 buckets above and so were counted nowhere. */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Unpaid or Incomplete</CardTitle>
+                <CardTitle className="text-sm font-medium">未払い・未完了</CardTitle>
                 <AlertCircle className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>

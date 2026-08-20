@@ -22,7 +22,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     const session = await auth();
     if (!session?.user?.id) {
-      return apiErrors.unauthorized('Authentication required for exports');
+      return apiErrors.unauthorized('エクスポートには認証が必要です');
     }
 
     const { versionId } = await params;
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     const format = (searchParams.get('format') || 'csv').toLowerCase();
     if (format !== 'csv' && format !== 'pdf') {
-      return apiErrors.badRequest('Invalid format. Use "csv" or "pdf"');
+      return apiErrors.badRequest('フォーマットが正しくありません。"csv" または "pdf" を指定してください');
     }
 
     const includeResolved = searchParams.get('includeResolved') !== 'false';
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
     if (totalComments > MAX_EXPORT_COMMENTS) {
       return apiErrors.badRequest(
-        `Too many comments to export (${totalComments}). Maximum allowed is ${MAX_EXPORT_COMMENTS}.`
+        `エクスポートするコメントが多すぎます(${totalComments} 件)。エクスポートできるのは最大 ${MAX_EXPORT_COMMENTS} 件です。`
       );
     }
 
@@ -158,6 +158,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error exporting comments:', error);
-    return apiErrors.internalError('Failed to export comments');
+    return apiErrors.internalError('コメントのエクスポートに失敗しました');
   }
 }

@@ -182,7 +182,7 @@ export default function CompareVersionsPageClient({
           `/api/projects/${projectId}/videos/${videoId}?includeComments=false`
         );
         if (!res.ok) {
-          setError('Failed to load video');
+          setError('動画の読み込みに失敗しました');
           setLoading(false);
           return;
         }
@@ -212,7 +212,7 @@ export default function CompareVersionsPageClient({
           setPanelVersionIds([data.versions[0].id]);
         }
       } catch {
-        setError('Failed to load video');
+        setError('動画の読み込みに失敗しました');
       } finally {
         setLoading(false);
       }
@@ -606,10 +606,10 @@ export default function CompareVersionsPageClient({
       <div className="h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <p className="text-muted-foreground mb-4">
-            {error || 'Need at least 2 versions to compare'}
+            {error || '比較するには2つ以上のバージョンが必要です'}
           </p>
           <Button asChild variant="outline">
-            <Link href={`/projects/${projectId}/videos/${videoId}`}>Back to Video</Link>
+            <Link href={`/projects/${projectId}/videos/${videoId}`}>動画に戻る</Link>
           </Button>
         </div>
       </div>
@@ -630,12 +630,12 @@ export default function CompareVersionsPageClient({
             className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
-            Back
+            戻る
           </Link>
           <Separator orientation="vertical" className="h-5" />
           <div className="flex items-center gap-2">
             <GitCompareArrows className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium">Compare Versions</span>
+            <span className="text-sm font-medium">バージョンを比較</span>
             <span className="text-xs text-muted-foreground hidden sm:inline">• {video.title}</span>
           </div>
         </div>
@@ -664,7 +664,7 @@ export default function CompareVersionsPageClient({
                         v{version.versionNumber}
                       </Badge>
                       <span className="truncate max-w-[100px]">
-                        {version.versionLabel || `Version ${version.versionNumber}`}
+                        {version.versionLabel || `バージョン ${version.versionNumber}`}
                       </span>
                       <ChevronDown className="h-3.5 w-3.5 ml-1.5 shrink-0" />
                     </Button>
@@ -682,7 +682,7 @@ export default function CompareVersionsPageClient({
                         >
                           v{v.versionNumber}
                         </Badge>
-                        {v.versionLabel || `Version ${v.versionNumber}`}
+                        {v.versionLabel || `バージョン ${v.versionNumber}`}
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>
@@ -716,7 +716,7 @@ export default function CompareVersionsPageClient({
                         return next;
                       });
                     }}
-                    title={mutedPanels.has(versionId) ? 'Unmute' : 'Mute'}
+                    title={mutedPanels.has(versionId) ? 'ミュート解除' : 'ミュート'}
                   >
                     {mutedPanels.has(versionId) ? (
                       <VolumeX className="h-3.5 w-3.5" />
@@ -805,7 +805,7 @@ export default function CompareVersionsPageClient({
                   <div className="shrink-0 flex items-center justify-between px-3 py-2 border-b">
                     <div className="flex items-center gap-1.5">
                       <MessageSquare className="h-3.5 w-3.5" />
-                      <span className="text-xs font-medium">Comments</span>
+                      <span className="text-xs font-medium">コメント</span>
                       <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
                         {panelComments.length}
                       </Badge>
@@ -827,14 +827,14 @@ export default function CompareVersionsPageClient({
                       </div>
                     ) : panelComments.length === 0 ? (
                       <div className="text-center py-6 text-muted-foreground text-xs">
-                        No comments on this version
+                        このバージョンにはコメントがありません
                       </div>
                     ) : (
                       [...panelComments]
                         .sort((a, b) => a.timestamp - b.timestamp)
                         .map((comment) => {
                           const authorName =
-                            comment.author?.name || comment.guestName || 'Anonymous';
+                            comment.author?.name || comment.guestName || '匿名';
                           return (
                             <div
                               key={comment.id}
@@ -936,7 +936,7 @@ export default function CompareVersionsPageClient({
                   left: `calc(${duration > 0 ? (comment.timestamp / duration) * 100 : 0}% - 6px)`,
                   backgroundColor: markerColor,
                 }}
-                title={`v${comment.versionNumber} • ${formatTime(comment.timestamp)} - ${comment.content?.substring(0, 30) || '(comment)'}...`}
+                title={`v${comment.versionNumber} • ${formatTime(comment.timestamp)} - ${comment.content?.substring(0, 30) || '(コメント)'}...`}
               />
             );
           })}

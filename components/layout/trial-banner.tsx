@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { TrialNotice } from '@/lib/billing';
 
 function formatDate(value: Date) {
-  return value.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+  return value.toLocaleDateString('ja-JP', { month: 'long', day: 'numeric' });
 }
 
 /**
@@ -27,17 +27,17 @@ export function TrialBanner({ notice }: { notice: TrialNotice }) {
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-2 gap-y-1">
         <span>
           {isEnded
-            ? `Your free trial ended on ${formatDate(notice.endsAt)}.`
-            : `Your free trial ends on ${formatDate(notice.endsAt)}.`}
+            ? `無料トライアルは${formatDate(notice.endsAt)}に終了しました。`
+            : `無料トライアルは${formatDate(notice.endsAt)}に終了します。`}
         </span>
         {notice.contentKeptUntil ? (
           <span className="text-muted-foreground">
-            Nothing has been deleted. Your projects and media are kept until{' '}
-            {formatDate(notice.contentKeptUntil)}.
+            データは削除されていません。プロジェクトとメディアは{' '}
+            {formatDate(notice.contentKeptUntil)}まで保持されます。
           </span>
         ) : null}
         <Link href="/settings" className="font-medium underline underline-offset-4">
-          {isEnded ? 'Subscribe to pick up where you left off' : 'See plan'}
+          {isEnded ? '登録して続きから利用する' : 'プランを見る'}
         </Link>
       </div>
     </div>

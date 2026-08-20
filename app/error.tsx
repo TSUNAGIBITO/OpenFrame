@@ -19,18 +19,18 @@ export default function RootError({
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-4">
       <div className="flex flex-col items-center gap-2 text-center">
         <AlertTriangle className="h-12 w-12 text-destructive" />
-        <h1 className="text-2xl font-bold">Something went wrong</h1>
+        <h1 className="text-2xl font-bold">問題が発生しました</h1>
         <p className="text-muted-foreground max-w-md">
-          An unexpected error occurred. We&apos;ve been notified and are working to fix it.
+          予期しないエラーが発生しました。通知を受け取り、修正に取り組んでいます。
         </p>
-        {error.digest && <p className="text-muted-foreground text-xs">Error ID: {error.digest}</p>}
+        {error.digest && <p className="text-muted-foreground text-xs">エラーID: {error.digest}</p>}
       </div>
       <div className="flex gap-2">
         <Button onClick={reset} variant="default">
-          Try again
+          再試行
         </Button>
         <Button onClick={() => (window.location.href = '/')} variant="outline">
-          Go home
+          ホームへ戻る
         </Button>
       </div>
     </div>

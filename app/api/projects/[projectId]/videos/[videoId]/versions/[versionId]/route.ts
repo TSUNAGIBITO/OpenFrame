@@ -55,7 +55,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       return apiErrors.notFound('Version');
     }
     if (!result.canEdit) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const body = await request.json();
@@ -65,7 +65,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       duration !== undefined &&
       (typeof duration !== 'number' || !isFinite(duration) || duration < 0)
     ) {
-      return apiErrors.badRequest('Invalid duration value');
+      return apiErrors.badRequest('再生時間の値が正しくありません');
     }
 
     const updateData: Record<string, unknown> = {};
@@ -90,7 +90,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error updating version:', error);
-    return apiErrors.internalError('Failed to update version');
+    return apiErrors.internalError('バージョンの更新に失敗しました');
   }
 }
 
@@ -112,7 +112,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       return apiErrors.notFound('Version');
     }
     if (!result.canEdit) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     // Check there's more than one version — can't delete the last one
@@ -121,7 +121,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
 
     if (versionCount <= 1) {
-      return apiErrors.badRequest('Cannot delete the only version. Delete the video instead.');
+      return apiErrors.badRequest('唯一のバージョンは削除できません。動画自体を削除してください。');
     }
 
     const wasActive = result.version.isActive;
@@ -172,6 +172,6 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error deleting version:', error);
-    return apiErrors.internalError('Failed to delete version');
+    return apiErrors.internalError('バージョンの削除に失敗しました');
   }
 }

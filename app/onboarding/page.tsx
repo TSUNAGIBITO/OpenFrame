@@ -38,7 +38,7 @@ export default async function OnboardingPage() {
     redirect('/dashboard');
   }
 
-  const userName = user?.name || user?.email?.split('@')[0] || 'there';
+  const userName = user?.name || user?.email?.split('@')[0] || 'ゲスト';
 
   return (
     <OnboardingWizard

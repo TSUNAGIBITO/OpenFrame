@@ -33,19 +33,19 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     const pageRaw = pageParam === null ? 1 : Number(pageParam);
     if (!Number.isSafeInteger(pageRaw) || pageRaw < 1 || pageRaw > MAX_PAGE) {
-      return apiErrors.badRequest('Invalid page. Must be a positive integer.');
+      return apiErrors.badRequest('page が正しくありません。正の整数で指定してください。');
     }
 
     const limitRaw = limitParam === null ? 20 : Number(limitParam);
     if (!Number.isSafeInteger(limitRaw) || limitRaw < 1 || limitRaw > MAX_LIMIT) {
-      return apiErrors.badRequest('Invalid limit. Must be a positive integer between 1 and 100.');
+      return apiErrors.badRequest('limit が正しくありません。1〜100 の正の整数で指定してください。');
     }
 
     const page = pageRaw;
     const limit = limitRaw;
     const skip = (page - 1) * limit;
     if (!Number.isSafeInteger(skip) || skip > MAX_OFFSET) {
-      return apiErrors.badRequest('Invalid page range. Offset must be 10000 or less.');
+      return apiErrors.badRequest('ページ範囲が正しくありません。オフセットは 10000 以下にしてください。');
     }
 
     const workspace = await db.workspace.findUnique({
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const isAdmin = workspace.members[0]?.role === WorkspaceMemberRole.ADMIN;
 
     if (!access.hasAccess || (!isOwner && !isMember)) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const now = new Date();
@@ -124,7 +124,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error fetching workspace members:', error);
-    return apiErrors.internalError('Failed to fetch members');
+    return apiErrors.internalError('メンバーの取得に失敗しました');
   }
 }
 
@@ -159,19 +159,19 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const isAdmin = workspace.members[0]?.role === WorkspaceMemberRole.ADMIN;
 
     if (!access.canEdit || (!isOwner && !isAdmin)) {
-      return apiErrors.forbidden('Only workspace owners and admins can invite members');
+      return apiErrors.forbidden('メンバーを招待できるのはワークスペースのオーナーと管理者のみです');
     }
 
     const body = await request.json();
     const { email, role } = body;
 
     if (!email || typeof email !== 'string') {
-      return apiErrors.badRequest('Email is required');
+      return apiErrors.badRequest('メールアドレスを入力してください');
     }
 
     const normalizedEmail = normalizeEmail(email);
     if (!isValidEmailAddress(normalizedEmail)) {
-      return apiErrors.validationError('Invalid email format');
+      return apiErrors.validationError('メールアドレスの形式が正しくありません');
     }
 
     // Validate role
@@ -185,7 +185,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (userToInvite?.id === workspace.ownerId) {
-      return apiErrors.badRequest('Cannot invite the workspace owner as a member');
+      return apiErrors.badRequest('ワークスペースのオーナーをメンバーとして招待することはできません');
     }
 
     if (userToInvite) {
@@ -194,7 +194,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       });
 
       if (existingMember) {
-        return apiErrors.conflict('User is already a member of this workspace');
+        return apiErrors.conflict('このユーザーはすでにワークスペースのメンバーです');
       }
     }
 
@@ -220,6 +220,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error inviting workspace member:', error);
-    return apiErrors.internalError('Failed to invite member');
+    return apiErrors.internalError('メンバーの招待に失敗しました');
   }
 }

@@ -40,7 +40,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     const access = await checkProjectAccess(project, userId);
     if (!access.canEdit) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     // Workspace owners/admins can manage every project in the workspace; everyone
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error listing video move targets:', error);
-    return apiErrors.internalError('Failed to load destination projects');
+    return apiErrors.internalError('移動先プロジェクトの読み込みに失敗しました');
   }
 }
 
@@ -101,23 +101,23 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     };
 
     if (!Array.isArray(videoIds) || videoIds.length === 0) {
-      return apiErrors.badRequest('videoIds must be a non-empty array');
+      return apiErrors.badRequest('videoIds は空でない配列である必要があります');
     }
     if (videoIds.length > MAX_BULK_MOVE) {
-      return apiErrors.badRequest(`You can move at most ${MAX_BULK_MOVE} videos at once`);
+      return apiErrors.badRequest(`一度に移動できる動画は最大 ${MAX_BULK_MOVE} 本です`);
     }
     if (!videoIds.every((id) => typeof id === 'string' && id.trim().length > 0)) {
-      return apiErrors.badRequest('Each video id must be a non-empty string');
+      return apiErrors.badRequest('各動画 ID は空でない文字列である必要があります');
     }
     if (typeof targetProjectId !== 'string' || targetProjectId.trim().length === 0) {
-      return apiErrors.badRequest('targetProjectId must be a non-empty string');
+      return apiErrors.badRequest('targetProjectId は空でない文字列である必要があります');
     }
 
     const normalizedIds = [...new Set(videoIds.map((id) => id.trim()))];
     const targetId = targetProjectId.trim();
 
     if (targetId === projectId) {
-      return apiErrors.badRequest('Source and destination projects are the same');
+      return apiErrors.badRequest('移動元と移動先のプロジェクトが同じです');
     }
 
     const [sourceProject, targetProject] = await Promise.all([
@@ -134,10 +134,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return apiErrors.notFound('Project');
     }
     if (!targetProject) {
-      return apiErrors.badRequest('Destination project not found');
+      return apiErrors.badRequest('移動先のプロジェクトが見つかりません');
     }
     if (sourceProject.workspaceId !== targetProject.workspaceId) {
-      return apiErrors.badRequest('Videos can only be moved within the same workspace');
+      return apiErrors.badRequest('動画は同じワークスペース内でのみ移動できます');
     }
 
     const [sourceAccess, targetAccess] = await Promise.all([
@@ -145,10 +145,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       checkProjectAccess(targetProject, userId),
     ]);
     if (!sourceAccess.canEdit) {
-      return apiErrors.forbidden('You cannot move videos out of this project');
+      return apiErrors.forbidden('このプロジェクトから動画を移動する権限がありません');
     }
     if (!targetAccess.canEdit) {
-      return apiErrors.forbidden('You cannot move videos into the selected project');
+      return apiErrors.forbidden('選択したプロジェクトへ動画を移動する権限がありません');
     }
 
     // Fast, friendly pre-check for the common case (stale UI). The authoritative
@@ -158,7 +158,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       select: { id: true },
     });
     if (videos.length !== normalizedIds.length) {
-      return apiErrors.badRequest('One or more selected videos do not belong to this project');
+      return apiErrors.badRequest('選択した動画の中にこのプロジェクトに属さないものがあります');
     }
 
     try {
@@ -199,7 +199,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     } catch (error) {
       if (error instanceof VideoMoveConflictError) {
         return apiErrors.conflict(
-          'One or more selected videos changed while moving. Please refresh and try again.'
+          '移動中に選択した動画の状態が変わりました。ページを再読み込みして、もう一度お試しください。'
         );
       }
       throw error;
@@ -216,6 +216,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error moving videos:', error);
-    return apiErrors.internalError('Failed to move videos');
+    return apiErrors.internalError('動画の移動に失敗しました');
   }
 }

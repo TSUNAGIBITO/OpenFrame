@@ -21,7 +21,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
     if (!project) return apiErrors.notFound('Project');
 
     const access = await checkProjectAccess(project, session.user.id);
-    if (!access.canEdit) return apiErrors.forbidden('Access denied');
+    if (!access.canEdit) return apiErrors.forbidden('アクセスが拒否されました');
 
     const candidates = await getApprovalCandidatesForProject(projectId);
     if (!candidates) return apiErrors.notFound('Project');
@@ -30,6 +30,6 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error fetching approval candidates:', error);
-    return apiErrors.internalError('Failed to fetch approval candidates');
+    return apiErrors.internalError('承認候補の取得に失敗しました');
   }
 }

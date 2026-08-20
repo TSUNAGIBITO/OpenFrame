@@ -14,32 +14,32 @@ interface ShortcutGroup {
 
 const shortcutGroups: ShortcutGroup[] = [
   {
-    title: 'Navigation',
-    shortcuts: [{ keys: ['Ctrl', 'K'], description: 'Open search' }],
+    title: 'ナビゲーション',
+    shortcuts: [{ keys: ['Ctrl', 'K'], description: '検索を開く' }],
   },
   {
-    title: 'Playback',
+    title: '再生',
     shortcuts: [
-      { keys: ['Space', 'K'], description: 'Play / Pause' },
-      { keys: ['M'], description: 'Mute / Unmute' },
+      { keys: ['Space', 'K'], description: '再生 / 一時停止' },
+      { keys: ['M'], description: 'ミュート / ミュート解除' },
     ],
   },
   {
-    title: 'Seeking',
+    title: 'シーク',
     shortcuts: [
-      { keys: ['←'], description: 'Seek back 5s' },
-      { keys: ['→'], description: 'Seek forward 5s' },
-      { keys: ['J'], description: 'Seek back 10s' },
-      { keys: ['L'], description: 'Seek forward 10s' },
+      { keys: ['←'], description: '5秒戻す' },
+      { keys: ['→'], description: '5秒進める' },
+      { keys: ['J'], description: '10秒戻す' },
+      { keys: ['L'], description: '10秒進める' },
     ],
   },
   {
-    title: 'Speed',
+    title: '再生速度',
     shortcuts: [
-      { keys: ['↑'], description: 'Increase speed' },
-      { keys: ['↓'], description: 'Decrease speed' },
-      { keys: ['⇧', '>'], description: 'Increase speed' },
-      { keys: ['⇧', '<'], description: 'Decrease speed' },
+      { keys: ['↑'], description: '速度を上げる' },
+      { keys: ['↓'], description: '速度を下げる' },
+      { keys: ['⇧', '>'], description: '速度を上げる' },
+      { keys: ['⇧', '<'], description: '速度を下げる' },
     ],
   },
 ];
@@ -54,7 +54,7 @@ export function KeyboardShortcutsModal({ open, onOpenChange }: KeyboardShortcuts
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-base">Keyboard Shortcuts</DialogTitle>
+          <DialogTitle className="text-base">キーボードショートカット</DialogTitle>
         </DialogHeader>
         <div className="space-y-5 mt-1">
           {shortcutGroups.map((group) => (

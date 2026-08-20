@@ -30,7 +30,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const access = await checkProjectAccess(project, session.user.id);
     if (!access.canEdit) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     // Verify tag belongs to this project
@@ -47,13 +47,13 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const updateData: Record<string, unknown> = {};
     if (name !== undefined) {
       if (!name.trim()) {
-        return apiErrors.badRequest('Name cannot be empty');
+        return apiErrors.badRequest('名前は空にできません');
       }
       updateData.name = name.trim();
     }
     if (color !== undefined) {
       if (!/^#[0-9A-Fa-f]{6}$/.test(color)) {
-        return apiErrors.badRequest('Invalid color format');
+        return apiErrors.badRequest('カラーの形式が正しくありません');
       }
       updateData.color = color.toUpperCase();
     }
@@ -71,9 +71,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   } catch (error) {
     logError('Error updating tag:', error);
     if ((error as { code?: string }).code === 'P2002') {
-      return apiErrors.conflict('Tag name already exists');
+      return apiErrors.conflict('同じ名前のタグがすでに存在します');
     }
-    return apiErrors.internalError('Failed to update tag');
+    return apiErrors.internalError('タグの更新に失敗しました');
   }
 }
 
@@ -100,7 +100,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     const access = await checkProjectAccess(project, session.user.id);
     if (!access.canEdit) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     // Verify tag belongs to this project
@@ -117,6 +117,6 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error deleting tag:', error);
-    return apiErrors.internalError('Failed to delete tag');
+    return apiErrors.internalError('タグの削除に失敗しました');
   }
 }

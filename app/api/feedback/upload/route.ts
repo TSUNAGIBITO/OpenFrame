@@ -24,44 +24,44 @@ export async function POST(request: NextRequest) {
 
     const session = await auth();
     if (!session?.user?.id) {
-      return apiErrors.unauthorized('You must be signed in to upload screenshots');
+      return apiErrors.unauthorized('スクリーンショットをアップロードするにはサインインが必要です');
     }
 
     const contentLength = request.headers.get('content-length');
     if (!contentLength) {
-      return apiErrors.badRequest('Missing Content-Length header');
+      return apiErrors.badRequest('Content-Length ヘッダーがありません');
     }
     const size = parseInt(contentLength, 10);
     if (Number.isNaN(size) || size <= 0) {
-      return apiErrors.badRequest('Invalid Content-Length header');
+      return apiErrors.badRequest('Content-Length ヘッダーが正しくありません');
     }
     if (size > MAX_MULTIPART_BODY_SIZE) {
-      return apiErrors.badRequest('File too large. Maximum size is 10MB.');
+      return apiErrors.badRequest('ファイルが大きすぎます。最大サイズは 10MB です。');
     }
 
     const formData = await request.formData();
     const files = formData.getAll('image');
     if (files.length !== 1) {
-      return apiErrors.badRequest('No image file provided');
+      return apiErrors.badRequest('画像ファイルが指定されていません');
     }
     const file = files[0];
     if (!(file instanceof File)) {
-      return apiErrors.badRequest('No image file provided');
+      return apiErrors.badRequest('画像ファイルが指定されていません');
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      return apiErrors.badRequest('File too large. Maximum size is 10MB.');
+      return apiErrors.badRequest('ファイルが大きすぎます。最大サイズは 10MB です。');
     }
 
     const normalizedMime = normalizeImageMime(file.type);
     if (normalizedMime && !isAllowedImageType(normalizedMime)) {
-      return apiErrors.badRequest(`Unsupported image format: ${file.type}`);
+      return apiErrors.badRequest(`対応していない画像形式です: ${file.type}`);
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const detectedMime = detectImageMime(buffer);
     if (!detectedMime) {
-      return apiErrors.badRequest('Uploaded file content does not match an allowed image type');
+      return apiErrors.badRequest('アップロードされたファイルの内容が許可された画像形式と一致しません');
     }
 
     const ext = getImageExtension(detectedMime);
@@ -80,6 +80,6 @@ export async function POST(request: NextRequest) {
     return successResponse({ url: `/api/upload/image/${filename}` }, 201);
   } catch (error) {
     logError('Error uploading feedback screenshot:', error);
-    return apiErrors.internalError('Failed to upload screenshot');
+    return apiErrors.internalError('スクリーンショットのアップロードに失敗しました');
   }
 }

@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
     if (contentLength) {
       const bodySize = parseInt(contentLength, 10);
       if (isNaN(bodySize) || bodySize > MAX_MULTIPART_BODY_SIZE) {
-        return apiErrors.badRequest('File too large. Maximum size is 10MB.');
+        return apiErrors.badRequest('ファイルが大きすぎます。最大サイズは 10MB です。');
       }
     }
 
@@ -128,10 +128,10 @@ export async function POST(request: NextRequest) {
     const uploadToken = formData.get('uploadToken');
 
     if (!file) {
-      return apiErrors.badRequest('No audio file provided');
+      return apiErrors.badRequest('音声ファイルが指定されていません');
     }
     if (typeof videoId !== 'string' || !videoId.trim()) {
-      return apiErrors.badRequest('videoId is required');
+      return apiErrors.badRequest('videoId が必要です');
     }
 
     const safeVideoId = videoId.trim();
@@ -168,17 +168,17 @@ export async function POST(request: NextRequest) {
     const canCommentWithShareLink =
       shareAccess.canComment && (session?.user?.id ? true : shareAccess.allowGuests);
     if (!canCommentWithMembership && !canCommentWithShareLink) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     if (!session?.user?.id) {
       if (typeof uploadToken !== 'string' || !uploadToken.trim()) {
-        return apiErrors.badRequest('uploadToken is required for guest uploads');
+        return apiErrors.badRequest('ゲストのアップロードには uploadToken が必要です');
       }
 
       const expectedContext = deriveGuestUploadContext(request, shareSession?.token ?? null);
       if (!expectedContext) {
-        return apiErrors.forbidden('Missing trusted client IP header');
+        return apiErrors.forbidden('信頼できるクライアント IP ヘッダーがありません');
       }
 
       const isValidUploadToken = verifyGuestUploadToken(uploadToken.trim(), {
@@ -188,7 +188,7 @@ export async function POST(request: NextRequest) {
         context: expectedContext,
       });
       if (!isValidUploadToken) {
-        return apiErrors.forbidden('Invalid upload token');
+        return apiErrors.forbidden('アップロードトークンが無効です');
       }
 
       const quotaError = await enforceGuestUploadQuota(
@@ -202,7 +202,7 @@ export async function POST(request: NextRequest) {
 
     // Double-check file size (defense in depth - Content-Length can be spoofed)
     if (file.size > MAX_FILE_SIZE) {
-      return apiErrors.badRequest('File too large. Maximum size is 10MB.');
+      return apiErrors.badRequest('ファイルが大きすぎます。最大サイズは 10MB です。');
     }
 
     // Enforce per-user storage quota before uploading.
@@ -227,7 +227,7 @@ export async function POST(request: NextRequest) {
         workspaceOwnerId,
         UPLOAD_RESERVATION_PURPOSES.AUDIO
       );
-      return apiErrors.badRequest(`Unsupported audio format: ${rawContentType}`);
+      return apiErrors.badRequest(`対応していない音声形式です: ${rawContentType}`);
     }
 
     // Prefer the original file extension when it's a known safe type (e.g. preserve .opus, .mp3)
@@ -248,7 +248,7 @@ export async function POST(request: NextRequest) {
         workspaceOwnerId,
         UPLOAD_RESERVATION_PURPOSES.AUDIO
       );
-      return apiErrors.badRequest('File content does not match an audio format');
+      return apiErrors.badRequest('ファイルの内容が音声形式と一致しません');
     }
     const hasValidMagicBytes = hasValidAudioMagicBytes(buffer.slice(0, 16), contentType);
     if (!hasValidMagicBytes) {
@@ -257,7 +257,7 @@ export async function POST(request: NextRequest) {
         workspaceOwnerId,
         UPLOAD_RESERVATION_PURPOSES.AUDIO
       );
-      return apiErrors.badRequest('File content does not match the declared audio format');
+      return apiErrors.badRequest('ファイルの内容が指定された音声形式と一致しません');
     }
 
     try {
@@ -286,6 +286,6 @@ export async function POST(request: NextRequest) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error uploading audio:', error);
-    return apiErrors.internalError('Failed to upload audio');
+    return apiErrors.internalError('音声のアップロードに失敗しました');
   }
 }

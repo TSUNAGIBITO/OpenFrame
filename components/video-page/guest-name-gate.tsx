@@ -24,18 +24,18 @@ export const GuestNameGate = memo(function GuestNameGate({
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
             <User className="h-6 w-6 text-primary" />
           </div>
-          <h1 className="text-xl font-semibold mb-1">Welcome to OpenFrame</h1>
+          <h1 className="text-xl font-semibold mb-1">つなぐレビューへようこそ</h1>
           <p className="text-sm text-muted-foreground">
-            Enter your name to view and comment on this video
+            この動画を閲覧・コメントするには、お名前を入力してください
           </p>
         </div>
         <div className="space-y-3">
           <label htmlFor="guest-name" className="sr-only">
-            Your name
+            お名前
           </label>
           <Input
             id="guest-name"
-            placeholder="Your name"
+            placeholder="お名前"
             value={guestName}
             onChange={(e) => setGuestName(e.target.value)}
             onKeyDown={(e) => {
@@ -46,15 +46,15 @@ export const GuestNameGate = memo(function GuestNameGate({
             autoFocus
           />
           <Button className="w-full" disabled={!guestName.trim()} onClick={onConfirm}>
-            Continue
+            続ける
           </Button>
         </div>
         <p className="text-xs text-muted-foreground text-center mt-4">
-          Or{' '}
+          または{' '}
           <Link href="/login" className="text-primary hover:underline">
-            sign in
+            ログイン
           </Link>{' '}
-          for a full account
+          してアカウントを利用する
         </p>
       </div>
     </div>

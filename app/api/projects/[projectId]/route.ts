@@ -25,12 +25,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     const limitRaw = limitParam === null ? 20 : Number(limitParam);
     if (!Number.isSafeInteger(limitRaw) || limitRaw < 1 || limitRaw > MAX_LIMIT) {
-      return apiErrors.badRequest('Invalid limit. Must be a positive integer between 1 and 100.');
+      return apiErrors.badRequest('limit が正しくありません。1〜100 の正の整数で指定してください。');
     }
 
     const offset = offsetParam === null ? 0 : Number(offsetParam);
     if (!Number.isSafeInteger(offset) || offset < 0 || offset > MAX_OFFSET) {
-      return apiErrors.badRequest('Invalid offset. Must be a non-negative integer up to 10000.');
+      return apiErrors.badRequest('offset が正しくありません。0〜10000 の整数で指定してください。');
     }
 
     const limit = limitRaw;
@@ -74,14 +74,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     const access = await checkProjectAccess(project, session?.user?.id);
     if (!access.hasAccess) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const response = successResponse(project);
     return withCacheControl(response, 'private, max-age=30, stale-while-revalidate=60');
   } catch (error) {
     logError('Error fetching project:', error);
-    return apiErrors.internalError('Failed to fetch project');
+    return apiErrors.internalError('プロジェクトの取得に失敗しました');
   }
 }
 
@@ -106,7 +106,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       ? await checkProjectAccess(projectAccessTarget, session.user.id)
       : null;
     if (!access?.canEdit) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const body = await request.json();
@@ -114,27 +114,27 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     if (name !== undefined) {
       if (typeof name !== 'string' || name.trim().length === 0) {
-        return apiErrors.badRequest('Name must be a non-empty string');
+        return apiErrors.badRequest('名前は空でない文字列で入力してください');
       }
       if (name.trim().length > 100) {
-        return apiErrors.badRequest('Name must be 100 characters or fewer');
+        return apiErrors.badRequest('名前は 100 文字以内で入力してください');
       }
     }
     if (description !== undefined && description !== null) {
       if (typeof description !== 'string') {
-        return apiErrors.badRequest('Description must be a string');
+        return apiErrors.badRequest('説明は文字列で入力してください');
       }
       if (description.trim().length > 1000) {
-        return apiErrors.badRequest('Description must be 1000 characters or fewer');
+        return apiErrors.badRequest('説明は 1000 文字以内で入力してください');
       }
     }
 
     const VALID_VISIBILITY = ['PRIVATE', 'INVITE', 'PUBLIC'] as const;
     if (visibility !== undefined && !VALID_VISIBILITY.includes(visibility)) {
-      return apiErrors.badRequest('Invalid visibility value');
+      return apiErrors.badRequest('公開範囲の値が正しくありません');
     }
     if (allowDownloads !== undefined && typeof allowDownloads !== 'boolean') {
-      return apiErrors.badRequest('allowDownloads must be a boolean');
+      return apiErrors.badRequest('allowDownloads は真偽値である必要があります');
     }
 
     const updateData: Record<string, unknown> = {};
@@ -156,7 +156,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error updating project:', error);
-    return apiErrors.internalError('Failed to update project');
+    return apiErrors.internalError('プロジェクトの更新に失敗しました');
   }
 }
 
@@ -183,7 +183,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     const access = await checkProjectAccess(project, session.user.id);
     if (!access.canDelete) {
-      return apiErrors.forbidden('Only the project owner can delete it');
+      return apiErrors.forbidden('プロジェクトを削除できるのはオーナーのみです');
     }
 
     const [projectVersionRefs, projectAssetRefs, mediaUrls] = await Promise.all([
@@ -240,6 +240,6 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error deleting project:', error);
-    return apiErrors.internalError('Failed to delete project');
+    return apiErrors.internalError('プロジェクトの削除に失敗しました');
   }
 }

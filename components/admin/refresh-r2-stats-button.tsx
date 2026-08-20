@@ -21,14 +21,14 @@ export function RefreshR2StatsButton() {
 
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) {
-        const message = (payload as { error?: string }).error || 'Failed to refresh R2 stats';
+        const message = (payload as { error?: string }).error || 'R2統計の更新に失敗しました';
         setError(message);
         return;
       }
 
       router.refresh();
     } catch {
-      setError('Failed to refresh R2 stats');
+      setError('R2統計の更新に失敗しました');
     } finally {
       setIsRefreshing(false);
     }
@@ -48,7 +48,7 @@ export function RefreshR2StatsButton() {
         ) : (
           <RefreshCw className="mr-1.5 h-4 w-4" />
         )}
-        {isRefreshing ? 'Refreshing...' : 'Refresh R2 Stats'}
+        {isRefreshing ? '更新中...' : 'R2統計を更新'}
       </Button>
       {error ? <p className="text-xs text-destructive">{error}</p> : null}
     </div>

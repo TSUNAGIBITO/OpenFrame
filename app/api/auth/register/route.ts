@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     const rateLimit = await checkRateLimit(rateLimitKey, 'register');
 
     if (!rateLimit.allowed) {
-      return apiErrors.rateLimited('Too many registration attempts. Please try again later.');
+      return apiErrors.rateLimited('登録の試行回数が多すぎます。しばらくしてから再度お試しください。');
     }
 
     const body = await request.json();
@@ -42,17 +42,17 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields
     if (!name || typeof name !== 'string' || name.trim().length < 2 || name.trim().length > 100) {
-      return apiErrors.badRequest('Name must be between 2 and 100 characters');
+      return apiErrors.badRequest('名前は 2〜100 文字で入力してください');
     }
 
     if (!email || typeof email !== 'string') {
-      return apiErrors.badRequest('Email is required');
+      return apiErrors.badRequest('メールアドレスを入力してください');
     }
     const normalizedEmail = normalizeEmail(email);
 
     // Basic email validation
     if (!isValidEmailAddress(normalizedEmail)) {
-      return apiErrors.validationError('Invalid email format');
+      return apiErrors.validationError('メールアドレスの形式が正しくありません');
     }
 
     // Checked before the invitation branch reads its token, but only applied to
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
         invitationIsValid = true;
         validatedInvitationToken = normalizedToken;
       } else {
-        return apiErrors.forbidden('Invalid or expired invitation token');
+        return apiErrors.forbidden('招待トークンが無効か、有効期限が切れています');
       }
     }
 
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
       // Validate invite code using constant-time comparison to prevent timing attacks
       const validInviteCode = process.env.INVITE_CODE;
       if (!validInviteCode || !inviteCode) {
-        return apiErrors.forbidden('Invalid invite code');
+        return apiErrors.forbidden('招待コードが無効です');
       }
 
       // Constant-time comparison
@@ -93,18 +93,18 @@ export async function POST(request: NextRequest) {
       const isValidCode = isValidLength && timingSafeEqual(validBuffer, compareBuffer);
 
       if (!isValidCode) {
-        return apiErrors.forbidden('Invalid invite code');
+        return apiErrors.forbidden('招待コードが無効です');
       }
     }
 
     if (!invitationIsValid && isDisposableAddress) {
       return apiErrors.badRequest(
-        'Please sign up with a permanent email address. Disposable mailboxes are not accepted.'
+        '常時利用できるメールアドレスで登録してください。使い捨てメールアドレスは利用できません。'
       );
     }
 
     if (!password || typeof password !== 'string' || password.length < 8 || password.length > 128) {
-      return apiErrors.badRequest('Password must be between 8 and 128 characters');
+      return apiErrors.badRequest('パスワードは 8〜128 文字で入力してください');
     }
 
     // Check if email already exists
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingUser) {
-      return apiErrors.conflict('An account with this email already exists');
+      return apiErrors.conflict('このメールアドレスのアカウントはすでに存在します');
     }
 
     // Hash password
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
       if (result !== 'accepted') {
         await db.user.delete({ where: { id: user.id } });
         return apiErrors.conflict(
-          'Invitation could not be accepted. Please request a new invitation.'
+          '招待を受諾できませんでした。新しい招待をリクエストしてください。'
         );
       }
     }
@@ -196,6 +196,6 @@ export async function POST(request: NextRequest) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Registration error:', error);
-    return apiErrors.internalError('Failed to create account');
+    return apiErrors.internalError('アカウントの作成に失敗しました');
   }
 }

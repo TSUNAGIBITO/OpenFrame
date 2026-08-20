@@ -31,7 +31,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     const access = await checkProjectAccess(video.project, session?.user?.id);
     if (!access.hasAccess) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const versions = await db.videoVersion.findMany({
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, max-age=30, stale-while-revalidate=60');
   } catch (error) {
     logError('Error fetching versions:', error);
-    return apiErrors.internalError('Failed to fetch versions');
+    return apiErrors.internalError('バージョンの取得に失敗しました');
   }
 }
 
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const access = await checkProjectAccess(video.project, session.user.id);
     if (!access.canEdit) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const body = await request.json();
@@ -97,15 +97,15 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     } = body;
 
     if (!videoUrl) {
-      return apiErrors.badRequest('Video URL is required');
+      return apiErrors.badRequest('動画 URL を入力してください');
     }
 
     if (versionLabel !== undefined && versionLabel !== null) {
       if (typeof versionLabel !== 'string') {
-        return apiErrors.badRequest('Version label must be a string');
+        return apiErrors.badRequest('バージョンラベルは文字列で入力してください');
       }
       if (versionLabel.trim().length > 100) {
-        return apiErrors.badRequest('Version label must be 100 characters or fewer');
+        return apiErrors.badRequest('バージョンラベルは 100 文字以内で入力してください');
       }
     }
 
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     if (normalizedProviderIdEarly === 'r2') {
       if (!videoUrl.startsWith('/api/upload/video/')) {
-        return apiErrors.badRequest('Video URL must be a valid upload path');
+        return apiErrors.badRequest('動画 URL は有効なアップロードパスである必要があります');
       }
     } else {
       const videoUrlError = validateUrl(videoUrl, 'Video URL');
@@ -150,7 +150,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     if (normalizedProviderId === 'bunny') {
       if (!normalizedProviderVideoId || !normalizedUploadToken) {
-        return apiErrors.badRequest('Bunny uploads must include providerVideoId and uploadToken');
+        return apiErrors.badRequest('Bunny のアップロードには providerVideoId と uploadToken が必要です');
       }
 
       const grant = readBunnyUploadGrant(normalizedUploadToken, {
@@ -159,7 +159,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         videoId: normalizedProviderVideoId,
       });
       if (!grant) {
-        return apiErrors.forbidden('Invalid Bunny upload token');
+        return apiErrors.forbidden('Bunny のアップロードトークンが無効です');
       }
 
       // The size the upload was admitted on, written down here so the account is
@@ -173,7 +173,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     } else if (normalizedProviderId === 'r2') {
       const normalizedObjectKey = typeof objectKey === 'string' ? objectKey.trim() : '';
       if (!normalizedObjectKey || !normalizedUploadToken) {
-        return apiErrors.badRequest('R2 uploads must include objectKey and uploadToken');
+        return apiErrors.badRequest('R2 のアップロードには objectKey と uploadToken が必要です');
       }
 
       const finalizeResult = await finalizeR2VideoUpload({
@@ -294,6 +294,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error creating version:', error);
-    return apiErrors.internalError('Failed to create version');
+    return apiErrors.internalError('バージョンの作成に失敗しました');
   }
 }

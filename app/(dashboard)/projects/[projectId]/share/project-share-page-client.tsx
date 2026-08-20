@@ -61,7 +61,7 @@ export default function ProjectSharePageClient({ projectId }: ProjectSharePagePr
           setMembers(project.members || []);
         }
       })
-      .catch(() => setError('Failed to load project'))
+      .catch(() => setError('プロジェクトの読み込みに失敗しました'))
       .finally(() => setIsLoading(false));
   }, [projectId]);
 
@@ -89,11 +89,11 @@ export default function ProjectSharePageClient({ projectId }: ProjectSharePagePr
     try {
       // TODO: Implement invite API
       await new Promise((resolve) => setTimeout(resolve, 500));
-      setInviteSuccess(`Invitation sent to ${inviteEmail}`);
+      setInviteSuccess(`${inviteEmail} に招待を送信しました`);
       setInviteEmail('');
       setTimeout(() => setInviteSuccess(''), 3000);
     } catch {
-      setError('Failed to send invitation');
+      setError('招待の送信に失敗しました');
     } finally {
       setIsInviting(false);
     }
@@ -124,11 +124,11 @@ export default function ProjectSharePageClient({ projectId }: ProjectSharePagePr
   const getVisibilityLabel = () => {
     switch (projectVisibility) {
       case 'PUBLIC':
-        return { title: 'Public', description: 'Anyone with the link can view this project' };
+        return { title: '公開', description: 'リンクを知っている人は誰でもこのプロジェクトを閲覧できます' };
       case 'INVITE':
-        return { title: 'Invite Only', description: 'Only people you invite can access' };
+        return { title: '招待制', description: '招待した人だけがアクセスできます' };
       default:
-        return { title: 'Private', description: 'Only you can access this project' };
+        return { title: '非公開', description: 'あなただけがこのプロジェクトにアクセスできます' };
     }
   };
 
@@ -151,7 +151,7 @@ export default function ProjectSharePageClient({ projectId }: ProjectSharePagePr
             className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Project
+            プロジェクトに戻る
           </Link>
         </div>
 
@@ -162,9 +162,9 @@ export default function ProjectSharePageClient({ projectId }: ProjectSharePagePr
               <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <Share2 className="h-7 w-7 text-primary" />
               </div>
-              <CardTitle className="text-2xl">Share Project</CardTitle>
+              <CardTitle className="text-2xl">プロジェクトを共有</CardTitle>
               <CardDescription className="text-base">
-                Share &quot;{projectName}&quot; with your team or clients
+                「{projectName}」をチームやクライアントと共有します
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-4">
@@ -178,16 +178,16 @@ export default function ProjectSharePageClient({ projectId }: ProjectSharePagePr
                   <div className="text-sm opacity-80">{visibilityInfo.description}</div>
                   {(projectVisibility === 'PUBLIC' || projectVisibility === 'INVITE') && (
                     <div className="text-sm opacity-80 mt-1">
-                      Viewer downloads:{' '}
+                      閲覧者のダウンロード:{' '}
                       {allowDownloads
-                        ? 'enabled (includes anonymous visitors on public links)'
-                        : 'disabled'}
+                        ? '有効（公開リンクでは匿名の訪問者も含む）'
+                        : '無効'}
                     </div>
                   )}
                 </div>
                 <Link href={`/projects/${projectId}/settings`}>
                   <Button variant="ghost" size="sm" className="text-current hover:bg-current/10">
-                    Change
+                    変更
                   </Button>
                 </Link>
               </div>
@@ -200,9 +200,9 @@ export default function ProjectSharePageClient({ projectId }: ProjectSharePagePr
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Mail className="h-5 w-5 text-primary" />
-                  Invite People
+                  ユーザーを招待
                 </CardTitle>
-                <CardDescription>Send email invitations to specific people</CardDescription>
+                <CardDescription>特定の人にメールで招待を送信します</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <form onSubmit={handleInvite} className="flex gap-2">
@@ -224,7 +224,7 @@ export default function ProjectSharePageClient({ projectId }: ProjectSharePagePr
                     ) : (
                       <>
                         <UserPlus className="h-4 w-4 mr-2" />
-                        Invite
+                        招待
                       </>
                     )}
                   </Button>
@@ -239,7 +239,7 @@ export default function ProjectSharePageClient({ projectId }: ProjectSharePagePr
                 {/* Current Members */}
                 {members.length > 0 && (
                   <div className="space-y-2 pt-2">
-                    <Label className="text-sm text-muted-foreground">Project Members</Label>
+                    <Label className="text-sm text-muted-foreground">プロジェクトメンバー</Label>
                     <div className="space-y-2">
                       {members.map((member) => (
                         <div
@@ -254,7 +254,7 @@ export default function ProjectSharePageClient({ projectId }: ProjectSharePagePr
                             </Avatar>
                             <div>
                               <div className="font-medium text-sm">
-                                {member.user.name || 'Unknown'}
+                                {member.user.name || '不明'}
                               </div>
                               <div className="text-xs text-muted-foreground">
                                 {member.user.email}
@@ -282,9 +282,9 @@ export default function ProjectSharePageClient({ projectId }: ProjectSharePagePr
                 {members.length === 0 && (
                   <div className="text-center py-6 text-muted-foreground">
                     <UserPlus className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">No members yet</p>
+                    <p className="text-sm">まだメンバーがいません</p>
                     <p className="text-xs opacity-70">
-                      Invite people to collaborate on this project
+                      このプロジェクトで協業する人を招待しましょう
                     </p>
                   </div>
                 )}
@@ -298,9 +298,9 @@ export default function ProjectSharePageClient({ projectId }: ProjectSharePagePr
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Globe className="h-5 w-5 text-primary" />
-                  Public Link
+                  公開リンク
                 </CardTitle>
-                <CardDescription>Share this link with anyone</CardDescription>
+                <CardDescription>このリンクを誰とでも共有できます</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex gap-2">
@@ -330,12 +330,12 @@ export default function ProjectSharePageClient({ projectId }: ProjectSharePagePr
                   <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
                     <Lock className="h-8 w-8 text-muted-foreground/50" />
                   </div>
-                  <h3 className="font-medium mb-1">This project is private</h3>
+                  <h3 className="font-medium mb-1">このプロジェクトは非公開です</h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Only you can access this project. Change visibility to share with others.
+                    あなただけがこのプロジェクトにアクセスできます。他の人と共有するには公開範囲を変更してください。
                   </p>
                   <Button asChild variant="outline">
-                    <Link href={`/projects/${projectId}/settings`}>Change Visibility</Link>
+                    <Link href={`/projects/${projectId}/settings`}>公開範囲を変更</Link>
                   </Button>
                 </div>
               </CardContent>

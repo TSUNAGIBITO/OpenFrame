@@ -33,7 +33,7 @@ export async function GET(
 
     // Validate filename to prevent path traversal
     if (!SAFE_FILENAME.test(filename)) {
-      return apiErrors.badRequest('Invalid filename');
+      return apiErrors.badRequest('ファイル名が正しくありません');
     }
 
     // Parallelize the DB lookup and session check to narrow the timing delta
@@ -75,12 +75,12 @@ export async function GET(
     videoAssets.forEach((videoAsset) => uniqueVideos.set(videoAsset.video.id, videoAsset.video));
 
     if (uniqueVideos.size > 1) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const video = uniqueVideos.values().next().value ?? null;
     if (!video) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const access = await checkProjectAccess(video.project, session?.user?.id);
@@ -98,7 +98,7 @@ export async function GET(
         : null;
 
       if (!shareAccess?.hasAccess) {
-        return apiErrors.forbidden('Access denied');
+        return apiErrors.forbidden('アクセスが拒否されました');
       }
     }
 
@@ -112,10 +112,10 @@ export async function GET(
         'X-Content-Type-Options': 'nosniff',
         'Content-Security-Policy': "default-src 'none'; sandbox",
       },
-      internalErrorMessage: 'Failed to retrieve audio',
+      internalErrorMessage: '音声の取得に失敗しました',
     });
   } catch (error: unknown) {
     logError('Error serving audio:', error);
-    return apiErrors.internalError('Failed to retrieve audio');
+    return apiErrors.internalError('音声の取得に失敗しました');
   }
 }

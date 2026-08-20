@@ -97,7 +97,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const access = await checkProjectAccess(project, session?.user?.id);
 
     if (!access.hasAccess) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     // Strip internal project data from response
@@ -107,7 +107,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-cache');
   } catch (error) {
     logError('Error fetching comment:', error);
-    return apiErrors.internalError('Failed to fetch comment');
+    return apiErrors.internalError('コメントの取得に失敗しました');
   }
 }
 
@@ -180,7 +180,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       const hasGuestAccess =
         project.visibility === 'PUBLIC' || (shareAccess.canComment && shareAccess.allowGuests);
       if (!hasGuestAccess) {
-        return apiErrors.forbidden('Access denied');
+        return apiErrors.forbidden('アクセスが拒否されました');
       }
     }
 
@@ -196,7 +196,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         wantsImageUpdate) &&
       !canEditOwnContent
     ) {
-      return apiErrors.forbidden('Only the author can edit comment content');
+      return apiErrors.forbidden('コメント本文を編集できるのは投稿者のみです');
     }
 
     let desiredImageUrls: string[] = [];
@@ -222,14 +222,14 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
           select: { id: true },
         });
         if (alreadyClaimed) {
-          return apiErrors.badRequest('Image is already attached to another comment');
+          return apiErrors.badRequest('この画像はすでに別のコメントに添付されています');
         }
 
         const checks = await Promise.all(
           addedUrls.map(async (url) => ({ url, ...(await isFreshAttachment(url, 'image')) }))
         );
         if (checks.some((check) => !check.isFresh)) {
-          return apiErrors.badRequest('Image upload expired. Please upload again.');
+          return apiErrors.badRequest('画像のアップロードの有効期限が切れました。もう一度アップロードしてください。');
         }
         addedImages = checks;
       }
@@ -249,7 +249,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     // Owner, author, members, or workspace members can resolve/unresolve
     if (isResolved !== undefined && !canResolveComment) {
-      return apiErrors.forbidden('Only admins can resolve comments');
+      return apiErrors.forbidden('コメントを解決できるのは管理者のみです');
     }
 
     const updateData: Record<string, unknown> = {};
@@ -261,7 +261,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
           where: { id: tagId, projectId: project.id },
         });
         if (!tag) {
-          return apiErrors.badRequest('Tag not found');
+          return apiErrors.badRequest('タグが見つかりません');
         }
       }
       updateData.tagId = tagId;
@@ -271,11 +271,11 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         updateData.annotationData = null;
       } else {
         if (!Array.isArray(annotationData)) {
-          return apiErrors.badRequest('annotationData must be an array of valid stroke objects');
+          return apiErrors.badRequest('annotationData は有効なストロークオブジェクトの配列である必要があります');
         }
         const validStrokes = validateAnnotationStrokes(annotationData);
         if (validStrokes === null) {
-          return apiErrors.badRequest('annotationData must be an array of valid stroke objects');
+          return apiErrors.badRequest('annotationData は有効なストロークオブジェクトの配列である必要があります');
         }
         updateData.annotationData = JSON.stringify(validStrokes);
       }
@@ -391,7 +391,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       UPLOAD_RESERVATION_PURPOSES.ATTACHMENT
     );
     logError('Error updating comment:', error);
-    return apiErrors.internalError('Failed to update comment');
+    return apiErrors.internalError('コメントの更新に失敗しました');
   }
 }
 
@@ -463,14 +463,14 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         const hasGuestAccess =
           project.visibility === 'PUBLIC' || (shareAccess.canComment && shareAccess.allowGuests);
         if (!hasGuestAccess) {
-          return apiErrors.forbidden('Access denied');
+          return apiErrors.forbidden('アクセスが拒否されました');
         }
         canDelete = true;
       }
     }
 
     if (!canDelete) {
-      return apiErrors.forbidden('You do not have permission to delete this comment');
+      return apiErrors.forbidden('このコメントを削除する権限がありません');
     }
 
     // Collect all media URLs to delete from R2 (comment + its replies)
@@ -523,6 +523,6 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error deleting comment:', error);
-    return apiErrors.internalError('Failed to delete comment');
+    return apiErrors.internalError('コメントの削除に失敗しました');
   }
 }

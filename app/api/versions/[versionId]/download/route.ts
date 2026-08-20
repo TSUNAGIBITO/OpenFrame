@@ -317,11 +317,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       if (!belongsToProject && !shareAccess.hasAccess) {
         return apiErrors.notFound('Version');
       }
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     if (version.providerId !== 'bunny') {
-      return apiErrors.badRequest('Download is currently supported for Bunny versions only');
+      return apiErrors.badRequest('現在ダウンロードに対応しているのは Bunny のバージョンのみです');
     }
 
     if (
@@ -330,7 +330,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       sourceParam !== 'original' &&
       sourceParam !== 'compressed'
     ) {
-      return apiErrors.badRequest('Invalid source. Allowed values: auto, original, compressed');
+      return apiErrors.badRequest('source が正しくありません。指定できる値: auto, original, compressed');
     }
 
     if (
@@ -338,12 +338,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       (!Number.isFinite(requestedQuality) || !BUNNY_ALLOWED_QUALITIES.has(requestedQuality))
     ) {
       return apiErrors.badRequest(
-        'Invalid quality. Allowed values: 2160, 1440, 1080, 720, 480, 360, 240'
+        'quality が正しくありません。指定できる値: 2160, 1440, 1080, 720, 480, 360, 240'
       );
     }
 
     if (rawQuality !== null && sourcePreference === 'original') {
-      return apiErrors.badRequest('Quality cannot be used when source=original');
+      return apiErrors.badRequest('source=original の場合は quality を指定できません');
     }
 
     const source = await resolveBunnyDownloadSource(
@@ -404,6 +404,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return Response.redirect(source.url, 302);
   } catch (error) {
     logError('Error downloading version:', error);
-    return apiErrors.internalError('Failed to download video');
+    return apiErrors.internalError('動画のダウンロードに失敗しました');
   }
 }

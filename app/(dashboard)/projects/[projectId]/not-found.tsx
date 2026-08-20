@@ -7,18 +7,17 @@ export default function ProjectNotFound() {
     <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 p-4">
       <div className="flex flex-col items-center gap-2 text-center">
         <FolderX className="h-12 w-12 text-muted-foreground" />
-        <h1 className="text-2xl font-bold">Project Not Found</h1>
+        <h1 className="text-2xl font-bold">プロジェクトが見つかりません</h1>
         <p className="text-muted-foreground max-w-md">
-          The project you&apos;re looking for doesn&apos;t exist or you don&apos;t have access to
-          it.
+          お探しのプロジェクトは存在しないか、アクセス権がありません。
         </p>
       </div>
       <div className="flex gap-2">
         <Button asChild variant="default">
-          <Link href="/dashboard">View all projects</Link>
+          <Link href="/dashboard">すべてのプロジェクトを見る</Link>
         </Button>
         <Button asChild variant="outline">
-          <Link href="/projects/new">Create new project</Link>
+          <Link href="/projects/new">新規プロジェクトを作成</Link>
         </Button>
       </div>
     </div>

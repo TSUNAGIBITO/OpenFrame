@@ -22,7 +22,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     const session = await auth();
     if (!session?.user?.isAdmin) {
-      return apiErrors.forbidden('Admin access required');
+      return apiErrors.forbidden('管理者権限が必要です');
     }
 
     const { feedbackId } = await params;
@@ -60,7 +60,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     ).userFeedbackScreenshot;
 
     if (!userFeedbackDelegate) {
-      return apiErrors.internalError('Feedback model is not available yet');
+      return apiErrors.internalError('フィードバック機能はまだ利用できません');
     }
 
     let feedbackRecord = await userFeedbackDelegate
@@ -141,6 +141,6 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       return apiErrors.notFound('Feedback');
     }
     logError('Error deleting feedback:', error);
-    return apiErrors.internalError('Failed to delete feedback');
+    return apiErrors.internalError('フィードバックの削除に失敗しました');
   }
 }

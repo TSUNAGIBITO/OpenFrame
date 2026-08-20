@@ -130,7 +130,7 @@ export function flattenCommentsForExport(comments: ExportComment[]): ExportComme
       commentId: comment.id,
       parentCommentId: null,
       level: 0,
-      authorName: comment.author?.name || comment.guestName || 'Anonymous',
+      authorName: comment.author?.name || comment.guestName || '匿名',
       authorType: comment.author ? 'user' : 'guest',
       content: comment.content || '',
       timestamp: comment.timestamp,
@@ -149,7 +149,7 @@ export function flattenCommentsForExport(comments: ExportComment[]): ExportComme
         commentId: reply.id,
         parentCommentId: comment.id,
         level: 1,
-        authorName: reply.author?.name || reply.guestName || 'Anonymous',
+        authorName: reply.author?.name || reply.guestName || '匿名',
         authorType: reply.author ? 'user' : 'guest',
         content: reply.content || '',
         timestamp: reply.timestamp,
@@ -235,7 +235,7 @@ export function buildCommentsPdf(
     ? `v${meta.versionNumber} (${meta.versionLabel})`
     : `v${meta.versionNumber}`;
 
-  lines.push(`OpenFrame Comments Export`);
+  lines.push(`Tsunagu Review Comments Export`);
   lines.push(`Video: ${meta.videoTitle}`);
   lines.push(`Version: ${versionTitle}`);
   lines.push(`Generated At: ${new Date().toISOString()}`);

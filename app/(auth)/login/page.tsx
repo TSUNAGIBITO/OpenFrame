@@ -21,14 +21,15 @@ export default function LoginPage() {
         </Suspense>
 
         <p className="text-center text-xs text-muted-foreground mt-4">
-          By continuing, you agree to our{' '}
+          続行することで、{' '}
           <Link href="/terms" className="underline hover:text-foreground">
-            Terms of Service
+            利用規約
           </Link>{' '}
-          and{' '}
+          および{' '}
           <Link href="/privacy" className="underline hover:text-foreground">
-            Privacy Policy
+            プライバシーポリシー
           </Link>
+          に同意したものとみなされます
         </p>
       </div>
     </div>

@@ -59,10 +59,10 @@ export const ImageAttachmentStrip = memo(function ImageAttachmentStrip({
   return (
     <div className={cn('mb-2 flex flex-wrap gap-2', className)}>
       {existingUrls.map((url, index) =>
-        tile(url, url, `Attachment ${index + 1}`, () => onRemoveExisting?.(url))
+        tile(url, url, `添付 ${index + 1}`, () => onRemoveExisting?.(url))
       )}
       {previewUrls.map((url, index) =>
-        tile(`staged-${index}`, url, `Preview ${index + 1}`, () => onRemoveFile(index))
+        tile(`staged-${index}`, url, `プレビュー ${index + 1}`, () => onRemoveFile(index))
       )}
     </div>
   );
@@ -97,7 +97,7 @@ export const CommentImageGallery = memo(function CommentImageGallery({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={images[0].url}
-          alt="Attachment"
+          alt="添付"
           className={cn('w-auto object-contain', compact ? 'max-h-40' : 'max-h-60')}
         />
       </div>
@@ -118,7 +118,7 @@ export const CommentImageGallery = memo(function CommentImageGallery({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={image.url}
-            alt={`Attachment ${index + 1}`}
+            alt={`添付 ${index + 1}`}
             className="h-full w-full object-cover"
           />
         </div>

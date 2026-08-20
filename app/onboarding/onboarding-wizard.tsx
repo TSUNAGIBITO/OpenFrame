@@ -46,20 +46,20 @@ const visibilityOptions: {
 }[] = [
   {
     value: 'PRIVATE',
-    label: 'Private',
-    description: 'Only workspace members and project members can access',
+    label: '非公開',
+    description: 'ワークスペースメンバーとプロジェクトメンバーのみアクセス可能',
     icon: <Lock className="h-5 w-5" />,
   },
   {
     value: 'INVITE',
-    label: 'Invite Only',
-    description: 'Share with specific people via email',
+    label: '招待のみ',
+    description: 'メールで特定の人にだけ共有',
     icon: <UserPlus className="h-5 w-5" />,
   },
   {
     value: 'PUBLIC',
-    label: 'Public',
-    description: 'Anyone with the link can view',
+    label: '公開',
+    description: 'リンクを知っている人は誰でも閲覧可能',
     icon: <Globe className="h-5 w-5" />,
   },
 ];
@@ -113,12 +113,12 @@ function ToggleButton({
 const SOURCE_OPTIONS: Array<{ value: string; label: string }> = [
   { value: 'GITHUB', label: 'GitHub' },
   { value: 'YOUTUBE', label: 'YouTube' },
-  { value: 'GOOGLE', label: 'A search engine' },
-  { value: 'REVIEW_LINK', label: 'A review or comparison site' },
-  { value: 'REFERRAL', label: 'Someone recommended it' },
-  { value: 'COMMUNITY', label: 'Reddit, X, Discord or a forum' },
-  { value: 'OUTBOUND', label: 'An email from us' },
-  { value: 'OTHER', label: 'Somewhere else' },
+  { value: 'GOOGLE', label: '検索エンジン' },
+  { value: 'REVIEW_LINK', label: 'レビュー・比較サイト' },
+  { value: 'REFERRAL', label: '知人からのおすすめ' },
+  { value: 'COMMUNITY', label: 'Reddit・X・Discord・フォーラム' },
+  { value: 'OUTBOUND', label: '当社からのメール' },
+  { value: 'OTHER', label: 'その他' },
 ];
 
 function StepWelcome({
@@ -153,22 +153,21 @@ function StepWelcome({
       </div>
       <div className="space-y-3">
         <h2 className="text-3xl font-bold tracking-tight">
-          Welcome to OpenFrame, {userName.split(' ')[0]}!
+          {userName.split(' ')[0]}さん、つなぐレビューへようこそ！
         </h2>
         <p className="text-base text-muted-foreground max-w-md mx-auto">
-          OpenFrame is your collaborative video review platform. Collect timestamped feedback,
-          manage versions, and streamline approvals — all in one place.
+          つなぐレビューは、みんなで動画をレビューできるプラットフォームです。タイムスタンプ付きのフィードバック収集、バージョン管理、承認フローを一か所でまとめて行えます。
         </p>
       </div>
 
       {askSource && (
         <div className="mx-auto max-w-sm space-y-3 text-left">
           <Label htmlFor="acquisition-source" className="text-sm text-muted-foreground">
-            How did you hear about us? (optional)
+            どこで知りましたか？（任意）
           </Label>
           <Select value={source} onValueChange={setSource}>
             <SelectTrigger id="acquisition-source" className="w-full">
-              <SelectValue placeholder="Pick one" />
+              <SelectValue placeholder="選択してください" />
             </SelectTrigger>
             <SelectContent>
               {SOURCE_OPTIONS.map((option) => (
@@ -183,14 +182,14 @@ function StepWelcome({
               value={note}
               onChange={(event) => setNote(event.target.value)}
               maxLength={200}
-              placeholder="Where, roughly?"
+              placeholder="差し支えなければ、どこで知ったか教えてください"
             />
           )}
         </div>
       )}
 
       <Button onClick={handleNext} size="lg" className="w-full sm:w-auto px-10 h-12 text-base">
-        Get Started
+        始める
         <ChevronRight className="h-5 w-5 ml-1" />
       </Button>
     </div>
@@ -230,13 +229,13 @@ function StepWorkspace({
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || 'Failed to create workspace');
+        setError(data.error || 'ワークスペースの作成に失敗しました');
         return;
       }
       onWorkspaceCreated(data.data.id);
       onNext();
     } catch {
-      setError('Something went wrong. Please try again.');
+      setError('問題が発生しました。もう一度お試しください。');
     } finally {
       setIsLoading(false);
     }
@@ -249,9 +248,9 @@ function StepWorkspace({
           <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-3">
             <Building2 className="h-8 w-8 text-primary" />
           </div>
-          <h2 className="text-2xl font-bold tracking-tight">Workspace access</h2>
+          <h2 className="text-2xl font-bold tracking-tight">ワークスペースへのアクセス</h2>
           <p className="text-base text-muted-foreground">
-            Your account can&apos;t create a new workspace right now.
+            現在、お使いのアカウントでは新しいワークスペースを作成できません。
           </p>
         </div>
 
@@ -260,21 +259,21 @@ function StepWorkspace({
             <div className="flex items-start gap-3 rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
               <Info className="h-4 w-4 shrink-0 mt-0.5" />
               <span>
-                You can still create projects inside workspaces where you already have admin access.
+                すでに管理者権限を持っているワークスペース内であれば、プロジェクトを作成できます。
               </span>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="onboarding-workspace">Choose a workspace</Label>
+              <Label htmlFor="onboarding-workspace">ワークスペースを選択</Label>
               <Select value={selectedWorkspaceId ?? undefined} onValueChange={onWorkspaceSelected}>
                 <SelectTrigger id="onboarding-workspace" className="w-full">
-                  <SelectValue placeholder="Select a workspace" />
+                  <SelectValue placeholder="ワークスペースを選択" />
                 </SelectTrigger>
                 <SelectContent>
                   {availableWorkspaces.map((workspace) => (
                     <SelectItem key={workspace.id} value={workspace.id}>
                       {workspace.name}
-                      {workspace.isOwner ? ' (Owner)' : ' (Admin)'}
+                      {workspace.isOwner ? '（オーナー）' : '（管理者）'}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -282,7 +281,7 @@ function StepWorkspace({
             </div>
 
             <Button onClick={onNext} className="w-full h-11" disabled={!selectedWorkspaceId}>
-              Continue
+              次へ
               <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           </div>
@@ -291,13 +290,11 @@ function StepWorkspace({
             <div className="flex items-start gap-3 rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
               <Info className="h-4 w-4 shrink-0 mt-0.5" />
               <span>
-                You don&apos;t currently have a workspace where you can create projects. Ask a
-                workspace owner to invite you as an admin, or upgrade later to create your own
-                workspace.
+                現在、プロジェクトを作成できるワークスペースがありません。ワークスペースのオーナーに管理者として招待してもらうか、後でアップグレードしてご自身のワークスペースを作成してください。
               </span>
             </div>
             <Button onClick={onNext} className="w-full h-11">
-              Continue
+              次へ
               <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           </div>
@@ -312,20 +309,20 @@ function StepWorkspace({
         <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-3">
           <Building2 className="h-8 w-8 text-primary" />
         </div>
-        <h2 className="text-2xl font-bold tracking-tight">Create your workspace</h2>
+        <h2 className="text-2xl font-bold tracking-tight">ワークスペースを作成</h2>
         <p className="text-base text-muted-foreground">
-          Workspaces organize your projects and team members.
+          ワークスペースでプロジェクトとチームメンバーを整理できます。
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor="ws-name" className="text-sm font-medium">
-            Workspace Name
+            ワークスペース名
           </Label>
           <Input
             id="ws-name"
-            placeholder="e.g., My Studio"
+            placeholder="例: My Studio"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
@@ -335,11 +332,11 @@ function StepWorkspace({
         </div>
         <div className="space-y-2">
           <Label htmlFor="ws-desc" className="text-sm font-medium">
-            Description <span className="text-muted-foreground font-normal">(optional)</span>
+            説明 <span className="text-muted-foreground font-normal">（任意）</span>
           </Label>
           <Textarea
             id="ws-desc"
-            placeholder="What is this workspace for?"
+            placeholder="このワークスペースの用途は？"
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             rows={3}
@@ -364,10 +361,10 @@ function StepWorkspace({
             {isLoading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Creating...
+                作成中...
               </>
             ) : (
-              'Create Workspace'
+              'ワークスペースを作成'
             )}
           </Button>
           <Button
@@ -377,7 +374,7 @@ function StepWorkspace({
             disabled={isLoading}
             className="w-full text-muted-foreground"
           >
-            Skip this step
+            このステップをスキップ
           </Button>
         </div>
       </form>
@@ -421,13 +418,13 @@ function StepProject({
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || 'Failed to create project');
+        setError(data.error || 'プロジェクトの作成に失敗しました');
         return;
       }
       onProjectCreated(data.data.id);
       onNext();
     } catch {
-      setError('Something went wrong. Please try again.');
+      setError('問題が発生しました。もう一度お試しください。');
     } finally {
       setIsLoading(false);
     }
@@ -439,9 +436,9 @@ function StepProject({
         <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-3">
           <FolderPlus className="h-8 w-8 text-primary" />
         </div>
-        <h2 className="text-2xl font-bold tracking-tight">Create your first project</h2>
+        <h2 className="text-2xl font-bold tracking-tight">最初のプロジェクトを作成</h2>
         <p className="text-base text-muted-foreground">
-          Projects hold your videos and collected feedback.
+          プロジェクトには動画と集まったフィードバックがまとまります。
         </p>
       </div>
 
@@ -451,14 +448,14 @@ function StepProject({
             <Info className="h-4 w-4 shrink-0 mt-0.5" />
             <span>
               {canCreateWorkspace
-                ? 'You skipped workspace creation. Projects require a workspace — you can create both from the dashboard later.'
+                ? 'ワークスペースの作成をスキップしました。プロジェクトにはワークスペースが必要です。どちらも後からダッシュボードで作成できます。'
                 : availableWorkspaces.length === 0
-                  ? 'You do not currently have permission to create projects in any workspace.'
-                  : 'Pick a workspace in the previous step to create a project here.'}
+                  ? '現在、どのワークスペースでもプロジェクトを作成する権限がありません。'
+                  : 'ここでプロジェクトを作成するには、前のステップでワークスペースを選択してください。'}
             </span>
           </div>
           <Button onClick={onNext} className="w-full h-11">
-            Continue
+            次へ
             <ChevronRight className="h-4 w-4 ml-1" />
           </Button>
         </div>
@@ -466,11 +463,11 @@ function StepProject({
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
             <Label htmlFor="proj-name" className="text-sm font-medium">
-              Project Name
+              プロジェクト名
             </Label>
             <Input
               id="proj-name"
-              placeholder="e.g., Product Demo Q1"
+              placeholder="例: 第1四半期プロダクトデモ"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
@@ -480,11 +477,11 @@ function StepProject({
           </div>
           <div className="space-y-2">
             <Label htmlFor="proj-desc" className="text-sm font-medium">
-              Description <span className="text-muted-foreground font-normal">(optional)</span>
+              説明 <span className="text-muted-foreground font-normal">（任意）</span>
             </Label>
             <Textarea
               id="proj-desc"
-              placeholder="Brief description of what this project is about..."
+              placeholder="このプロジェクトの概要を簡単に..."
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
@@ -494,7 +491,7 @@ function StepProject({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Who can access?</Label>
+            <Label className="text-sm font-medium">アクセスできる範囲</Label>
             <div className="grid gap-2.5">
               {visibilityOptions.map((option) => (
                 <button
@@ -556,10 +553,10 @@ function StepProject({
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Creating...
+                  作成中...
                 </>
               ) : (
-                'Create Project'
+                'プロジェクトを作成'
               )}
             </Button>
             <Button
@@ -569,7 +566,7 @@ function StepProject({
               disabled={isLoading}
               className="w-full text-muted-foreground"
             >
-              Skip this step
+              このステップをスキップ
             </Button>
           </div>
         </form>
@@ -587,9 +584,9 @@ function StepVideo({ onNext }: { onNext: () => void }) {
         <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-3">
           <PlayCircle className="h-8 w-8 text-primary" />
         </div>
-        <h2 className="text-2xl font-bold tracking-tight">Adding videos</h2>
+        <h2 className="text-2xl font-bold tracking-tight">動画の追加</h2>
         <p className="text-base text-muted-foreground">
-          OpenFrame supports two ways to add video content to your projects.
+          つなぐレビューでは、プロジェクトに動画を追加する方法が2つあります。
         </p>
       </div>
 
@@ -597,27 +594,25 @@ function StepVideo({ onNext }: { onNext: () => void }) {
         <div className="rounded-xl border p-5 space-y-2">
           <div className="flex items-center gap-2.5 font-semibold">
             <Youtube className="h-5 w-5 text-red-500" />
-            YouTube link
+            YouTube リンク
           </div>
           <p className="text-sm text-muted-foreground">
-            Paste a link to any YouTube video. OpenFrame will pull in the title, thumbnail, and
-            duration automatically — no file upload needed.
+            YouTube 動画のリンクを貼り付けるだけ。つなぐレビューがタイトル・サムネイル・再生時間を自動で取り込みます。ファイルのアップロードは不要です。
           </p>
         </div>
         <div className="rounded-xl border p-5 space-y-2">
           <div className="flex items-center gap-2.5 font-semibold">
             <Upload className="h-5 w-5 text-primary" />
-            Direct upload
+            直接アップロード
           </div>
           <p className="text-sm text-muted-foreground">
-            Upload video files directly from your device. Files are processed and delivered via CDN
-            for fast, reliable playback worldwide.
+            お使いのデバイスから動画ファイルを直接アップロード。ファイルは処理され、CDN 経由で配信されるため、世界中どこでも高速かつ安定して再生できます。
           </p>
         </div>
       </div>
 
       <Button onClick={onNext} className="w-full h-11">
-        Got it, continue
+        了解、次へ
         <ChevronRight className="h-4 w-4 ml-1" />
       </Button>
     </div>
@@ -668,10 +663,9 @@ function StepNotifications({ onFinish }: { onFinish: () => Promise<void> }) {
         <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
           <Bell className="h-6 w-6 text-primary" />
         </div>
-        <h2 className="text-xl font-bold tracking-tight">Notification preferences</h2>
+        <h2 className="text-xl font-bold tracking-tight">通知設定</h2>
         <p className="text-sm text-muted-foreground">
-          Choose when you want to be notified. Email and Telegram are both supported — you can
-          configure Telegram anytime in Settings.
+          通知を受け取るタイミングを選べます。メールと Telegram の両方に対応しています。Telegram はいつでも設定画面から設定できます。
         </p>
       </div>
 
@@ -679,50 +673,50 @@ function StepNotifications({ onFinish }: { onFinish: () => Promise<void> }) {
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
             <Mail className="h-4 w-4" />
-            Channels
+            チャネル
           </div>
           <ToggleButton
             enabled={emailEnabled}
             onToggle={() => setEmailEnabled((v) => !v)}
-            label="Email notifications"
-            description="Receive emails to your account address"
+            label="メール通知"
+            description="アカウントのメールアドレスに通知を受け取る"
           />
         </div>
 
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
             <Bell className="h-4 w-4" />
-            Events
+            イベント
           </div>
           <ToggleButton
             enabled={events.onNewVideo}
             onToggle={() => setEvents((e) => ({ ...e, onNewVideo: !e.onNewVideo }))}
-            label="New Video Added"
-            description="When a new video is added to one of your projects"
+            label="動画の追加"
+            description="自分のプロジェクトに新しい動画が追加されたとき"
           />
           <ToggleButton
             enabled={events.onNewVersion}
             onToggle={() => setEvents((e) => ({ ...e, onNewVersion: !e.onNewVersion }))}
-            label="New Version Added"
-            description="When a new version is added to an existing video"
+            label="バージョンの追加"
+            description="既存の動画に新しいバージョンが追加されたとき"
           />
           <ToggleButton
             enabled={events.onNewComment}
             onToggle={() => setEvents((e) => ({ ...e, onNewComment: !e.onNewComment }))}
-            label="New Comment"
-            description="When someone leaves a comment on your videos"
+            label="新しいコメント"
+            description="自分の動画に誰かがコメントしたとき"
           />
           <ToggleButton
             enabled={events.onNewReply}
             onToggle={() => setEvents((e) => ({ ...e, onNewReply: !e.onNewReply }))}
-            label="New Reply"
-            description="When someone replies to a comment thread"
+            label="新しい返信"
+            description="コメントスレッドに誰かが返信したとき"
           />
           <ToggleButton
             enabled={events.onApprovalEvents}
             onToggle={() => setEvents((e) => ({ ...e, onApprovalEvents: !e.onApprovalEvents }))}
-            label="Approval Workflow"
-            description="When approval requests are created, responded to, or finalized"
+            label="承認フロー"
+            description="承認リクエストが作成・対応・確定されたとき"
           />
         </div>
       </div>
@@ -732,10 +726,10 @@ function StepNotifications({ onFinish }: { onFinish: () => Promise<void> }) {
           {isSaving ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Saving...
+              保存中...
             </>
           ) : (
-            'Save & finish'
+            '保存して完了'
           )}
         </Button>
         <Button
@@ -745,7 +739,7 @@ function StepNotifications({ onFinish }: { onFinish: () => Promise<void> }) {
           disabled={isSaving}
           className="w-full text-muted-foreground"
         >
-          Skip
+          スキップ
         </Button>
       </div>
     </div>
@@ -779,12 +773,12 @@ export function OnboardingWizard({
     try {
       const res = await fetch('/api/onboarding/complete', { method: 'POST' });
       if (!res.ok) {
-        toast.error('Failed to complete setup. Please try again.');
+        toast.error('セットアップを完了できませんでした。もう一度お試しください。');
         setIsCompleting(false);
         return;
       }
     } catch {
-      toast.error('Something went wrong. Please try again.');
+      toast.error('問題が発生しました。もう一度お試しください。');
       setIsCompleting(false);
       return;
     }
@@ -822,7 +816,7 @@ export function OnboardingWizard({
             className="text-muted-foreground text-sm"
           >
             {isCompleting ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
-            Skip setup
+            セットアップをスキップ
           </Button>
         )}
       </div>
@@ -859,7 +853,7 @@ export function OnboardingWizard({
 
       {/* Step label */}
       <p className="text-center text-sm text-muted-foreground mt-5">
-        Step {currentStep} of {TOTAL_STEPS}
+        全{TOTAL_STEPS}ステップ中 {currentStep} ステップ目
       </p>
     </div>
   );

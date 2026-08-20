@@ -62,7 +62,7 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
         const payload = (await response.json()) as ShareResponse;
 
         if (!response.ok || payload.error) {
-          setError(payload.error || 'Failed to load share link');
+          setError(payload.error || '共有リンクの読み込みに失敗しました');
           setShareUrl(null);
           return;
         }
@@ -71,7 +71,7 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
         setHasPassword(!!payload.data.link?.hasPassword);
         setAllowDownloads(!!payload.data.link?.allowDownloads);
       } catch {
-        setError('Failed to load share link');
+        setError('共有リンクの読み込みに失敗しました');
         setShareUrl(null);
         setHasPassword(false);
         setAllowDownloads(false);
@@ -105,7 +105,7 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
 
       const payload = (await response.json()) as ShareResponse;
       if (!response.ok || payload.error) {
-        setError(payload.error || 'Failed to create share link');
+        setError(payload.error || '共有リンクの作成に失敗しました');
         return;
       }
 
@@ -114,7 +114,7 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
       setAllowDownloads(!!payload.data.link?.allowDownloads);
       setPassword('');
     } catch {
-      setError('Failed to create share link');
+      setError('共有リンクの作成に失敗しました');
     } finally {
       setSubmitting(false);
     }
@@ -133,7 +133,7 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
 
       if (!response.ok) {
         const payload = (await response.json().catch(() => null)) as { error?: string } | null;
-        setError(payload?.error || 'Failed to revoke share link');
+        setError(payload?.error || '共有リンクの無効化に失敗しました');
         return;
       }
 
@@ -142,7 +142,7 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
       setAllowDownloads(false);
       setPassword('');
     } catch {
-      setError('Failed to revoke share link');
+      setError('共有リンクの無効化に失敗しました');
     } finally {
       setSubmitting(false);
     }
@@ -169,7 +169,7 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
         | { error?: string }
         | null;
       if (!response.ok || ('error' in (payload || {}) && payload?.error)) {
-        setError((payload as { error?: string } | null)?.error || 'Failed to update link security');
+        setError((payload as { error?: string } | null)?.error || 'リンクのセキュリティ設定の更新に失敗しました');
         return;
       }
 
@@ -179,7 +179,7 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
       setAllowDownloads(!!data.link?.allowDownloads);
       setPassword('');
     } catch {
-      setError('Failed to update link security');
+      setError('リンクのセキュリティ設定の更新に失敗しました');
     } finally {
       setSubmitting(false);
     }
@@ -203,7 +203,7 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
         | null;
       if (!response.ok || ('error' in (payload || {}) && payload?.error)) {
         setError(
-          (payload as { error?: string } | null)?.error || 'Failed to update download setting'
+          (payload as { error?: string } | null)?.error || 'ダウンロード設定の更新に失敗しました'
         );
         return;
       }
@@ -212,7 +212,7 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
       setAllowDownloads(!!data.link?.allowDownloads);
       setHasPassword(!!data.link?.hasPassword);
     } catch {
-      setError('Failed to update download setting');
+      setError('ダウンロード設定の更新に失敗しました');
     } finally {
       setSubmitting(false);
     }
@@ -226,21 +226,21 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to Video
+          動画に戻る
         </Link>
 
         <Card className="border-border/50 shadow-lg">
           <CardHeader>
-            <CardTitle className="text-2xl">Share Video For Review</CardTitle>
+            <CardTitle className="text-2xl">レビュー用に動画を共有</CardTitle>
             <CardDescription>
-              Create a private link so reviewers can watch and comment on this single video.
+              レビュアーがこの動画を視聴してコメントできるよう、非公開リンクを作成します。
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {loading ? (
               <div className="flex items-center text-sm text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                Loading link settings...
+                リンク設定を読み込み中...
               </div>
             ) : shareUrl ? (
               <div className="space-y-3">
@@ -262,7 +262,7 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
                     ) : (
                       <RefreshCcw className="h-4 w-4 mr-2" />
                     )}
-                    Regenerate Link
+                    リンクを再生成
                   </Button>
                   <Button onClick={revokeShareLink} disabled={submitting} variant="destructive">
                     {submitting ? (
@@ -270,14 +270,14 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
                     ) : (
                       <ShieldOff className="h-4 w-4 mr-2" />
                     )}
-                    Revoke Link
+                    リンクを無効化
                   </Button>
                 </div>
                 <div className="rounded-lg border p-3 space-y-2">
                   <div>
-                    <p className="text-sm font-medium">Video download</p>
+                    <p className="text-sm font-medium">動画のダウンロード</p>
                     <p className="text-xs text-muted-foreground">
-                      Allow viewers with this link to download
+                      このリンクの閲覧者にダウンロードを許可します
                     </p>
                   </div>
                   <div className="flex gap-2">
@@ -286,14 +286,14 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
                       disabled={submitting || allowDownloads}
                       onClick={() => updateDownloadSetting(true)}
                     >
-                      Allow Download
+                      ダウンロードを許可
                     </Button>
                     <Button
                       variant={!allowDownloads ? 'default' : 'outline'}
                       disabled={submitting || !allowDownloads}
                       onClick={() => updateDownloadSetting(false)}
                     >
-                      Block Download
+                      ダウンロードを禁止
                     </Button>
                   </div>
                 </div>
@@ -305,13 +305,13 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
                     ) : (
                       <Lock className="h-4 w-4" />
                     )}
-                    Link password
+                    リンクのパスワード
                   </div>
                   <div className="flex gap-2">
                     <Input
                       type="password"
                       placeholder={
-                        hasPassword ? 'Enter new password to replace current one' : 'Set a password'
+                        hasPassword ? '現在のパスワードを置き換える新しいパスワードを入力' : 'パスワードを設定'
                       }
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -322,7 +322,7 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
                       disabled={submitting || !password.trim()}
                       variant="outline"
                     >
-                      Save
+                      保存
                     </Button>
                     {hasPassword && (
                       <Button
@@ -330,7 +330,7 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
                         disabled={submitting}
                         variant="outline"
                       >
-                        Remove
+                        削除
                       </Button>
                     )}
                   </div>
@@ -343,13 +343,12 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
                 ) : (
                   <Link2 className="h-4 w-4 mr-2" />
                 )}
-                Create Review Link
+                レビューリンクを作成
               </Button>
             )}
 
             <p className="text-xs text-muted-foreground">
-              This link allows guests to leave comments without an account. You can optionally
-              protect it with a password.
+              このリンクを使うと、ゲストはアカウントなしでコメントを残せます。必要に応じてパスワードで保護できます。
             </p>
 
             {error && <p className="text-sm text-destructive">{error}</p>}

@@ -94,13 +94,13 @@ export default function RegisterPageClient({
     setIsLoading(true);
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError('パスワードが一致しません');
       setIsLoading(false);
       return;
     }
 
     if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters');
+      setError('パスワードは8文字以上で入力してください');
       setIsLoading(false);
       return;
     }
@@ -121,7 +121,7 @@ export default function RegisterPageClient({
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Registration failed');
+        setError(data.error || '登録に失敗しました');
         return;
       }
 
@@ -132,7 +132,7 @@ export default function RegisterPageClient({
         router.push(`/login?registered=true${callbackParam}`);
       }
     } catch {
-      setError('Something went wrong. Please try again.');
+      setError('エラーが発生しました。もう一度お試しください。');
     } finally {
       setIsLoading(false);
     }
@@ -159,7 +159,7 @@ export default function RegisterPageClient({
           <CardHeader className="text-center">
             <CardTitle className="flex items-center justify-center gap-2">
               <UserPlus className="h-5 w-5" />
-              Create Account
+              アカウント作成
             </CardTitle>
             <CardDescription>つなぐレビューに参加して動画レビューをはじめましょう</CardDescription>
             {/* The landing page CTA promises a trial and no card. Say it again here,
@@ -168,7 +168,7 @@ export default function RegisterPageClient({
                 workspace, so the trial is not what brought them. */}
             {trialOnSignup && !isInvitationFlow && (
               <CardDescription>
-                Your 7-day free trial starts as soon as you create the account. No credit card.
+                アカウント作成と同時に7日間の無料トライアルが始まります。クレジットカードは不要です。
               </CardDescription>
             )}
           </CardHeader>
@@ -206,7 +206,7 @@ export default function RegisterPageClient({
                         />
                       </svg>
                     )}
-                    Continue with Google
+                    Googleで続ける
                   </Button>
                 )}
                 {githubEnabled && (
@@ -229,7 +229,7 @@ export default function RegisterPageClient({
                         <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
                       </svg>
                     )}
-                    Continue with GitHub
+                    GitHubで続ける
                   </Button>
                 )}
               </div>
@@ -242,7 +242,7 @@ export default function RegisterPageClient({
                   <span className="w-full border-t" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">or continue with email</span>
+                  <span className="bg-card px-2 text-muted-foreground">またはメールアドレスで続ける</span>
                 </div>
               </div>
             )}
@@ -251,39 +251,38 @@ export default function RegisterPageClient({
               {isInvitationFlow && invitation ? (
                 <div className="p-3 rounded-md bg-primary/10 text-sm space-y-1">
                   <p>
-                    {invitation.inviterName} invited you to{' '}
+                    {invitation.inviterName}さんが{' '}
                     <strong>
                       {invitation.targetName
-                        ? `${invitation.targetName} (${invitation.scopeLabel})`
-                        : `a ${invitation.scopeLabel}`}
+                        ? `${invitation.targetName}（${invitation.scopeLabel}）`
+                        : `${invitation.scopeLabel}`}
                     </strong>{' '}
-                    as {invitation.roleLabel}.
+                    に{invitation.roleLabel}として招待しています。
                   </p>
                   <p className="text-muted-foreground">
-                    Create your account below — you&apos;ll be taken straight to it.
+                    下記からアカウントを作成すると、そのまま移動します。
                   </p>
                 </div>
               ) : isInvitationFlow && invitationLookupThrottled ? (
                 <div className="p-3 rounded-md bg-amber-500/10 text-sm">
-                  We couldn&apos;t check this invitation right now. Please wait a few minutes and
-                  open the link again.
+                  現在この招待を確認できませんでした。数分待ってから、もう一度リンクを開いてください。
                 </div>
               ) : isInvitationFlow ? (
                 <div className="p-3 rounded-md bg-amber-500/10 text-sm">
-                  This invitation link is no longer valid. Ask whoever invited you for a new one.
+                  この招待リンクは無効になりました。招待した方に新しいリンクを依頼してください。
                 </div>
               ) : shouldShowInviteCode ? (
                 <>
                   <div className="space-y-2">
                     <Label htmlFor="inviteCode" className="flex items-center gap-2">
                       <KeyRound className="h-4 w-4 text-amber-500" />
-                      Invite Code
+                      招待コード
                     </Label>
                     <Input
                       id="inviteCode"
                       name="inviteCode"
                       type="text"
-                      placeholder="Enter your invite code"
+                      placeholder="招待コードを入力"
                       value={formData.inviteCode}
                       onChange={handleChange}
                       required
@@ -291,7 +290,7 @@ export default function RegisterPageClient({
                       className="border-amber-500/30 focus:border-amber-500"
                     />
                     <p className="text-xs text-muted-foreground">
-                      An invite code is required to create an account
+                      アカウント作成には招待コードが必要です
                     </p>
                   </div>
 
@@ -300,12 +299,12 @@ export default function RegisterPageClient({
               ) : null}
 
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="name">氏名</Label>
                 <Input
                   id="name"
                   name="name"
                   type="text"
-                  placeholder="John Doe"
+                  placeholder="山田 太郎"
                   value={formData.name}
                   onChange={handleChange}
                   required
@@ -315,7 +314,7 @@ export default function RegisterPageClient({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">メールアドレス</Label>
                 <Input
                   id="email"
                   name="email"
@@ -330,13 +329,13 @@ export default function RegisterPageClient({
                 />
                 {invitation && (
                   <p className="text-xs text-muted-foreground">
-                    The invitation is tied to this address.
+                    この招待はこのメールアドレスに紐づいています。
                   </p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">パスワード</Label>
                 <Input
                   id="password"
                   name="password"
@@ -351,7 +350,7 @@ export default function RegisterPageClient({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label htmlFor="confirmPassword">パスワード（確認）</Label>
                 <Input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -372,28 +371,29 @@ export default function RegisterPageClient({
 
               <Button type="submit" className="w-full" disabled={anyLoading}>
                 {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                Create Account
+                アカウント作成
               </Button>
             </form>
 
             <p className="text-center text-sm text-muted-foreground mt-6">
-              Already have an account?{' '}
+              すでにアカウントをお持ちの方は{' '}
               <Link href={loginHref} className="text-primary hover:underline">
-                Sign in
+                サインイン
               </Link>
             </p>
           </CardContent>
         </Card>
 
         <p className="text-center text-xs text-muted-foreground mt-4">
-          By continuing, you agree to our{' '}
+          続行することで、{' '}
           <Link href="/terms" className="underline hover:text-foreground">
-            Terms of Service
+            利用規約
           </Link>{' '}
-          and{' '}
+          および{' '}
           <Link href="/privacy" className="underline hover:text-foreground">
-            Privacy Policy
+            プライバシーポリシー
           </Link>
+          に同意したものとみなされます
         </p>
       </div>
     </div>

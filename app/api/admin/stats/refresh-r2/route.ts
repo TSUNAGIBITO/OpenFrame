@@ -7,7 +7,7 @@ export async function POST() {
   try {
     const session = await auth();
     if (!session?.user?.isAdmin) {
-      return apiErrors.forbidden('Admin access required');
+      return apiErrors.forbidden('管理者権限が必要です');
     }
 
     const refreshedAt = await refreshR2StorageSnapshot();
@@ -18,6 +18,6 @@ export async function POST() {
     });
   } catch (error) {
     logError('Error refreshing R2 admin stats cache:', error);
-    return apiErrors.internalError('Failed to refresh R2 stats');
+    return apiErrors.internalError('R2 統計の更新に失敗しました');
   }
 }

@@ -90,7 +90,7 @@ export default function NewVideoPageClient({
   const isUploadingFile = isLoading && uploadMode === 'file';
   const isMultiFileUpload = selectedFiles.length > 1;
   const leaveWarningMessage =
-    'A video upload is in progress. Leaving this page will interrupt it. Do you want to leave?';
+    '動画のアップロードが進行中です。このページを離れると中断されます。移動しますか？';
 
   const abortAndCleanupPendingUpload = useCallback(
     (keepalive = false) => {
@@ -188,7 +188,7 @@ export default function NewVideoPageClient({
     } else {
       setVideoSource(null);
       if (url.length > 10) {
-        setUrlError('Could not recognize this video URL. Currently supported: YouTube, Vimeo');
+        setUrlError('この動画URLを認識できませんでした。現在の対応: YouTube、Vimeo');
       }
     }
   };
@@ -207,13 +207,13 @@ export default function NewVideoPageClient({
       }
 
       if (validFiles.length === 0) {
-        setSubmitError('Please select valid video files.');
+        setSubmitError('有効な動画ファイルを選択してください。');
         return;
       }
 
       if (invalidCount > 0) {
         setSubmitError(
-          `${invalidCount} file${invalidCount === 1 ? '' : 's'} skipped (not a video).`
+          `${invalidCount}件のファイルをスキップしました（動画ではありません）。`
         );
       } else {
         setSubmitError('');
@@ -317,7 +317,7 @@ export default function NewVideoPageClient({
       bunnyCdnHostname,
       onProgress: (progress) => {
         setUploadProgress(progress);
-        setUploadStatus(`Uploading... ${progress}%`);
+        setUploadStatus(`アップロード中... ${progress}%`);
       },
       onStatus: setUploadStatus,
       onTusUploadReady: (upload) => {
@@ -344,7 +344,7 @@ export default function NewVideoPageClient({
       const file = files[index];
       setCurrentUploadIndex(index + 1);
       setUploadProgress(0);
-      setUploadStatus(`Uploading ${index + 1} of ${files.length}: ${file.name}`);
+      setUploadStatus(`アップロード中 ${index + 1}/${files.length}: ${file.name}`);
 
       try {
         await uploadProjectVideo(projectId, file, {
@@ -353,11 +353,11 @@ export default function NewVideoPageClient({
           onProgress: (progress) => {
             setUploadProgress(progress);
             setUploadStatus(
-              `Uploading ${index + 1} of ${files.length}: ${file.name} (${progress}%)`
+              `アップロード中 ${index + 1}/${files.length}: ${file.name}（${progress}%）`
             );
           },
           onStatus: (status) => {
-            setUploadStatus(`Uploading ${index + 1} of ${files.length}: ${status}`);
+            setUploadStatus(`アップロード中 ${index + 1}/${files.length}: ${status}`);
           },
           onTusUploadReady: (upload) => {
             activeTusUploadRef.current = upload;
@@ -375,7 +375,7 @@ export default function NewVideoPageClient({
         pendingUploadRef.current = null;
         activeTusUploadRef.current = null;
         failCount += 1;
-        const message = error instanceof Error ? error.message : 'Upload failed';
+        const message = error instanceof Error ? error.message : 'アップロードに失敗しました';
         setSubmitError(`${file.name}: ${message}`, error);
         setUploadStatus('');
       }
@@ -388,13 +388,13 @@ export default function NewVideoPageClient({
 
     if (successCount > 0 && failCount > 0) {
       setSubmitError(
-        `${successCount} uploaded, ${failCount} failed. Remove failed files and retry.`
+        `${successCount}件をアップロード、${failCount}件が失敗しました。失敗したファイルを削除して再試行してください。`
       );
       return;
     }
 
     if (failCount > 0 && successCount === 0) {
-      throw new Error('All uploads failed');
+      throw new Error('すべてのアップロードに失敗しました');
     }
   };
 
@@ -410,12 +410,12 @@ export default function NewVideoPageClient({
     try {
       if (uploadMode === 'url') {
         if (!videoSource) {
-          setUrlError('Please enter a valid video URL');
+          setUrlError('有効な動画URLを入力してください');
           setIsLoading(false);
           return;
         }
 
-        const finalTitle = formData.title.trim() || videoSource.metadata?.title || 'Untitled Video';
+        const finalTitle = formData.title.trim() || videoSource.metadata?.title || '無題の動画';
         const finalDescription = formData.description.trim() || null;
 
         const response = await fetch(`/api/projects/${projectId}/videos`, {
@@ -434,7 +434,7 @@ export default function NewVideoPageClient({
 
         if (!response.ok) {
           const data = await response.json();
-          setSubmitError(data.error || 'Failed to add video', data);
+          setSubmitError(data.error || '動画の追加に失敗しました', data);
           return;
         }
 
@@ -443,11 +443,11 @@ export default function NewVideoPageClient({
       }
 
       if (!directUploadsEnabled) {
-        throw new Error('Direct uploads are disabled by this host');
+        throw new Error('このホストでは直接アップロードが無効になっています');
       }
 
       if (selectedFiles.length === 0) {
-        setSubmitError('Please select at least one video file to upload');
+        setSubmitError('アップロードする動画ファイルを1つ以上選択してください');
         setIsLoading(false);
         return;
       }
@@ -462,7 +462,7 @@ export default function NewVideoPageClient({
     } catch (error: unknown) {
       console.error('Failed to add video:', error);
       setSubmitError(
-        error instanceof Error ? error.message : 'An unexpected error occurred',
+        error instanceof Error ? error.message : '予期しないエラーが発生しました',
         error
       );
       // Cleared on the failure path too. Leaving it set showed the error above a stale
@@ -494,17 +494,17 @@ export default function NewVideoPageClient({
           }}
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to Project
+          プロジェクトに戻る
         </Link>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Add Video</CardTitle>
+          <CardTitle>動画を追加</CardTitle>
           <CardDescription>
             {directUploadsEnabled
-              ? 'Paste a video link or upload one or more files directly to add them to your project.'
-              : 'Paste a video link to add it to your project. Direct uploads are disabled on this host.'}
+              ? '動画リンクを貼り付けるか、1つ以上のファイルを直接アップロードしてプロジェクトに追加します。'
+              : '動画リンクを貼り付けてプロジェクトに追加します。このホストでは直接アップロードが無効になっています。'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -517,11 +517,11 @@ export default function NewVideoPageClient({
               className={`grid w-full ${directUploadsEnabled ? 'grid-cols-2' : 'grid-cols-1'}`}
             >
               <TabsTrigger value="url" disabled={isLoading}>
-                Paste URL
+                URLを貼り付け
               </TabsTrigger>
               {directUploadsEnabled ? (
                 <TabsTrigger value="file" disabled={isLoading}>
-                  Direct Upload
+                  直接アップロード
                 </TabsTrigger>
               ) : null}
             </TabsList>
@@ -530,7 +530,7 @@ export default function NewVideoPageClient({
           <form onSubmit={handleSubmit} className="space-y-6">
             {uploadMode === 'url' ? (
               <div className="space-y-2">
-                <Label htmlFor="url">Video URL</Label>
+                <Label htmlFor="url">動画URL</Label>
                 <div className="relative">
                   <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -556,14 +556,14 @@ export default function NewVideoPageClient({
                     <CheckCircle2 className="h-4 w-4" />
                     {videoSource.providerId.charAt(0).toUpperCase() +
                       videoSource.providerId.slice(1)}{' '}
-                    video detected
-                    {isFetchingMeta && ' — fetching metadata...'}
+                    の動画を検出しました
+                    {isFetchingMeta && ' — メタデータを取得中...'}
                   </p>
                 )}
               </div>
             ) : (
               <div className="space-y-2">
-                <Label htmlFor="file">Video Files</Label>
+                <Label htmlFor="file">動画ファイル</Label>
                 <div className="flex items-center justify-center w-full">
                   <label
                     htmlFor="file"
@@ -584,10 +584,10 @@ export default function NewVideoPageClient({
                         <>
                           <UploadCloud className="w-10 h-10 mb-3 text-muted-foreground" />
                           <p className="mb-2 text-sm text-muted-foreground text-center">
-                            <span className="font-semibold">Click to upload</span> or drag and drop
+                            <span className="font-semibold">クリックしてアップロード</span> またはドラッグ＆ドロップ
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            Multiple videos supported · MP4, WebM, MOV, and more
+                            複数の動画に対応 · MP4、WebM、MOV など
                           </p>
                         </>
                       ) : selectedFiles.length === 1 ? (
@@ -604,10 +604,10 @@ export default function NewVideoPageClient({
                         <>
                           <FileVideo className="w-10 h-10 mb-3 text-primary" />
                           <p className="mb-2 text-sm text-foreground font-medium">
-                            {selectedFiles.length} videos selected
+                            {selectedFiles.length}件の動画を選択中
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            Click or drop to add more files
+                            クリックまたはドロップでさらにファイルを追加
                           </p>
                         </>
                       )}
@@ -659,11 +659,11 @@ export default function NewVideoPageClient({
 
             {uploadMode === 'url' && thumbnailUrl && videoSource && (
               <div className="space-y-2">
-                <Label>Preview</Label>
+                <Label>プレビュー</Label>
                 <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
                   <Image
                     src={thumbnailUrl}
-                    alt="Video thumbnail"
+                    alt="動画のサムネイル"
                     fill
                     sizes="(max-width: 768px) 100vw, 600px"
                     className="object-cover"
@@ -675,15 +675,15 @@ export default function NewVideoPageClient({
             {uploadMode === 'url' || selectedFiles.length <= 1 ? (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="title">Title</Label>
+                  <Label htmlFor="title">タイトル</Label>
                   <Input
                     id="title"
                     placeholder={
                       isFetchingMeta
-                        ? 'Fetching title...'
+                        ? 'タイトルを取得中...'
                         : uploadMode === 'file' && isMultiFileUpload
-                          ? 'Not used for multi-file uploads'
-                          : 'Video title (will auto-fill from video if empty)'
+                          ? '複数ファイルのアップロードでは使用されません'
+                          : '動画のタイトル（空欄の場合は動画から自動入力されます）'
                     }
                     value={formData.title}
                     onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
@@ -691,20 +691,20 @@ export default function NewVideoPageClient({
                   />
                   {uploadMode === 'file' && isMultiFileUpload ? (
                     <p className="text-xs text-muted-foreground">
-                      Each file will use its filename as the title.
+                      各ファイルはファイル名がタイトルとして使われます。
                     </p>
                   ) : (
                     <p className="text-xs text-muted-foreground">
-                      Leave empty to use the original video title
+                      空欄のままにすると元の動画のタイトルが使われます
                     </p>
                   )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description">Description (optional)</Label>
+                  <Label htmlFor="description">説明（任意）</Label>
                   <Textarea
                     id="description"
-                    placeholder="Add context about this video..."
+                    placeholder="この動画に関する補足を入力..."
                     value={formData.description}
                     onChange={(e) =>
                       setFormData((prev) => ({ ...prev, description: e.target.value }))
@@ -714,7 +714,7 @@ export default function NewVideoPageClient({
                   />
                   {uploadMode === 'file' && isMultiFileUpload ? (
                     <p className="text-xs text-muted-foreground">
-                      Descriptions are not applied in bulk upload mode.
+                      一括アップロードモードでは説明は適用されません。
                     </p>
                   ) : null}
                 </div>
@@ -731,7 +731,7 @@ export default function NewVideoPageClient({
                       href="/settings"
                       className="ml-1 font-medium underline underline-offset-2"
                     >
-                      Upgrade
+                      アップグレード
                     </Link>
                   )}
                 </span>
@@ -751,9 +751,9 @@ export default function NewVideoPageClient({
                 )}
                 {isUploadingFile && (
                   <p className="text-xs text-amber-500">
-                    Do not close, refresh, or navigate away while uploads are in progress.
+                    アップロード中はページを閉じたり、更新したり、移動したりしないでください。
                     {isMultiFileUpload && currentUploadIndex > 0
-                      ? ` (${currentUploadIndex} of ${selectedFiles.length})`
+                      ? `（${currentUploadIndex}/${selectedFiles.length}）`
                       : ''}
                   </p>
                 )}
@@ -771,8 +771,8 @@ export default function NewVideoPageClient({
               >
                 {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 {uploadMode === 'file' && selectedFiles.length > 1
-                  ? `Upload ${selectedFiles.length} Videos`
-                  : 'Add Video'}
+                  ? `${selectedFiles.length}件の動画をアップロード`
+                  : '動画を追加'}
               </Button>
               <Button
                 type="button"
@@ -780,7 +780,7 @@ export default function NewVideoPageClient({
                 onClick={() => router.back()}
                 disabled={isLoading}
               >
-                Cancel
+                キャンセル
               </Button>
             </div>
           </form>

@@ -71,14 +71,14 @@ export const VersionActionsDialog = memo(function VersionActionsDialog({
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Plus className="h-4 w-4 mr-1" />
-          New Version
+          新規バージョン
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New Version</DialogTitle>
+          <DialogTitle>新規バージョンの追加</DialogTitle>
           <DialogDescription>
-            Upload a new version of this video. The new version will become active.
+            この動画の新しいバージョンをアップロードします。新しいバージョンがアクティブになります。
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 mt-2">
@@ -90,14 +90,14 @@ export const VersionActionsDialog = memo(function VersionActionsDialog({
             <TabsList
               className={`grid w-full ${directUploadsEnabled ? 'grid-cols-2' : 'grid-cols-1'}`}
             >
-              <TabsTrigger value="url">Link URL</TabsTrigger>
-              {directUploadsEnabled ? <TabsTrigger value="file">Upload File</TabsTrigger> : null}
+              <TabsTrigger value="url">URL でリンク</TabsTrigger>
+              {directUploadsEnabled ? <TabsTrigger value="file">ファイルをアップロード</TabsTrigger> : null}
             </TabsList>
           </Tabs>
 
           {newVersionMode === 'url' ? (
             <div className="space-y-2">
-              <Label htmlFor="versionUrl">Video URL</Label>
+              <Label htmlFor="versionUrl">動画 URL</Label>
               <div className="relative">
                 <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -120,13 +120,13 @@ export const VersionActionsDialog = memo(function VersionActionsDialog({
                   <CheckCircle2 className="h-4 w-4" />
                   {newVersionSource.providerId.charAt(0).toUpperCase() +
                     newVersionSource.providerId.slice(1)}{' '}
-                  video detected
+                  の動画を検出しました
                 </p>
               )}
             </div>
           ) : (
             <div className="space-y-2">
-              <Label htmlFor="versionFile">Video File</Label>
+              <Label htmlFor="versionFile">動画ファイル</Label>
               <div className="flex items-center justify-center w-full">
                 <label
                   htmlFor="versionFile"
@@ -147,9 +147,9 @@ export const VersionActionsDialog = memo(function VersionActionsDialog({
                       <>
                         <UploadCloud className="w-8 h-8 mb-2 text-muted-foreground" />
                         <p className="mb-1 text-sm text-muted-foreground">
-                          <span className="font-semibold">Click to upload</span> or drag and drop
+                          <span className="font-semibold">クリックしてアップロード</span> またはドラッグ＆ドロップ
                         </p>
-                        <p className="text-xs text-muted-foreground">MP4, WebM, or OGG</p>
+                        <p className="text-xs text-muted-foreground">MP4、WebM、OGG</p>
                       </>
                     )}
                   </div>
@@ -163,7 +163,7 @@ export const VersionActionsDialog = memo(function VersionActionsDialog({
                       if (file && file.type.startsWith('video/')) {
                         onNewVersionFileChange(file);
                       } else {
-                        toast.error('Please select a valid video file');
+                        toast.error('有効な動画ファイルを選択してください');
                       }
                     }}
                     disabled={isCreatingVersion}
@@ -174,10 +174,10 @@ export const VersionActionsDialog = memo(function VersionActionsDialog({
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="versionLabel">Version Label (optional)</Label>
+            <Label htmlFor="versionLabel">バージョンラベル（任意）</Label>
             <Input
               id="versionLabel"
-              placeholder="e.g. Final Cut, Review Round 2"
+              placeholder="例: 最終版、レビュー第2回"
               value={newVersionLabel}
               onChange={(e) => onNewVersionLabelChange(e.target.value)}
               disabled={isCreatingVersion}
@@ -208,7 +208,7 @@ export const VersionActionsDialog = memo(function VersionActionsDialog({
             className="w-full"
           >
             {isCreatingVersion && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-            Add Version {versionsCount + 1}
+            バージョン {versionsCount + 1} を追加
           </Button>
         </div>
       </DialogContent>

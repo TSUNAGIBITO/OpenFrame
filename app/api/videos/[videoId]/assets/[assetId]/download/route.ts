@@ -95,11 +95,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // who does belong, including an owner whose billing lapsed, gets the 403.
     if (!context.hasViewAccess) {
       return context.viewerBelongsToProject
-        ? apiErrors.forbidden('Access denied')
+        ? apiErrors.forbidden('アクセスが拒否されました')
         : apiErrors.notFound('Video');
     }
     if (!context.canDownloadAssets) {
-      return apiErrors.forbidden('Downloads are disabled for this project');
+      return apiErrors.forbidden('このプロジェクトではダウンロードが無効になっています');
     }
 
     const asset = await db.videoAsset.findFirst({
@@ -114,12 +114,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
     if (!asset) return apiErrors.notFound('Asset');
     if (asset.provider === VideoAssetProvider.YOUTUBE) {
-      return apiErrors.badRequest('YouTube assets cannot be downloaded');
+      return apiErrors.badRequest('YouTube のアセットはダウンロードできません');
     }
 
     if (asset.provider === VideoAssetProvider.R2_IMAGE) {
       const fileName = extractImageFileNameFromProxyUrl(asset.sourceUrl);
-      if (!fileName) return apiErrors.badRequest('Invalid image asset URL');
+      if (!fileName) return apiErrors.badRequest('画像アセットの URL が正しくありません');
       const key = `images/${fileName}`;
       const extension = fileName.includes('.') ? fileName.slice(fileName.lastIndexOf('.')) : '.png';
       const downloadName = withExtension(asset.displayName, extension);
@@ -135,13 +135,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           'X-Content-Type-Options': 'nosniff',
           'Content-Security-Policy': "default-src 'none'; sandbox",
         },
-        internalErrorMessage: 'Failed to retrieve image',
+        internalErrorMessage: '画像の取得に失敗しました',
       });
     }
 
     if (asset.provider === VideoAssetProvider.R2_AUDIO) {
       const fileName = extractAudioFileNameFromProxyUrl(asset.sourceUrl);
-      if (!fileName) return apiErrors.badRequest('Invalid audio asset URL');
+      if (!fileName) return apiErrors.badRequest('音声アセットの URL が正しくありません');
       const key = `voice/${fileName}`;
       const ext = fileName.includes('.') ? fileName.slice(fileName.lastIndexOf('.')) : '.webm';
       const downloadName = withExtension(asset.displayName, ext);
@@ -158,13 +158,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           'Content-Disposition': contentDisposition,
           'X-Content-Type-Options': 'nosniff',
         },
-        internalErrorMessage: 'Failed to retrieve audio',
+        internalErrorMessage: '音声の取得に失敗しました',
       });
     }
 
     if (asset.provider === VideoAssetProvider.R2_VIDEO) {
       const fileName = extractVideoFileNameFromProxyUrl(asset.sourceUrl);
-      if (!fileName) return apiErrors.badRequest('Invalid video asset URL');
+      if (!fileName) return apiErrors.badRequest('動画アセットの URL が正しくありません');
       const key = buildVideoObjectKey(fileName);
       const ext = fileName.includes('.') ? fileName.slice(fileName.lastIndexOf('.')) : '.mp4';
       const downloadName = withExtension(asset.displayName, ext);
@@ -197,22 +197,22 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           : 'auto';
 
     if (sourceParam !== null && sourceParam !== 'original' && sourceParam !== 'compressed') {
-      return apiErrors.badRequest('Invalid source. Allowed values: original, compressed');
+      return apiErrors.badRequest('source が正しくありません。指定できる値: original, compressed');
     }
     if (
       rawQuality !== null &&
       (!Number.isFinite(requestedQuality) || !BUNNY_ALLOWED_QUALITIES.has(requestedQuality))
     ) {
       return apiErrors.badRequest(
-        'Invalid quality. Allowed values: 2160, 1440, 1080, 720, 480, 360, 240'
+        'quality が正しくありません。指定できる値: 2160, 1440, 1080, 720, 480, 360, 240'
       );
     }
     if (rawQuality !== null && sourcePreference === 'original') {
-      return apiErrors.badRequest('Quality cannot be used when source=original');
+      return apiErrors.badRequest('source=original の場合は quality を指定できません');
     }
 
     if (!asset.providerVideoId) {
-      return apiErrors.badRequest('Missing Bunny asset video id');
+      return apiErrors.badRequest('Bunny アセットの動画 ID がありません');
     }
 
     const source = await resolveBunnyDownloadSource(
@@ -257,6 +257,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error downloading asset:', error);
-    return apiErrors.internalError('Failed to download asset');
+    return apiErrors.internalError('アセットのダウンロードに失敗しました');
   }
 }

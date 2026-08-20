@@ -19,12 +19,12 @@ export async function GET(request: NextRequest) {
         return apiErrors.unauthorized();
       }
       if (!session.user.isAdmin) {
-        return apiErrors.forbidden('Admin access required');
+        return apiErrors.forbidden('管理者権限が必要です');
       }
     }
 
     if (!isProductAnalyticsEnabled()) {
-      return apiErrors.badRequest('Analytics are disabled by this host');
+      return apiErrors.badRequest('このホストでは分析機能が無効になっています');
     }
 
     const weeksParam = Number(request.nextUrl.searchParams.get('weeks'));
@@ -39,6 +39,6 @@ export async function GET(request: NextRequest) {
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error building the growth scoreboard:', error);
-    return apiErrors.internalError('Failed to build the scoreboard');
+    return apiErrors.internalError('スコアボードの作成に失敗しました');
   }
 }

@@ -64,14 +64,14 @@ export function MoveVideosDialog({
       .then(async (res) => {
         const body = await res.json().catch(() => null);
         if (!res.ok) {
-          throw new Error(typeof body?.error === 'string' ? body.error : 'Failed to load projects');
+          throw new Error(typeof body?.error === 'string' ? body.error : 'プロジェクトの読み込みに失敗しました');
         }
         if (cancelled) return;
         setTargets((body?.data?.projects as MoveTarget[] | undefined) ?? []);
       })
       .catch((err) => {
         if (!cancelled) {
-          setLoadError(err instanceof Error ? err.message : 'Failed to load projects');
+          setLoadError(err instanceof Error ? err.message : 'プロジェクトの読み込みに失敗しました');
         }
       })
       .finally(() => {
@@ -84,7 +84,7 @@ export function MoveVideosDialog({
   }, [open, projectId]);
 
   const count = videoIds.length;
-  const noun = count === 1 ? 'video' : 'videos';
+  const noun = count === 1 ? '動画' : '動画';
 
   const handleMove = async () => {
     if (!selectedId || isMoving) return;
@@ -97,15 +97,15 @@ export function MoveVideosDialog({
       });
       const body = await res.json().catch(() => null);
       if (!res.ok) {
-        toast.error(typeof body?.error === 'string' ? body.error : 'Failed to move videos');
+        toast.error(typeof body?.error === 'string' ? body.error : '動画を移動できませんでした');
         return;
       }
-      toast.success(typeof body?.data?.message === 'string' ? body.data.message : 'Videos moved');
+      toast.success(typeof body?.data?.message === 'string' ? body.data.message : '動画を移動しました');
       onOpenChange(false);
       onMoved?.(videoIds);
       router.refresh();
     } catch {
-      toast.error('Failed to move videos');
+      toast.error('動画を移動できませんでした');
     } finally {
       setIsMoving(false);
     }
@@ -116,11 +116,11 @@ export function MoveVideosDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            Move {count === 1 ? 'video' : `${count} videos`} to another project
+            {count === 1 ? '動画' : `${count}件の動画`}を別のプロジェクトに移動
           </DialogTitle>
           <DialogDescription>
-            Choose a destination project in this workspace. Versions, comments and assets move with
-            the {noun}.
+            このワークスペース内の移動先プロジェクトを選んでください。バージョン・コメント・アセットも
+            {noun}と一緒に移動します。
           </DialogDescription>
         </DialogHeader>
 
@@ -128,14 +128,14 @@ export function MoveVideosDialog({
           {isLoading ? (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" />
-              Loading projects…
+              プロジェクトを読み込み中…
             </div>
           ) : loadError ? (
             <p className="text-sm text-destructive">{loadError}</p>
           ) : targets && targets.length > 0 ? (
             <Select value={selectedId} onValueChange={setSelectedId} disabled={isMoving}>
               <SelectTrigger>
-                <SelectValue placeholder="Select a project" />
+                <SelectValue placeholder="プロジェクトを選択" />
               </SelectTrigger>
               <SelectContent>
                 {targets.map((target) => (
@@ -147,14 +147,14 @@ export function MoveVideosDialog({
             </Select>
           ) : (
             <p className="text-sm text-muted-foreground">
-              No other projects in this workspace are available to move to.
+              このワークスペースには移動先にできる他のプロジェクトがありません。
             </p>
           )}
         </div>
 
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={isMoving}>
-            Cancel
+            キャンセル
           </Button>
           <Button onClick={handleMove} disabled={!selectedId || isMoving}>
             {isMoving ? (
@@ -162,7 +162,7 @@ export function MoveVideosDialog({
             ) : (
               <FolderInput className="h-4 w-4 mr-2" />
             )}
-            Move
+            移動
           </Button>
         </DialogFooter>
       </DialogContent>

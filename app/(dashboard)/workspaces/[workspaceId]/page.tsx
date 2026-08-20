@@ -37,10 +37,10 @@ function formatRelativeTime(date: Date): string {
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 1) return 'just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffMins < 1) return 'たった今';
+  if (diffMins < 60) return `${diffMins}分前`;
+  if (diffHours < 24) return `${diffHours}時間前`;
+  if (diffDays < 7) return `${diffDays}日前`;
   return date.toLocaleDateString();
 }
 
@@ -119,7 +119,7 @@ export default async function WorkspacePage({ params, searchParams }: WorkspaceP
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
-          All Workspaces
+          すべてのワークスペース
         </Link>
       </div>
 
@@ -132,11 +132,11 @@ export default async function WorkspacePage({ params, searchParams }: WorkspaceP
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-2 text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
               <FolderOpen className="h-3.5 w-3.5" />
-              {workspace._count.projects} projects
+              {workspace._count.projects}件のプロジェクト
             </span>
             <span className="flex items-center gap-1">
               <Users className="h-3.5 w-3.5" />
-              {workspace._count.members + 1} members
+              {workspace._count.members + 1}人のメンバー
             </span>
           </div>
         </div>
@@ -146,19 +146,19 @@ export default async function WorkspacePage({ params, searchParams }: WorkspaceP
               <Button asChild variant="outline" size="sm" className="flex-1 sm:flex-none">
                 <Link href={`/workspaces/${workspaceId}/members`}>
                   <Users className="h-4 w-4 mr-2" />
-                  Members
+                  メンバー
                 </Link>
               </Button>
               <Button asChild variant="outline" size="sm" className="flex-1 sm:flex-none">
                 <Link href={`/workspaces/${workspaceId}/settings`}>
                   <Settings className="h-4 w-4 mr-2" />
-                  Settings
+                  設定
                 </Link>
               </Button>
               <Button asChild size="sm" className="w-full sm:w-auto">
                 <Link href={`/workspaces/${workspaceId}/projects/new`}>
                   <Plus className="h-4 w-4 mr-2" />
-                  New Project
+                  新規プロジェクト
                 </Link>
               </Button>
             </>
@@ -185,7 +185,7 @@ export default async function WorkspacePage({ params, searchParams }: WorkspaceP
                       </Badge>
                     </div>
                     <CardDescription className="line-clamp-2">
-                      {project.description || 'No description'}
+                      {project.description || '説明なし'}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -198,7 +198,7 @@ export default async function WorkspacePage({ params, searchParams }: WorkspaceP
                         <Users className="h-3.5 w-3.5" />
                         {project._count.members + 1}
                       </span>
-                      <span>{project._count.videos} videos</span>
+                      <span>{project._count.videos}本の動画</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -209,13 +209,13 @@ export default async function WorkspacePage({ params, searchParams }: WorkspaceP
             <div className="mt-8 flex items-center justify-end space-x-2">
               <Button variant="outline" size="sm" disabled={page <= 1} asChild={page > 1}>
                 {page > 1 ? (
-                  <Link href={`/workspaces/${workspaceId}?page=${page - 1}`}>Previous</Link>
+                  <Link href={`/workspaces/${workspaceId}?page=${page - 1}`}>前へ</Link>
                 ) : (
-                  'Previous'
+                  '前へ'
                 )}
               </Button>
               <span className="text-sm font-medium">
-                Page {page} of {totalPages}
+                {totalPages}ページ中 {page}ページ
               </span>
               <Button
                 variant="outline"
@@ -224,9 +224,9 @@ export default async function WorkspacePage({ params, searchParams }: WorkspaceP
                 asChild={page < totalPages}
               >
                 {page < totalPages ? (
-                  <Link href={`/workspaces/${workspaceId}?page=${page + 1}`}>Next</Link>
+                  <Link href={`/workspaces/${workspaceId}?page=${page + 1}`}>次へ</Link>
                 ) : (
-                  'Next'
+                  '次へ'
                 )}
               </Button>
             </div>
@@ -236,15 +236,15 @@ export default async function WorkspacePage({ params, searchParams }: WorkspaceP
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-16">
             <FolderOpen className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium mb-2">No projects yet</h3>
+            <h3 className="text-lg font-medium mb-2">プロジェクトがまだありません</h3>
             <p className="text-muted-foreground text-center mb-4">
-              Create a project in this workspace to get started
+              このワークスペースにプロジェクトを作成して始めましょう
             </p>
             {isAdmin && (
               <Button asChild>
                 <Link href={`/workspaces/${workspaceId}/projects/new`}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Create Project
+                  プロジェクトを作成
                 </Link>
               </Button>
             )}

@@ -81,12 +81,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     if (!isS3VideoUploadsEnabled()) {
-      return apiErrors.badRequest('S3 video uploads are disabled by this host');
+      return apiErrors.badRequest('このホストでは S3 への動画アップロードが無効になっています');
     }
 
     const project = await getProjectWithEditAccess(projectId, session.user.id);
     if (!project) {
-      return apiErrors.forbidden('Access denied');
+      return apiErrors.forbidden('アクセスが拒否されました');
     }
 
     const body = await request.json().catch(() => null);
@@ -95,16 +95,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const parts = parseParts(body?.parts);
 
     if (!objectKey || !uploadToken) {
-      return apiErrors.badRequest('objectKey and uploadToken are required');
+      return apiErrors.badRequest('objectKey と uploadToken が必要です');
     }
 
     if (!parts) {
-      return apiErrors.badRequest('parts must be a non-empty list of { partNumber, etag }');
+      return apiErrors.badRequest('parts は { partNumber, etag } の空でないリストである必要があります');
     }
 
     const tokenPayload = parseR2UploadToken(uploadToken);
     if (!tokenPayload) {
-      return apiErrors.forbidden('Invalid upload token');
+      return apiErrors.forbidden('アップロードトークンが無効です');
     }
 
     const isValidUploadToken = verifyR2UploadToken(uploadToken, {
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       tokenId: tokenPayload.jti,
     });
     if (!isValidUploadToken) {
-      return apiErrors.forbidden('Invalid upload token');
+      return apiErrors.forbidden('アップロードトークンが無効です');
     }
 
     const uploadSession = await db.videoUploadSession.findFirst({
@@ -136,12 +136,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       },
     });
     if (!uploadSession || !uploadSession.multipartUploadId) {
-      return apiErrors.forbidden('Invalid upload token');
+      return apiErrors.forbidden('アップロードトークンが無効です');
     }
 
     const proxyUrl = objectKeyToVideoProxyPath(objectKey);
     if (!proxyUrl) {
-      return apiErrors.badRequest('Invalid object key');
+      return apiErrors.badRequest('オブジェクトキーが正しくありません');
     }
 
     try {
@@ -160,13 +160,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         uploadSession.billedUserId,
         UPLOAD_RESERVATION_PURPOSES.R2_VIDEO
       );
-      return apiErrors.internalError('Failed to complete multipart upload');
+      return apiErrors.internalError('マルチパートアップロードの完了に失敗しました');
     }
 
     const response = successResponse({ objectKey, proxyUrl });
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     logError('Error completing R2 multipart upload:', error);
-    return apiErrors.internalError('Failed to complete upload');
+    return apiErrors.internalError('アップロードの完了に失敗しました');
   }
 }

@@ -27,10 +27,10 @@ function formatRelativeTime(date: Date): string {
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 1) return 'just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffMins < 1) return 'たった今';
+  if (diffMins < 60) return `${diffMins}分前`;
+  if (diffHours < 24) return `${diffHours}時間前`;
+  if (diffDays < 7) return `${diffDays}日前`;
   return date.toLocaleDateString();
 }
 
@@ -182,7 +182,7 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
               className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <ArrowLeft className="h-4 w-4 mr-1" />
-              Back to Projects
+              プロジェクト一覧に戻る
             </Link>
           </div>
           <ProjectContentClient
@@ -214,7 +214,7 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to Projects
+          プロジェクト一覧に戻る
         </Link>
       </div>
       <ProjectContentClient

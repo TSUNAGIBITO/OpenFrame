@@ -214,13 +214,13 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
       if (res.ok) {
         const data = await res.json();
         setSettings(data.data);
-        showMessage('success', 'Settings saved');
+        showMessage('success', '設定を保存しました');
       } else {
         const data = await res.json();
-        showMessage('error', data.error || 'Failed to save');
+        showMessage('error', data.error || '保存に失敗しました');
       }
     } catch {
-      showMessage('error', 'Failed to save settings');
+      showMessage('error', '設定の保存に失敗しました');
     } finally {
       setSaving(false);
     }
@@ -242,10 +242,10 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
         if (res.ok) {
           showMessage('success', data.data.message);
         } else {
-          showMessage('error', data.error || 'Test failed');
+          showMessage('error', data.error || 'テストに失敗しました');
         }
       } catch {
-        showMessage('error', 'Test failed');
+        showMessage('error', 'テストに失敗しました');
       } finally {
         setTesting(null);
       }
@@ -264,13 +264,13 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
         const data = await res.json();
 
         if (!res.ok) {
-          showMessage('error', data.error || 'Failed to open billing flow');
+          showMessage('error', data.error || '請求手続きを開けませんでした');
           return;
         }
 
         window.location.href = data.data.url;
       } catch {
-        showMessage('error', 'Failed to open billing flow');
+        showMessage('error', '請求手続きを開けませんでした');
       } finally {
         setBillingAction(null);
       }
@@ -314,9 +314,9 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
   return (
     <div className="max-w-2xl mx-auto py-8 px-4">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
+        <h1 className="text-2xl font-bold tracking-tight">設定</h1>
         <p className="text-muted-foreground mt-1">
-          {billingOnly ? 'Manage your billing access' : 'Manage your notification preferences'}
+          {billingOnly ? '請求アクセスを管理します' : '通知設定を管理します'}
         </p>
       </div>
 
@@ -343,9 +343,9 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CreditCard className="h-5 w-5" />
-            Billing
+            請求
           </CardTitle>
-          <CardDescription>Manage your paid plan and workspace creation access</CardDescription>
+          <CardDescription>有料プランとワークスペース作成の権限を管理します</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {billingLoading || !billing ? (
@@ -356,13 +356,11 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
             </div>
           ) : !billing.isEnabled ? (
             <div className="rounded-md border border-muted bg-muted/40 p-4 text-sm text-muted-foreground">
-              Stripe billing is disabled by this host. Workspace creation is unrestricted in this
-              environment.
+              このホストではStripe請求が無効になっています。この環境ではワークスペースの作成に制限はありません。
             </div>
           ) : !billing.isConfigured ? (
             <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-700 dark:text-amber-400">
-              Stripe is not configured yet. Add your Stripe environment variables before using
-              billing.
+              Stripeがまだ設定されていません。請求を利用する前にStripeの環境変数を追加してください。
             </div>
           ) : (
             <>
@@ -371,30 +369,29 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
               billing.subscription.trialEndsAt ? (
                 <div className="rounded-md border border-primary/30 bg-primary/5 p-4 space-y-2">
                   <p className="text-sm font-semibold">
-                    Your free trial runs until{' '}
+                    無料トライアルは{' '}
                     {new Date(billing.subscription.trialEndsAt).toLocaleDateString()}
+                    まで有効です
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Every feature is on and no card is on file. The trial covers one workspace and
-                    one project. Subscribing starts your paid month straight away, so there is no
-                    reason to do it before you are ready.
+                    すべての機能が有効で、カード情報の登録は不要です。トライアルではワークスペース1つ・プロジェクト1つが利用できます。サブスクリプションに登録するとすぐに有料期間が始まるため、準備が整うまで急いで登録する必要はありません。
                   </p>
                 </div>
               ) : null}
 
               <div className="flex items-center justify-between rounded-lg border p-4">
                 <div>
-                  <p className="text-sm font-medium">Current plan</p>
+                  <p className="text-sm font-medium">現在のプラン</p>
                   <p className="text-sm text-muted-foreground mt-1">
                     {billing.subscription.hasActiveSubscription
                       ? hasScheduledCancellation
                         ? billing.subscription.hasActiveTrial
-                          ? 'Trial canceled. Access remains active until the trial ends.'
-                          : 'Subscription canceled. Access remains active until the end of the current billing period.'
-                        : 'Paid account with workspace creation unlocked.'
+                          ? 'トライアルはキャンセル済みです。トライアル終了まではアクセスが有効です。'
+                          : 'サブスクリプションはキャンセル済みです。現在の請求期間の終了までアクセスが有効です。'
+                        : '有料アカウントです。ワークスペースの作成が可能です。'
                       : billing.subscription.hasActiveTrial
-                        ? 'Free trial, no card required.'
-                        : 'Billing access has ended.'}
+                        ? '無料トライアル中です。カード情報は不要です。'
+                        : '請求アクセスは終了しています。'}
                   </p>
                 </div>
                 <Badge
@@ -407,8 +404,7 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
               {billing.subscription.hasRecoverableSubscription &&
               !billing.subscription.hasActiveSubscription ? (
                 <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive">
-                  Your latest payment didn&apos;t go through. Update your payment method to keep
-                  your subscription — starting a new one would create a duplicate.
+                  直近のお支払いが完了しませんでした。サブスクリプションを維持するには支払い方法を更新してください。新規に登録すると重複してしまいます。
                 </p>
               ) : null}
 
@@ -416,23 +412,25 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
               billing.subscription.trialEndsAt &&
               hasScheduledCancellation ? (
                 <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive">
-                  Access ends on {new Date(billing.subscription.trialEndsAt).toLocaleDateString()}.
+                  アクセスは{new Date(billing.subscription.trialEndsAt).toLocaleDateString()}に終了します。
                 </p>
               ) : null}
 
               {billing.subscription.currentPeriodEnd ? (
                 <p className="text-sm text-muted-foreground">
                   {hasScheduledCancellation
-                    ? 'Your subscription ends on '
-                    : 'Current billing period ends on '}
-                  {new Date(billing.subscription.currentPeriodEnd).toLocaleDateString()}.
+                    ? 'サブスクリプションは '
+                    : '現在の請求期間は '}
+                  {new Date(billing.subscription.currentPeriodEnd).toLocaleDateString()}
+                  に終了します。
                 </p>
               ) : null}
 
               {hasScheduledCancellation && billing.subscription.cancelAt ? (
                 <p className="text-sm text-muted-foreground">
-                  Cancellation was scheduled on{' '}
-                  {new Date(billing.subscription.cancelAt).toLocaleDateString()}.
+                  キャンセルは{' '}
+                  {new Date(billing.subscription.cancelAt).toLocaleDateString()}
+                  に予約されました。
                 </p>
               ) : null}
 
@@ -442,17 +440,17 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
               {!billing.subscription.hasBillingAccess &&
               billing.subscription.storageCleanupEligibleAt ? (
                 <p className="text-sm text-amber-700 dark:text-amber-400">
-                  Nothing has been deleted. Your projects and media are kept until{' '}
-                  {new Date(billing.subscription.storageCleanupEligibleAt).toLocaleDateString()};
-                  subscribe before then and everything is where you left it.
+                  まだ何も削除されていません。プロジェクトとメディアは{' '}
+                  {new Date(billing.subscription.storageCleanupEligibleAt).toLocaleDateString()}
+                  まで保持されます。それまでにサブスクリプションに登録すれば、すべてそのまま残ります。
                 </p>
               ) : null}
 
               {!billing.workspaceCreation.canCreateWorkspace ? (
                 <div className="rounded-lg border bg-muted/30 p-4 space-y-2">
-                  <p className="text-sm font-medium">Workspace creation</p>
+                  <p className="text-sm font-medium">ワークスペースの作成</p>
                   <p className="text-sm text-muted-foreground">
-                    {billing.workspaceCreation.reason || 'Upgrade to create another workspace.'}
+                    {billing.workspaceCreation.reason || 'ワークスペースをもう1つ作成するにはアップグレードしてください。'}
                   </p>
                 </div>
               ) : null}
@@ -466,12 +464,12 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
                     {billingAction === 'portal' ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Opening Portal...
+                        ポータルを開いています...
                       </>
                     ) : billing.subscription.hasActiveSubscription ? (
-                      'Manage Subscription'
+                      'サブスクリプションを管理'
                     ) : (
-                      'Update Payment Method'
+                      '支払い方法を更新'
                     )}
                   </Button>
                 ) : (
@@ -482,10 +480,10 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
                     {billingAction === 'checkout' ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Redirecting...
+                        リダイレクトしています...
                       </>
                     ) : (
-                      'Upgrade with Stripe'
+                      'Stripeでアップグレード'
                     )}
                   </Button>
                 )}
@@ -500,11 +498,11 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <HardDrive className="h-5 w-5" />
-              Storage
+              ストレージ
             </CardTitle>
             <CardDescription>
-              Combined usage across video files and media attachments
-              {storageInfo ? ` (${formatBytes(storageInfo.limitBytes)} limit)` : ''}
+              動画ファイルとメディア添付の合計使用量
+              {storageInfo ? `（上限 ${formatBytes(storageInfo.limitBytes)}）` : ''}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -517,8 +515,8 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
               <>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">
-                    {formatBytes(storageInfo.usedBytes)} used of{' '}
-                    {formatBytes(storageInfo.limitBytes)}
+                    {formatBytes(storageInfo.limitBytes)}中{' '}
+                    {formatBytes(storageInfo.usedBytes)}使用
                   </span>
                   <span
                     className={
@@ -547,12 +545,11 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
                 {storageInfo.percentage >= 90 &&
                   (storageInfo.isPaid ? (
                     <p className="text-xs text-destructive">
-                      Storage is almost full. Delete unused files or contact support.
+                      ストレージがほぼいっぱいです。不要なファイルを削除するか、サポートにお問い合わせください。
                     </p>
                   ) : (
                     <p className="text-xs text-destructive">
-                      Your free trial storage is almost full. Subscribe above for more room, or
-                      delete unused files.
+                      無料トライアルのストレージがほぼいっぱいです。上のボタンからサブスクリプションに登録して容量を増やすか、不要なファイルを削除してください。
                     </p>
                   ))}
               </>
@@ -568,42 +565,42 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5" />
-                Notification Events
+                通知イベント
               </CardTitle>
-              <CardDescription>Choose which events trigger notifications</CardDescription>
+              <CardDescription>どのイベントで通知するかを選択します</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <ToggleButton
                 enabled={settings.onNewVideo}
                 onToggle={() => setSettings((s) => ({ ...s, onNewVideo: !s.onNewVideo }))}
-                label="New Video Added"
-                description="When a new video is added to one of your projects"
+                label="動画が追加されたとき"
+                description="いずれかのプロジェクトに新しい動画が追加されたとき"
               />
               <ToggleButton
                 enabled={settings.onNewVersion}
                 onToggle={() => setSettings((s) => ({ ...s, onNewVersion: !s.onNewVersion }))}
-                label="New Version Added"
-                description="When a new version is added to an existing video"
+                label="バージョンが追加されたとき"
+                description="既存の動画に新しいバージョンが追加されたとき"
               />
               <ToggleButton
                 enabled={settings.onNewComment}
                 onToggle={() => setSettings((s) => ({ ...s, onNewComment: !s.onNewComment }))}
-                label="New Comment"
-                description="When someone leaves a comment on your videos"
+                label="新しいコメント"
+                description="動画に誰かがコメントを残したとき"
               />
               <ToggleButton
                 enabled={settings.onNewReply}
                 onToggle={() => setSettings((s) => ({ ...s, onNewReply: !s.onNewReply }))}
-                label="New Reply"
-                description="When someone replies to a comment thread"
+                label="新しい返信"
+                description="コメントスレッドに誰かが返信したとき"
               />
               <ToggleButton
                 enabled={settings.onApprovalEvents}
                 onToggle={() =>
                   setSettings((s) => ({ ...s, onApprovalEvents: !s.onApprovalEvents }))
                 }
-                label="Approval Workflow"
-                description="When approval requests are created, responded to, or finalized"
+                label="承認ワークフロー"
+                description="承認リクエストが作成・対応・確定されたとき"
               />
             </CardContent>
           </Card>
@@ -617,17 +614,17 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
                   Telegram
                 </CardTitle>
                 <Badge variant={settings.telegramEnabled ? 'default' : 'secondary'}>
-                  {settings.telegramEnabled ? 'Enabled' : 'Disabled'}
+                  {settings.telegramEnabled ? '有効' : '無効'}
                 </Badge>
               </div>
-              <CardDescription>Get instant notifications via Telegram</CardDescription>
+              <CardDescription>Telegramで即座に通知を受け取ります</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="rounded-md border bg-muted/40 p-3 space-y-2 text-sm text-muted-foreground">
-                <p className="font-medium text-foreground">Setup instructions</p>
+                <p className="font-medium text-foreground">設定手順</p>
                 <ol className="space-y-1.5 list-decimal list-inside">
                   <li>
-                    Message{' '}
+                    Telegramで{' '}
                     <a
                       href="https://t.me/UserInfeBot"
                       target="_blank"
@@ -636,12 +633,11 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
                     >
                       @UserInfeBot
                     </a>{' '}
-                    on Telegram and send{' '}
-                    <code className="bg-muted px-1 rounded text-xs">/start</code> to get your Chat
-                    ID
+                    にメッセージを送り、{' '}
+                    <code className="bg-muted px-1 rounded text-xs">/start</code> を送信してChat
+                    IDを取得します
                   </li>
                   <li>
-                    Start{' '}
                     <a
                       href="https://t.me/openframe_bot"
                       target="_blank"
@@ -650,15 +646,14 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
                     >
                       @openframe_bot
                     </a>{' '}
-                    and send <code className="bg-muted px-1 rounded text-xs">/start</code> so it can
-                    message you
+                    を開始し、<code className="bg-muted px-1 rounded text-xs">/start</code> を送信して、Botがあなたにメッセージを送れるようにします
                   </li>
-                  <li>Paste your Chat ID below and enable notifications</li>
+                  <li>下にChat IDを貼り付けて通知を有効にします</li>
                 </ol>
               </div>
 
               <div>
-                <Label htmlFor="telegram-chat-id">Your Chat ID</Label>
+                <Label htmlFor="telegram-chat-id">あなたのChat ID</Label>
                 <Input
                   id="telegram-chat-id"
                   placeholder="123456789"
@@ -671,7 +666,7 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
               <ToggleButton
                 enabled={settings.telegramEnabled}
                 onToggle={() => setSettings((s) => ({ ...s, telegramEnabled: !s.telegramEnabled }))}
-                label="Enable Telegram notifications"
+                label="Telegram通知を有効にする"
               />
 
               <Button
@@ -685,7 +680,7 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
                 ) : (
                   <Send className="h-4 w-4 mr-2" />
                 )}
-                Send Test Message
+                テストメッセージを送信
               </Button>
             </CardContent>
           </Card>
@@ -696,21 +691,21 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <Mail className="h-5 w-5" />
-                  Email
+                  メール
                 </CardTitle>
                 <Badge variant={settings.emailEnabled ? 'default' : 'secondary'}>
-                  {settings.emailEnabled ? 'Enabled' : 'Disabled'}
+                  {settings.emailEnabled ? '有効' : '無効'}
                 </Badge>
               </div>
               <CardDescription>
-                Receive notification emails to your account email address
+                アカウントのメールアドレスに通知メールを受け取ります
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <ToggleButton
                 enabled={settings.emailEnabled}
                 onToggle={() => setSettings((s) => ({ ...s, emailEnabled: !s.emailEnabled }))}
-                label="Enable email notifications"
+                label="メール通知を有効にする"
               />
 
               <Button
@@ -724,7 +719,7 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
                 ) : (
                   <Mail className="h-4 w-4 mr-2" />
                 )}
-                Send Test Email
+                テストメールを送信
               </Button>
             </CardContent>
           </Card>
@@ -734,9 +729,9 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Globe className="h-5 w-5" />
-                Timezone
+                タイムゾーン
               </CardTitle>
-              <CardDescription>Timestamps in notifications will use this timezone</CardDescription>
+              <CardDescription>通知内のタイムスタンプにこのタイムゾーンを使用します</CardDescription>
             </CardHeader>
             <CardContent>
               <Select
@@ -744,69 +739,69 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
                 onValueChange={(value) => setSettings((s) => ({ ...s, timezone: value }))}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select timezone" />
+                  <SelectValue placeholder="タイムゾーンを選択" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectLabel>Americas</SelectLabel>
-                    <SelectItem value="America/New_York">Eastern Time (New York)</SelectItem>
-                    <SelectItem value="America/Chicago">Central Time (Chicago)</SelectItem>
-                    <SelectItem value="America/Denver">Mountain Time (Denver)</SelectItem>
-                    <SelectItem value="America/Los_Angeles">Pacific Time (Los Angeles)</SelectItem>
-                    <SelectItem value="America/Anchorage">Alaska (Anchorage)</SelectItem>
-                    <SelectItem value="Pacific/Honolulu">Hawaii (Honolulu)</SelectItem>
-                    <SelectItem value="America/Toronto">Toronto</SelectItem>
-                    <SelectItem value="America/Vancouver">Vancouver</SelectItem>
-                    <SelectItem value="America/Mexico_City">Mexico City</SelectItem>
-                    <SelectItem value="America/Sao_Paulo">São Paulo</SelectItem>
-                    <SelectItem value="America/Argentina/Buenos_Aires">Buenos Aires</SelectItem>
-                    <SelectItem value="America/Bogota">Bogotá</SelectItem>
+                    <SelectLabel>南北アメリカ</SelectLabel>
+                    <SelectItem value="America/New_York">東部時間（ニューヨーク）</SelectItem>
+                    <SelectItem value="America/Chicago">中部時間（シカゴ）</SelectItem>
+                    <SelectItem value="America/Denver">山岳部時間（デンバー）</SelectItem>
+                    <SelectItem value="America/Los_Angeles">太平洋時間（ロサンゼルス）</SelectItem>
+                    <SelectItem value="America/Anchorage">アラスカ（アンカレッジ）</SelectItem>
+                    <SelectItem value="Pacific/Honolulu">ハワイ（ホノルル）</SelectItem>
+                    <SelectItem value="America/Toronto">トロント</SelectItem>
+                    <SelectItem value="America/Vancouver">バンクーバー</SelectItem>
+                    <SelectItem value="America/Mexico_City">メキシコシティ</SelectItem>
+                    <SelectItem value="America/Sao_Paulo">サンパウロ</SelectItem>
+                    <SelectItem value="America/Argentina/Buenos_Aires">ブエノスアイレス</SelectItem>
+                    <SelectItem value="America/Bogota">ボゴタ</SelectItem>
                   </SelectGroup>
                   <SelectGroup>
-                    <SelectLabel>Europe</SelectLabel>
-                    <SelectItem value="Europe/London">London (GMT/BST)</SelectItem>
-                    <SelectItem value="Europe/Paris">Paris (CET)</SelectItem>
-                    <SelectItem value="Europe/Berlin">Berlin (CET)</SelectItem>
-                    <SelectItem value="Europe/Amsterdam">Amsterdam (CET)</SelectItem>
-                    <SelectItem value="Europe/Madrid">Madrid (CET)</SelectItem>
-                    <SelectItem value="Europe/Rome">Rome (CET)</SelectItem>
-                    <SelectItem value="Europe/Zurich">Zurich (CET)</SelectItem>
-                    <SelectItem value="Europe/Stockholm">Stockholm (CET)</SelectItem>
-                    <SelectItem value="Europe/Helsinki">Helsinki (EET)</SelectItem>
-                    <SelectItem value="Europe/Athens">Athens (EET)</SelectItem>
-                    <SelectItem value="Europe/Istanbul">Istanbul (TRT)</SelectItem>
-                    <SelectItem value="Europe/Moscow">Moscow (MSK)</SelectItem>
-                    <SelectItem value="Europe/Kiev">Kyiv (EET)</SelectItem>
-                    <SelectItem value="Europe/Warsaw">Warsaw (CET)</SelectItem>
+                    <SelectLabel>ヨーロッパ</SelectLabel>
+                    <SelectItem value="Europe/London">ロンドン (GMT/BST)</SelectItem>
+                    <SelectItem value="Europe/Paris">パリ (CET)</SelectItem>
+                    <SelectItem value="Europe/Berlin">ベルリン (CET)</SelectItem>
+                    <SelectItem value="Europe/Amsterdam">アムステルダム (CET)</SelectItem>
+                    <SelectItem value="Europe/Madrid">マドリード (CET)</SelectItem>
+                    <SelectItem value="Europe/Rome">ローマ (CET)</SelectItem>
+                    <SelectItem value="Europe/Zurich">チューリッヒ (CET)</SelectItem>
+                    <SelectItem value="Europe/Stockholm">ストックホルム (CET)</SelectItem>
+                    <SelectItem value="Europe/Helsinki">ヘルシンキ (EET)</SelectItem>
+                    <SelectItem value="Europe/Athens">アテネ (EET)</SelectItem>
+                    <SelectItem value="Europe/Istanbul">イスタンブール (TRT)</SelectItem>
+                    <SelectItem value="Europe/Moscow">モスクワ (MSK)</SelectItem>
+                    <SelectItem value="Europe/Kiev">キーウ (EET)</SelectItem>
+                    <SelectItem value="Europe/Warsaw">ワルシャワ (CET)</SelectItem>
                   </SelectGroup>
                   <SelectGroup>
-                    <SelectLabel>Asia & Pacific</SelectLabel>
-                    <SelectItem value="Asia/Dubai">Dubai (GST)</SelectItem>
-                    <SelectItem value="Asia/Kolkata">India (IST)</SelectItem>
-                    <SelectItem value="Asia/Bangkok">Bangkok (ICT)</SelectItem>
-                    <SelectItem value="Asia/Singapore">Singapore (SGT)</SelectItem>
-                    <SelectItem value="Asia/Hong_Kong">Hong Kong (HKT)</SelectItem>
-                    <SelectItem value="Asia/Shanghai">Shanghai (CST)</SelectItem>
-                    <SelectItem value="Asia/Tokyo">Tokyo (JST)</SelectItem>
-                    <SelectItem value="Asia/Seoul">Seoul (KST)</SelectItem>
-                    <SelectItem value="Asia/Taipei">Taipei (CST)</SelectItem>
-                    <SelectItem value="Asia/Jakarta">Jakarta (WIB)</SelectItem>
-                    <SelectItem value="Australia/Sydney">Sydney (AEST)</SelectItem>
-                    <SelectItem value="Australia/Melbourne">Melbourne (AEST)</SelectItem>
-                    <SelectItem value="Australia/Perth">Perth (AWST)</SelectItem>
-                    <SelectItem value="Pacific/Auckland">Auckland (NZST)</SelectItem>
+                    <SelectLabel>アジア・太平洋</SelectLabel>
+                    <SelectItem value="Asia/Dubai">ドバイ (GST)</SelectItem>
+                    <SelectItem value="Asia/Kolkata">インド (IST)</SelectItem>
+                    <SelectItem value="Asia/Bangkok">バンコク (ICT)</SelectItem>
+                    <SelectItem value="Asia/Singapore">シンガポール (SGT)</SelectItem>
+                    <SelectItem value="Asia/Hong_Kong">香港 (HKT)</SelectItem>
+                    <SelectItem value="Asia/Shanghai">上海 (CST)</SelectItem>
+                    <SelectItem value="Asia/Tokyo">東京 (JST)</SelectItem>
+                    <SelectItem value="Asia/Seoul">ソウル (KST)</SelectItem>
+                    <SelectItem value="Asia/Taipei">台北 (CST)</SelectItem>
+                    <SelectItem value="Asia/Jakarta">ジャカルタ (WIB)</SelectItem>
+                    <SelectItem value="Australia/Sydney">シドニー (AEST)</SelectItem>
+                    <SelectItem value="Australia/Melbourne">メルボルン (AEST)</SelectItem>
+                    <SelectItem value="Australia/Perth">パース (AWST)</SelectItem>
+                    <SelectItem value="Pacific/Auckland">オークランド (NZST)</SelectItem>
                   </SelectGroup>
                   <SelectGroup>
-                    <SelectLabel>Africa & Middle East</SelectLabel>
-                    <SelectItem value="Africa/Cairo">Cairo (EET)</SelectItem>
-                    <SelectItem value="Africa/Lagos">Lagos (WAT)</SelectItem>
-                    <SelectItem value="Africa/Johannesburg">Johannesburg (SAST)</SelectItem>
-                    <SelectItem value="Africa/Nairobi">Nairobi (EAT)</SelectItem>
-                    <SelectItem value="Asia/Riyadh">Riyadh (AST)</SelectItem>
-                    <SelectItem value="Asia/Tehran">Tehran (IRST)</SelectItem>
+                    <SelectLabel>アフリカ・中東</SelectLabel>
+                    <SelectItem value="Africa/Cairo">カイロ (EET)</SelectItem>
+                    <SelectItem value="Africa/Lagos">ラゴス (WAT)</SelectItem>
+                    <SelectItem value="Africa/Johannesburg">ヨハネスブルグ (SAST)</SelectItem>
+                    <SelectItem value="Africa/Nairobi">ナイロビ (EAT)</SelectItem>
+                    <SelectItem value="Asia/Riyadh">リヤド (AST)</SelectItem>
+                    <SelectItem value="Asia/Tehran">テヘラン (IRST)</SelectItem>
                   </SelectGroup>
                   <SelectGroup>
-                    <SelectLabel>Other</SelectLabel>
+                    <SelectLabel>その他</SelectLabel>
                     <SelectItem value="UTC">UTC</SelectItem>
                   </SelectGroup>
                 </SelectContent>
@@ -822,10 +817,10 @@ export default function SettingsPage({ billingOnly = false }: { billingOnly?: bo
               {saving ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Saving...
+                  保存中...
                 </>
               ) : (
-                'Save Settings'
+                '設定を保存'
               )}
             </Button>
           </div>

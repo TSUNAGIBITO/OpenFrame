@@ -219,12 +219,12 @@ export const CommentsPane = memo(function CommentsPane({
     return `${formatTime(timestamp)} - ${formatTime(timestampEnd)}`;
   };
   const replyRangeButtonLabel =
-    replyRangeStart === null || replyRangeEnd !== null ? 'Set In' : 'Set Out';
+    replyRangeStart === null || replyRangeEnd !== null ? '開始点を設定' : '終了点を設定';
   const replyRangeLabel =
     replyRangeStart !== null
       ? replyRangeEnd !== null
         ? `${formatTime(replyRangeStart)} - ${formatTime(replyRangeEnd)}`
-        : `In ${formatTime(replyRangeStart)}`
+        : `開始 ${formatTime(replyRangeStart)}`
       : null;
 
   return (
@@ -269,7 +269,7 @@ export const CommentsPane = memo(function CommentsPane({
       >
         {isPaneDraggingOver && (
           <div className="absolute inset-0 z-20 flex items-center justify-center border-2 border-dashed border-primary bg-primary/10 pointer-events-none">
-            <p className="text-sm font-medium text-primary">Drop images to attach</p>
+            <p className="text-sm font-medium text-primary">画像をドロップして添付</p>
           </div>
         )}
         <div className="shrink-0 p-4 border-b lg:cursor-default space-y-2">
@@ -282,7 +282,7 @@ export const CommentsPane = memo(function CommentsPane({
                 onClick={() => setActivePane('comments')}
               >
                 <MessageSquare className="h-4 w-4 mr-1" />
-                Comments
+                コメント
                 <Badge variant="secondary" className="ml-2">
                   {comments.length}
                 </Badge>
@@ -294,7 +294,7 @@ export const CommentsPane = memo(function CommentsPane({
                 onClick={() => setActivePane('assets')}
               >
                 <FolderOpen className="h-4 w-4 mr-1" />
-                Assets
+                アセット
                 <Badge variant="secondary" className="ml-2">
                   {assets.length}
                 </Badge>
@@ -321,7 +321,7 @@ export const CommentsPane = memo(function CommentsPane({
                   handleToggleShowResolved();
                 }}
               >
-                Resolved
+                解決済み
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -330,8 +330,8 @@ export const CommentsPane = memo(function CommentsPane({
                     size="sm"
                     className="h-8 px-2"
                     disabled={!activeVersion || isExportingCsv || isExportingPdf}
-                    aria-label="Download comments"
-                    title="Download comments"
+                    aria-label="コメントをダウンロード"
+                    title="コメントをダウンロード"
                   >
                     {isExportingCsv || isExportingPdf ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -350,12 +350,12 @@ export const CommentsPane = memo(function CommentsPane({
                     }}
                     title={
                       isGuest
-                        ? 'CSV export requires an authenticated account'
-                        : 'Download comments as CSV'
+                        ? 'CSVエクスポートにはアカウントへのログインが必要です'
+                        : 'コメントをCSVでダウンロード'
                     }
                   >
                     <Download className="h-4 w-4 mr-2" />
-                    Download CSV
+                    CSVをダウンロード
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     disabled={!activeVersion || isExportingCsv || isExportingPdf}
@@ -363,10 +363,10 @@ export const CommentsPane = memo(function CommentsPane({
                       e.stopPropagation();
                       handleExportComments('pdf');
                     }}
-                    title="Download comments as PDF"
+                    title="コメントをPDFでダウンロード"
                   >
                     <FileText className="h-4 w-4 mr-2" />
-                    Download PDF
+                    PDFをダウンロード
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -389,12 +389,12 @@ export const CommentsPane = memo(function CommentsPane({
             {filteredComments.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p>No comments yet</p>
-                <p className="text-sm">Be the first to leave feedback!</p>
+                <p>まだコメントはありません</p>
+                <p className="text-sm">最初のフィードバックを残しましょう！</p>
               </div>
             ) : (
               sortedComments.map((comment) => {
-                const authorName = comment.author?.name || comment.guestName || 'Anonymous';
+                const authorName = comment.author?.name || comment.guestName || '匿名';
                 const isEditing = editingCommentId === comment.id;
                 const isReplying = replyingTo === comment.id;
                 const canEditComment = comment.canEdit ?? comment.author?.id === currentUserId;
@@ -430,7 +430,7 @@ export const CommentsPane = memo(function CommentsPane({
                             })
                           }
                           className="flex items-center gap-1 text-xs text-primary hover:underline px-1.5 py-0.5 rounded bg-primary/10 hover:bg-primary/20 transition-colors"
-                          title="Jump to this timestamp"
+                          title="このタイムスタンプにジャンプ"
                         >
                           <Clock className="h-3 w-3" />
                           {formatCommentRange(comment.timestamp, comment.timestampEnd)}
@@ -466,12 +466,12 @@ export const CommentsPane = memo(function CommentsPane({
                                 }}
                               >
                                 <Reply className="h-4 w-4 mr-2" />
-                                Reply
+                                返信
                               </DropdownMenuItem>
                               {canEditComment && (
                                 <DropdownMenuItem onClick={() => startEditingComment(comment)}>
                                   <Pencil className="h-4 w-4 mr-2" />
-                                  Edit
+                                  編集
                                 </DropdownMenuItem>
                               )}
                               {canDeleteComment && (
@@ -480,7 +480,7 @@ export const CommentsPane = memo(function CommentsPane({
                                   onClick={() => handleDeleteComment(comment.id)}
                                 >
                                   <Trash2 className="h-4 w-4 mr-2" />
-                                  Delete
+                                  削除
                                 </DropdownMenuItem>
                               )}
                             </DropdownMenuContent>
@@ -530,7 +530,7 @@ export const CommentsPane = memo(function CommentsPane({
                             {isSubmittingEdit ? (
                               <Loader2 className="h-3 w-3 animate-spin" />
                             ) : (
-                              'Save'
+                              '保存'
                             )}
                           </Button>
                           <Button
@@ -539,7 +539,7 @@ export const CommentsPane = memo(function CommentsPane({
                             onClick={cancelEditingComment}
                             className="h-7 text-xs"
                           >
-                            Cancel
+                            キャンセル
                           </Button>
                           <Button
                             size="icon"
@@ -549,7 +549,7 @@ export const CommentsPane = memo(function CommentsPane({
                             disabled={
                               editImageUrls.length + editImageFiles.length >= MAX_COMMENT_IMAGES
                             }
-                            title={`Attach images (up to ${MAX_COMMENT_IMAGES})`}
+                            title={`画像を添付（最大${MAX_COMMENT_IMAGES}枚）`}
                           >
                             <ImageIcon className="h-3.5 w-3.5" />
                           </Button>
@@ -568,7 +568,7 @@ export const CommentsPane = memo(function CommentsPane({
                             onClick={() => {
                               onStartEditAnnotation();
                             }}
-                            title={comment.annotationData ? 'Redraw annotation' : 'Add annotation'}
+                            title={comment.annotationData ? '注釈を描き直す' : '注釈を追加'}
                           >
                             <Pencil className="h-3.5 w-3.5" />
                           </Button>
@@ -591,8 +591,8 @@ export const CommentsPane = memo(function CommentsPane({
                                 >
                                   <Tag className="h-3 w-3 mr-1" />
                                   {editTagId
-                                    ? availableTags.find((t) => t.id === editTagId)?.name || 'Tag'
-                                    : 'Tag'}
+                                    ? availableTags.find((t) => t.id === editTagId)?.name || 'タグ'
+                                    : 'タグ'}
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
@@ -601,7 +601,7 @@ export const CommentsPane = memo(function CommentsPane({
                                   className="gap-2"
                                 >
                                   <X className="h-3 w-3" />
-                                  No Tag
+                                  タグなし
                                   {!editTagId && <span className="ml-auto">✓</span>}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
@@ -690,7 +690,7 @@ export const CommentsPane = memo(function CommentsPane({
                       {comment.annotationData && (
                         <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-violet-500 text-white shrink-0 flex items-center gap-1">
                           <Pencil className="h-2.5 w-2.5" />
-                          Annotated
+                          注釈あり
                         </span>
                       )}
                       {comment.tag && (
@@ -706,7 +706,7 @@ export const CommentsPane = memo(function CommentsPane({
                     {comment.replies && comment.replies.length > 0 && (
                       <div className="mt-3 pl-3 border-l-2 space-y-2">
                         {comment.replies.map((reply) => {
-                          const replyAuthor = reply.author?.name || reply.guestName || 'Anonymous';
+                          const replyAuthor = reply.author?.name || reply.guestName || '匿名';
                           const isEditingReply = editingCommentId === reply.id;
                           const canEditReply = reply.canEdit ?? reply.author?.id === currentUserId;
                           const canDeleteReply =
@@ -732,7 +732,7 @@ export const CommentsPane = memo(function CommentsPane({
                                       })
                                     }
                                     className="flex items-center gap-1 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary transition-colors hover:bg-primary/20"
-                                    title="Jump to this reply"
+                                    title="この返信にジャンプ"
                                   >
                                     <Clock className="h-2.5 w-2.5" />
                                     {formatCommentRange(reply.timestamp, reply.timestampEnd)}
@@ -756,7 +756,7 @@ export const CommentsPane = memo(function CommentsPane({
                                       {canEditReply && (
                                         <DropdownMenuItem onClick={() => startEditingReply(reply)}>
                                           <Pencil className="h-4 w-4 mr-2" />
-                                          Edit
+                                          編集
                                         </DropdownMenuItem>
                                       )}
                                       {canDeleteReply && (
@@ -765,7 +765,7 @@ export const CommentsPane = memo(function CommentsPane({
                                           onClick={() => handleDeleteComment(reply.id)}
                                         >
                                           <Trash2 className="h-4 w-4 mr-2" />
-                                          Delete
+                                          削除
                                         </DropdownMenuItem>
                                       )}
                                     </DropdownMenuContent>
@@ -813,7 +813,7 @@ export const CommentsPane = memo(function CommentsPane({
                                       {isSubmittingEdit ? (
                                         <Loader2 className="h-3 w-3 animate-spin" />
                                       ) : (
-                                        'Save'
+                                        '保存'
                                       )}
                                     </Button>
                                     <Button
@@ -822,7 +822,7 @@ export const CommentsPane = memo(function CommentsPane({
                                       onClick={cancelEditingComment}
                                       className="h-7 text-xs"
                                     >
-                                      Cancel
+                                      キャンセル
                                     </Button>
                                     <Button
                                       size="icon"
@@ -833,7 +833,7 @@ export const CommentsPane = memo(function CommentsPane({
                                         editImageUrls.length + editImageFiles.length >=
                                         MAX_COMMENT_IMAGES
                                       }
-                                      title={`Attach images (up to ${MAX_COMMENT_IMAGES})`}
+                                      title={`画像を添付（最大${MAX_COMMENT_IMAGES}枚）`}
                                     >
                                       <ImageIcon className="h-3.5 w-3.5" />
                                     </Button>
@@ -927,7 +927,7 @@ export const CommentsPane = memo(function CommentsPane({
                               onClick={stopReplyRecording}
                               className="h-6 text-xs"
                             >
-                              Stop
+                              停止
                             </Button>
                             <Button
                               size="sm"
@@ -1000,7 +1000,7 @@ export const CommentsPane = memo(function CommentsPane({
                               value={replyText}
                               onChange={setReplyText}
                               assets={assets}
-                              placeholder="Add a note (optional)..."
+                              placeholder="メモを追加（任意）..."
                               rows={1}
                               className="resize-none text-sm"
                             />
@@ -1025,7 +1025,7 @@ export const CommentsPane = memo(function CommentsPane({
                                   className="h-7 text-xs"
                                   onClick={clearReplyRangeSelection}
                                 >
-                                  Clear
+                                  クリア
                                 </Button>
                               )}
                             </div>
@@ -1039,7 +1039,7 @@ export const CommentsPane = memo(function CommentsPane({
                                 {isUploadingReplyAudio || isUploadingReplyImage ? (
                                   <Loader2 className="h-3 w-3 animate-spin" />
                                 ) : (
-                                  'Send Reply'
+                                  '返信を送信'
                                 )}
                               </Button>
                               <Button
@@ -1048,7 +1048,7 @@ export const CommentsPane = memo(function CommentsPane({
                                 onClick={cancelReplyRecording}
                                 className="h-7 text-xs"
                               >
-                                Cancel
+                                キャンセル
                               </Button>
                             </div>
                           </div>
@@ -1064,7 +1064,7 @@ export const CommentsPane = memo(function CommentsPane({
                                 value={replyText}
                                 onChange={setReplyText}
                                 assets={assets}
-                                placeholder="Write a reply..."
+                                placeholder="返信を入力..."
                                 rows={2}
                                 className="resize-none text-sm flex-1"
                                 autoFocus
@@ -1084,7 +1084,7 @@ export const CommentsPane = memo(function CommentsPane({
                                 size="icon"
                                 variant="outline"
                                 onClick={startReplyRecording}
-                                title="Record voice reply"
+                                title="音声で返信を録音"
                                 className="h-8 w-8 shrink-0 self-end"
                               >
                                 <Mic className="h-3 w-3" />
@@ -1094,7 +1094,7 @@ export const CommentsPane = memo(function CommentsPane({
                                 variant="outline"
                                 onClick={() => replyImageInputRef.current?.click()}
                                 disabled={replyImageFiles.length >= MAX_COMMENT_IMAGES}
-                                title={`Attach images (up to ${MAX_COMMENT_IMAGES})`}
+                                title={`画像を添付（最大${MAX_COMMENT_IMAGES}枚）`}
                                 className="h-8 w-8 shrink-0 self-end"
                               >
                                 <ImageIcon className="h-3 w-3" />
@@ -1129,7 +1129,7 @@ export const CommentsPane = memo(function CommentsPane({
                                   className="h-7 text-xs"
                                   onClick={clearReplyRangeSelection}
                                 >
-                                  Clear
+                                  クリア
                                 </Button>
                               )}
                             </div>
@@ -1147,7 +1147,7 @@ export const CommentsPane = memo(function CommentsPane({
                                 {isSubmittingReply || isUploadingReplyImage ? (
                                   <Loader2 className="h-3 w-3 animate-spin" />
                                 ) : (
-                                  'Reply'
+                                  '返信'
                                 )}
                               </Button>
                               <Button
@@ -1160,7 +1160,7 @@ export const CommentsPane = memo(function CommentsPane({
                                 }}
                                 className="h-7 text-xs"
                               >
-                                Cancel
+                                キャンセル
                               </Button>
                             </div>
                           </>
@@ -1178,7 +1178,7 @@ export const CommentsPane = memo(function CommentsPane({
                         className="mt-2 text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
                       >
                         <Reply className="h-3 w-3" />
-                        Reply
+                        返信
                       </button>
                     )}
                   </div>

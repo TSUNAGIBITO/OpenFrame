@@ -52,7 +52,7 @@ export const AssetListSection = memo(function AssetListSection({
     return (
       <div className="text-sm text-muted-foreground flex items-center gap-2 py-4">
         <Loader2 className="h-4 w-4 animate-spin" />
-        Loading assets...
+        アセットを読み込み中...
       </div>
     );
   }
@@ -60,7 +60,7 @@ export const AssetListSection = memo(function AssetListSection({
   if (assets.length === 0) {
     return (
       <div className="text-sm text-muted-foreground py-4 text-center border rounded-lg">
-        No assets uploaded yet.
+        まだアセットがアップロードされていません。
       </div>
     );
   }
@@ -91,13 +91,13 @@ export const AssetListSection = memo(function AssetListSection({
                   {isBunnyProcessing ? (
                     <Badge variant="secondary" className="text-[10px] gap-1">
                       <Loader2 className="h-2.5 w-2.5 animate-spin" />
-                      Processing
+                      処理中
                     </Badge>
                   ) : null}
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
-                {asset.uploadedByUser?.name || asset.uploadedByGuestName || 'Unknown'} •{' '}
+                {asset.uploadedByUser?.name || asset.uploadedByGuestName || '不明'} •{' '}
                 {new Date(asset.createdAt).toLocaleDateString()}
               </p>
               <div className="pt-1 flex items-center gap-1">
@@ -107,17 +107,17 @@ export const AssetListSection = memo(function AssetListSection({
                   className="h-7 w-7"
                   title={
                     asset.kind === 'VIDEO'
-                      ? 'Play video'
+                      ? '動画を再生'
                       : asset.kind === 'AUDIO'
-                        ? 'Play recording'
-                        : 'View image'
+                        ? '録音を再生'
+                        : '画像を表示'
                   }
                   aria-label={
                     asset.kind === 'VIDEO'
-                      ? 'Play video'
+                      ? '動画を再生'
                       : asset.kind === 'AUDIO'
-                        ? 'Play recording'
-                        : 'View image'
+                        ? '録音を再生'
+                        : '画像を表示'
                   }
                   onClick={() => onViewAsset(asset)}
                 >
@@ -139,8 +139,8 @@ export const AssetListSection = memo(function AssetListSection({
                           size="icon"
                           variant="outline"
                           className="h-7 w-7"
-                          title="Download asset"
-                          aria-label="Download asset"
+                          title="アセットをダウンロード"
+                          aria-label="アセットをダウンロード"
                           disabled={activeDownloadAssetId === asset.id || isBunnyProcessing}
                         >
                           {activeDownloadAssetId === asset.id ? (
@@ -153,11 +153,11 @@ export const AssetListSection = memo(function AssetListSection({
                       <DropdownMenuContent align="start">
                         <DropdownMenuItem onClick={() => onDownloadAsset(asset, 'original')}>
                           <Download className="h-3 w-3 mr-2" />
-                          Original
+                          オリジナル
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onDownloadAsset(asset, 'compressed')}>
                           <Download className="h-3 w-3 mr-2" />
-                          Compressed
+                          圧縮版
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -166,8 +166,8 @@ export const AssetListSection = memo(function AssetListSection({
                       size="icon"
                       variant="outline"
                       className="h-7 w-7"
-                      title="Download asset"
-                      aria-label="Download asset"
+                      title="アセットをダウンロード"
+                      aria-label="アセットをダウンロード"
                       disabled={activeDownloadAssetId === asset.id || isBunnyProcessing}
                       onClick={() => onDownloadAsset(asset)}
                     >
@@ -184,8 +184,8 @@ export const AssetListSection = memo(function AssetListSection({
                     size="icon"
                     variant="destructive"
                     className="h-7 w-7"
-                    title="Delete asset"
-                    aria-label="Delete asset"
+                    title="アセットを削除"
+                    aria-label="アセットを削除"
                     disabled={deletingAssetIds.includes(asset.id)}
                     onClick={() => onDeleteAsset(asset.id)}
                   >
@@ -210,7 +210,7 @@ export const AssetListSection = memo(function AssetListSection({
           onClick={onLoadMoreAssets}
         >
           {isLoadingMoreAssets ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-          {isLoadingMoreAssets ? 'Loading more...' : 'Load more'}
+          {isLoadingMoreAssets ? 'さらに読み込み中...' : 'さらに読み込む'}
         </Button>
       ) : null}
     </div>

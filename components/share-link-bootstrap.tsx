@@ -41,10 +41,10 @@ export function ShareLinkBootstrap({ videoId, shareToken }: ShareLinkBootstrapPr
           return;
         }
 
-        setError(payload?.error || 'Invalid or expired share link');
+        setError(payload?.error || '共有リンクが無効か、有効期限が切れています');
       } catch {
         if (!isCancelled) {
-          setError('Failed to open share link');
+          setError('共有リンクを開けませんでした');
         }
       }
     }
@@ -61,8 +61,8 @@ export function ShareLinkBootstrap({ videoId, shareToken }: ShareLinkBootstrapPr
         <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
           <Loader2 className="h-5 w-5 animate-spin text-primary" />
         </div>
-        <h1 className="text-lg font-semibold">Opening shared video</h1>
-        <p className="text-sm text-muted-foreground">{error || 'Verifying link access...'}</p>
+        <h1 className="text-lg font-semibold">共有された動画を開いています</h1>
+        <p className="text-sm text-muted-foreground">{error || 'リンクのアクセス権を確認しています...'}</p>
       </div>
     </div>
   );

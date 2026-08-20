@@ -103,13 +103,13 @@ export const CommentComposer = memo(function CommentComposer({
   assets,
 }: CommentComposerProps) {
   const rangeButtonLabel =
-    commentRangeStart === null || commentRangeEnd !== null ? 'Set In' : 'Set Out';
+    commentRangeStart === null || commentRangeEnd !== null ? '開始点を設定' : '終了点を設定';
   const hasCommentRange = commentRangeStart !== null;
   const commentRangeLabel =
     commentRangeStart !== null
       ? commentRangeEnd !== null
         ? `${formatTime(commentRangeStart)} - ${formatTime(commentRangeEnd)}`
-        : `In ${formatTime(commentRangeStart)}`
+        : `開始 ${formatTime(commentRangeStart)}`
       : null;
 
   return (
@@ -118,11 +118,11 @@ export const CommentComposer = memo(function CommentComposer({
         <div className="flex items-center gap-3 p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
           <div className="h-3 w-3 rounded-full bg-destructive animate-pulse" />
           <span className="text-sm font-medium text-destructive">
-            Recording {formatTime(recordingTime)}
+            録音中 {formatTime(recordingTime)}
           </span>
           <div className="flex-1" />
           <Button size="sm" variant="destructive" onClick={stopRecording}>
-            Stop
+            停止
           </Button>
           <Button size="sm" variant="ghost" onClick={cancelRecording}>
             <X className="h-4 w-4" />
@@ -173,7 +173,7 @@ export const CommentComposer = memo(function CommentComposer({
           <ImageAttachmentStrip files={imageFiles} onRemoveFile={removeImageFile} />
 
           <MentionTextarea
-            placeholder="Add a note to your voice comment (optional)..."
+            placeholder="音声コメントにメモを追加（任意）..."
             value={commentText}
             onChange={setCommentText}
             assets={assets}
@@ -201,7 +201,7 @@ export const CommentComposer = memo(function CommentComposer({
                 className="h-7 text-xs"
                 onClick={clearCommentRangeSelection}
               >
-                Clear
+                クリア
               </Button>
             )}
           </div>
@@ -214,12 +214,12 @@ export const CommentComposer = memo(function CommentComposer({
             {isUploadingAudio || isUploadingImage ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                Uploading Media...
+                メディアをアップロード中...
               </>
             ) : (
               <>
                 <Send className="h-4 w-4 mr-2" />
-                Send Voice Comment
+                音声コメントを送信
               </>
             )}
           </Button>
@@ -229,7 +229,7 @@ export const CommentComposer = memo(function CommentComposer({
           {(annotationStrokes || isAnnotating) && (
             <div className="flex items-center gap-2 px-2 py-1.5 mb-2 rounded-md bg-violet-500/10 border border-violet-500/30">
               <Pencil className="h-3.5 w-3.5 text-violet-500 shrink-0" />
-              <span className="text-xs text-violet-400 font-medium">Annotation attached</span>
+              <span className="text-xs text-violet-400 font-medium">注釈を添付しました</span>
               <button
                 className="ml-auto text-xs text-muted-foreground hover:text-destructive transition-colors"
                 onClick={() => {
@@ -237,7 +237,7 @@ export const CommentComposer = memo(function CommentComposer({
                   setIsAnnotating(false);
                 }}
               >
-                Remove
+                削除
               </button>
             </div>
           )}
@@ -263,14 +263,14 @@ export const CommentComposer = memo(function CommentComposer({
                 className="h-7 text-xs"
                 onClick={clearCommentRangeSelection}
               >
-                Clear
+                クリア
               </Button>
             )}
           </div>
           <div className="flex gap-2 items-stretch">
             <div className="flex-1 min-w-0">
               <MentionTextarea
-                placeholder="Add a comment..."
+                placeholder="コメントを追加..."
                 value={commentText}
                 onChange={setCommentText}
                 assets={assets}
@@ -304,7 +304,7 @@ export const CommentComposer = memo(function CommentComposer({
                 size="icon"
                 variant="outline"
                 onClick={startRecording}
-                title="Record voice comment"
+                title="音声コメントを録音"
               >
                 <Mic className="h-4 w-4" />
               </Button>
@@ -313,7 +313,7 @@ export const CommentComposer = memo(function CommentComposer({
                 variant="outline"
                 onClick={() => imageInputRef.current?.click()}
                 disabled={imageFiles.length >= MAX_COMMENT_IMAGES}
-                title={`Attach images (up to ${MAX_COMMENT_IMAGES})`}
+                title={`画像を添付（最大${MAX_COMMENT_IMAGES}枚）`}
               >
                 <ImageIcon className="h-4 w-4" />
               </Button>
@@ -328,8 +328,8 @@ export const CommentComposer = memo(function CommentComposer({
                 }}
                 title={
                   annotationStrokes
-                    ? 'Annotation added ✓ (click to redraw)'
-                    : 'Draw annotation on video'
+                    ? '注釈を追加済み ✓（クリックで描き直し）'
+                    : '動画に注釈を描く'
                 }
               >
                 <Pencil className="h-4 w-4" />
@@ -348,7 +348,7 @@ export const CommentComposer = memo(function CommentComposer({
                     <Button
                       size="icon"
                       variant={selectedTagId ? 'default' : 'outline'}
-                      title="Select tag"
+                      title="タグを選択"
                       style={
                         selectedTagId
                           ? {
@@ -385,7 +385,7 @@ export const CommentComposer = memo(function CommentComposer({
                             className="gap-2 text-muted-foreground"
                           >
                             <Tag className="h-3 w-3" />
-                            Manage Tags
+                            タグを管理
                           </Link>
                         </DropdownMenuItem>
                       </>
@@ -396,7 +396,7 @@ export const CommentComposer = memo(function CommentComposer({
             </div>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            Cmd+Enter to submit &middot; paste or drop up to {MAX_COMMENT_IMAGES} images
+            Cmd+Enter で送信 &middot; 画像は最大{MAX_COMMENT_IMAGES}枚まで貼り付け・ドロップ可能
           </p>
         </>
       )}
