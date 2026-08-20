@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { CtaLink } from '@/components/marketing/cta-link';
-import { MarketingCompareLinks } from '@/components/marketing/marketing-compare-links';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import {
@@ -19,11 +19,7 @@ import {
   History,
   Smartphone,
   Link as LinkIcon,
-  CheckSquare,
   MessageSquare,
-  Github,
-  ArrowRight,
-  XCircle,
   ArrowDown,
   CheckCircle,
   Upload,
@@ -40,48 +36,46 @@ const controlButtonClass =
 
 const coreWorkflowFeatures = [
   {
-    title: 'Version Compare',
-    description: 'Compare any two versions side-by-side on a single timeline.',
+    title: 'バージョン比較',
+    description: '任意の2バージョンを同じタイムライン上で並べて比較できます。',
     icon: History,
   },
   {
-    title: 'Asset Management',
-    description: 'Keep images and supplementary videos grouped perfectly per cut.',
+    title: '素材管理',
+    description: '画像や参考動画をカットごとにきちんとグループ化して保持します。',
     icon: FolderOpen,
   },
   {
-    title: 'Version History',
-    description: 'Infinite versioning. Toggle between V1 and V10 without losing where you are.',
+    title: 'バージョン履歴',
+    description: '無制限のバージョン管理。V1とV10を行き来しても位置を見失いません。',
     icon: History,
   },
   {
-    title: 'Approval Workflow',
-    description:
-      'Assign specific team members or clients to review and sign off on a cut. Get an exact \"Approved\" status.',
+    title: '承認フロー',
+    description: '担当者に確認・承認を割り当て、「承認済み」の状態を明確にできます。',
     icon: CheckCircle,
   },
 ];
 
 const workflowAcceleratorFeatures = [
   {
-    title: 'Keyboard Shortcuts',
-    description: 'J, K, L, Space, and M controls for professional editing workflows.',
+    title: 'キーボードショートカット',
+    description: 'J・K・L・Space・Mなど、プロの編集ワークフローに合わせた操作。',
     icon: Keyboard,
   },
   {
-    title: 'PDF/CSV Exports',
-    description: 'Turn video comments into a professional feedback report in one click.',
+    title: 'PDF/CSVエクスポート',
+    description: '動画コメントをワンクリックでフィードバックレポートに変換。',
     icon: FileDown,
   },
   {
-    title: 'Real-time Webhooks',
-    description:
-      'Get instant Telegram alerts the second a comment is dropped. More integrations coming soon.',
+    title: 'リアルタイム通知',
+    description: 'コメントが付いた瞬間に通知を受け取れます。',
     icon: BellRing,
   },
   {
-    title: 'Mobile-Optimized Review',
-    description: 'Touch-optimized player for clients reviewing cuts on the move.',
+    title: 'モバイル最適化',
+    description: '外出先でもタッチ操作でスムーズにレビューできます。',
     icon: Smartphone,
   },
 ];
@@ -90,10 +84,7 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const navbarRef = useRef<HTMLElement | null>(null);
   const hostedCtaHref = isLoggedIn ? '/dashboard' : '/register';
-  // Same button, two audiences. Once you are signed in it goes to the dashboard,
-  // and offering a trial to someone who is already using the product reads as a
-  // mistake rather than as an offer.
-  const hostedCtaLabel = isLoggedIn ? 'Open dashboard' : 'Start 7-day free trial, no card required';
+  const hostedCtaLabel = isLoggedIn ? 'ダッシュボードを開く' : '招待コードではじめる';
 
   useEffect(() => {
     const cleanupHandlers: Array<() => void> = [];
@@ -166,7 +157,7 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
           >
             <span className="pointer-events-none absolute inset-0 -translate-x-[101%] bg-primary/10 transition-transform duration-300 group-hover:translate-x-0" />
             <Video className="relative z-10 h-4 w-4 text-primary" />
-            <span className="relative z-10 text-xs font-semibold tracking-[0.12em]">OPENFRAME</span>
+            <span className="relative z-10 text-xs font-semibold tracking-[0.05em]">つなぐレビュー</span>
           </Link>
 
           <nav className="hidden items-center gap-6 text-[11px] font-medium uppercase tracking-[0.14em] md:flex">
@@ -174,36 +165,17 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
               className="text-muted-foreground transition-colors hover:text-foreground"
               href="#features"
             >
-              Features
+              機能
             </Link>
-            <Link
-              className="text-muted-foreground transition-colors hover:text-foreground"
-              href="#pricing"
-            >
-              Pricing
-            </Link>
-            <a
-              className="text-muted-foreground transition-colors hover:text-foreground"
-              href="https://github.com/yusufipk/OpenFrame"
-              target="_blank"
-              rel="noreferrer"
-            >
-              GitHub
-            </a>
-            <a
-              className="text-muted-foreground transition-colors hover:text-foreground"
-              href="mailto:info@open-frame.net"
-            >
-              Contact
-            </a>
           </nav>
 
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             {isLoggedIn ? (
               <Link href="/dashboard" className={controlButtonClass}>
                 <span className="pointer-events-none absolute inset-0 -translate-x-[101%] bg-primary/10 transition-transform duration-300 group-hover:translate-x-0" />
                 <span className="relative z-10 inline-flex items-center gap-2">
-                  Dashboard
+                  ダッシュボード
                   <MoveRight className="h-3.5 w-3.5" />
                 </span>
               </Link>
@@ -213,11 +185,11 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
                   href="/login"
                   className="text-xs font-medium text-muted-foreground hover:text-foreground hidden sm:block mr-4"
                 >
-                  Log in
+                  ログイン
                 </Link>
                 <Link href="/register" className={controlButtonClass}>
                   <span className="pointer-events-none absolute inset-0 -translate-x-[101%] bg-primary/10 transition-transform duration-300 group-hover:translate-x-0" />
-                  <span className="relative z-10">Get Started Free</span>
+                  <span className="relative z-10">はじめる</span>
                 </Link>
               </>
             )}
@@ -239,24 +211,23 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
               </span>
-              <span className="font-mono tracking-wide uppercase">Fair Source Video Review</span>
+              <span className="font-mono tracking-wide uppercase">ツナギビト社内ツール</span>
             </div>
 
             <h1
               data-hero-copy
               className="text-4xl font-semibold leading-[0.95] tracking-[-0.03em] sm:text-5xl md:text-6xl lg:text-7xl"
             >
-              Get Client Sign-off From One Link. <br className="hidden md:block" />
-              <span className="text-muted-foreground">Stop Chasing Timecodes.</span>
+              ワンリンクで確認・承認。 <br className="hidden md:block" />
+              <span className="text-muted-foreground">タイムコードを追う手間はもう不要です。</span>
             </h1>
 
             <p
               data-hero-copy
               className="mx-auto max-w-2xl text-base text-muted-foreground md:text-xl"
             >
-              Hosted video review for editors, agencies, and small studios. Comments, voice notes,
-              and annotations land on one timeline — clients review in the browser, no account
-              needed.
+              動画編集チーム・関係者向けのレビューツール「つなぐレビュー」。コメント・音声メモ・
+              注釈がひとつのタイムラインに集約され、ブラウザだけで確認が完結します。
             </p>
 
             <div
@@ -270,19 +241,6 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
                 {hostedCtaLabel}
                 <MoveRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </CtaLink>
-
-              <p className="text-xs text-muted-foreground">
-                No credit card · Flat $10/mo after, no per-seat fees · No client accounts
-              </p>
-
-              <a
-                href="https://github.com/yusufipk/OpenFrame"
-                target="_blank"
-                rel="noreferrer"
-                className="text-xs font-medium text-muted-foreground/70 transition-colors hover:text-foreground"
-              >
-                Prefer self-hosting? View on GitHub <ArrowRight className="ml-1 inline h-3 w-3" />
-              </a>
             </div>
           </div>
 
@@ -319,29 +277,29 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
           <div className="mx-auto w-full max-w-[1200px]">
             <div className="mx-auto max-w-4xl">
               <h2 className="text-3xl font-semibold tracking-[-0.02em] md:text-5xl">
-                Feedback chaos looks like this:
+                フィードバックが散らかると、こうなります。
               </h2>
               <ul className="mt-8 space-y-4 text-base text-muted-foreground md:text-lg">
                 <li className="flex items-start gap-3">
-                  <XCircle className="mt-1 h-5 w-5 shrink-0 text-red-500/80" />
-                  <span>Comments spread across WhatsApp, email, and random screenshots.</span>
+                  <span className="mt-1 h-5 w-5 shrink-0 text-red-500/80">✕</span>
+                  <span>コメントがSlack・メール・スクリーンショットに散らばる。</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <XCircle className="mt-1 h-5 w-5 shrink-0 text-red-500/80" />
-                  <span>&quot;Around 1:12&quot; turns into 10 minutes of guessing.</span>
+                  <span className="mt-1 h-5 w-5 shrink-0 text-red-500/80">✕</span>
+                  <span>「1分12秒あたり」が結局10分の探し物になる。</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <XCircle className="mt-1 h-5 w-5 shrink-0 text-red-500/80" />
-                  <span>Nobody knows which version is actually the latest.</span>
+                  <span className="mt-1 h-5 w-5 shrink-0 text-red-500/80">✕</span>
+                  <span>どのバージョンが最新か誰も分からなくなる。</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <XCircle className="mt-1 h-5 w-5 shrink-0 text-red-500/80" />
-                  <span>One unclear note becomes a full extra revision round.</span>
+                  <span className="mt-1 h-5 w-5 shrink-0 text-red-500/80">✕</span>
+                  <span>あいまいな指摘が、丸ごと1回分の修正手戻りになる。</span>
                 </li>
               </ul>
               <div className="mt-10 border-l-2 border-primary/50 pl-4">
                 <p className="text-base text-foreground md:text-lg">
-                  OpenFrame replaces all of that with one link, one timeline, one source of truth.
+                  つなぐレビューなら、これを全部「1つのリンク・1つのタイムライン」に集約します。
                 </p>
               </div>
             </div>
@@ -353,16 +311,16 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
           <div className="mx-auto w-full max-w-[1200px]">
             <div className="mb-16 text-center">
               <h2 className="text-3xl font-semibold tracking-[-0.02em] md:text-5xl">
-                From upload to approval — in one flow.
+                アップロードから承認まで、ひと続きに。
               </h2>
             </div>
 
             <div className="grid gap-4 md:grid-cols-4 relative">
               {[
-                { label: 'Upload a cut', icon: Upload },
-                { label: 'Share a review link', icon: Share2 },
-                { label: 'Get timestamped feedback', icon: MessageSquare },
-                { label: 'Mark approved and move on', icon: Check },
+                { label: '動画をアップロード', icon: Upload },
+                { label: 'レビューリンクを共有', icon: Share2 },
+                { label: 'タイムスタンプ付きの意見が届く', icon: MessageSquare },
+                { label: '承認して次に進む', icon: Check },
               ].map((step, idx, arr) => (
                 <div key={step.label} className="group relative flex flex-col items-center">
                   <div className="flex flex-col items-center justify-center w-full min-h-[100px] md:aspect-[4/3] border border-border bg-card/20 px-4 py-6 md:p-6 text-center relative z-10 transition-all duration-300 group-hover:border-primary/40 group-hover:bg-card/40">
@@ -412,14 +370,12 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
               </div>
               <div data-reveal className="w-full lg:w-1/2 space-y-6">
                 <h2 className="text-3xl font-semibold tracking-[-0.02em] md:text-5xl">
-                  Compare versions side-by-side. End &quot;which cut is this?&quot;
+                  バージョンを並べて比較。「どのカットだっけ？」を終わらせる。
                 </h2>
                 <p className="text-base text-muted-foreground md:text-lg">
-                  See what actually changed between versions then approve with confidence.
+                  バージョン間で何が変わったかを実際に確認してから、自信を持って承認できます。
                 </p>
-                <p className="text-xs uppercase tracking-[0.14em] text-primary">
-                  Cuts revision cycles.
-                </p>
+                <p className="text-xs uppercase tracking-[0.14em] text-primary">修正サイクルを短縮。</p>
               </div>
             </div>
           </div>
@@ -429,14 +385,14 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
             <div className="mx-auto flex w-full max-w-[1200px] flex-col items-center justify-between gap-12 px-4 py-20 sm:px-6 lg:flex-row lg:px-8 lg:py-32">
               <div data-reveal className="w-full lg:w-1/2 space-y-6">
                 <h2 className="text-3xl font-semibold tracking-[-0.02em] md:text-5xl">
-                  Explain it better with Voice.
+                  音声メモで、もっと伝わる。
                 </h2>
                 <p className="text-base text-muted-foreground md:text-lg">
-                  No more &quot;What did you mean by this?&quot; emails. Every note lands at the
-                  exact moment in the video.
+                  「これってどういう意味？」というやり取りはもう不要。すべてのメモが動画の
+                  その瞬間に紐づきます。
                 </p>
                 <p className="text-xs uppercase tracking-[0.14em] text-primary">
-                  Faster feedback. Fewer misunderstandings.
+                  フィードバックが速く、誤解が減る。
                 </p>
               </div>
               <div data-reveal className="w-full lg:w-1/2">
@@ -445,11 +401,11 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
                         <div className="flex h-8 w-8 items-center justify-center bg-secondary font-mono text-xs">
-                          Y
+                          T
                         </div>
                         <div className="space-y-1">
                           <p className="font-mono text-[11px] font-medium leading-none">
-                            Yusuf İpek
+                            ツナギビト
                           </p>
                           <p className="font-mono text-[10px] text-muted-foreground">00:03:45</p>
                         </div>
@@ -499,13 +455,13 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
                       cx="500"
                       cy="225"
                       r="80"
-                      stroke="#06b6d4"
+                      stroke="#e2651e"
                       strokeWidth="4"
-                      className="opacity-90 drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]"
+                      className="opacity-90 drop-shadow-[0_0_8px_rgba(226,101,30,0.8)]"
                     />
                     <path
                       d="M500 145 Q550 80 620 120"
-                      stroke="#06b6d4"
+                      stroke="#e2651e"
                       strokeWidth="4"
                       className="opacity-90"
                       strokeLinecap="round"
@@ -518,7 +474,7 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
                       <div className="h-6 w-6 rounded-full bg-red-500 cursor-pointer border-2 border-transparent"></div>
                       <div className="h-6 w-6 rounded-full bg-yellow-500 cursor-pointer border-2 border-transparent"></div>
                       <div className="h-6 w-6 rounded-full bg-green-500 cursor-pointer border-2 border-transparent"></div>
-                      <div className="h-6 w-6 rounded-full bg-[#06b6d4] cursor-pointer border-2 border-white"></div>
+                      <div className="h-6 w-6 rounded-full bg-[#e2651e] cursor-pointer border-2 border-white"></div>
                     </div>
                     <div className="h-px w-full bg-border/50" />
                     <div className="flex gap-2">
@@ -534,14 +490,14 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
               </div>
               <div data-reveal className="w-full lg:w-1/2 space-y-6">
                 <h2 className="text-3xl font-semibold tracking-[-0.02em] md:text-5xl">
-                  Point. Draw. Done.
+                  指して、描いて、それで終わり。
                 </h2>
                 <p className="text-base text-muted-foreground md:text-lg">
-                  Precise feedback that leaves zero room for error. Circle, sketch, and point
-                  directly on the video frame.
+                  勘違いの余地がない正確なフィードバック。動画のフレーム上に直接、丸で囲んだり
+                  線を描いたりできます。
                 </p>
                 <p className="text-xs uppercase tracking-[0.14em] text-primary">
-                  Stops &quot;I thought you meant...&quot;
+                  「そういう意味だと思ってた」を無くす。
                 </p>
               </div>
             </div>
@@ -553,10 +509,10 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
           <div className="mx-auto w-full max-w-[1200px]">
             <div data-reveal className="mb-12 flex flex-col items-center text-center">
               <h2 className="text-3xl font-semibold tracking-[-0.02em] md:text-5xl">
-                Everything a real production workflow needs.
+                制作ワークフローに必要な機能を、ひと通り。
               </h2>
               <p className="mt-4 max-w-2xl text-base text-muted-foreground">
-                The core tools teams expect without the complexity that slows clients down.
+                レビューをもたつかせない、コアな機能だけを揃えています。
               </p>
             </div>
 
@@ -566,7 +522,7 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
                   data-reveal
                   className="mb-4 text-xs uppercase tracking-[0.14em] text-muted-foreground"
                 >
-                  Core workflow
+                  コアワークフロー
                 </p>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {coreWorkflowFeatures.map((feat) => (
@@ -588,7 +544,7 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
                   data-reveal
                   className="mb-4 text-xs uppercase tracking-[0.14em] text-muted-foreground"
                 >
-                  Workflow Accelerators
+                  作業を加速する機能
                 </p>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {workflowAcceleratorFeatures.map((feat) => (
@@ -608,229 +564,58 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
           </div>
         </section>
 
-        {/* 6) BUILT FOR CLIENTS */}
+        {/* 6) BUILT FOR REVIEWERS */}
         <section className="border-b border-border bg-card/20 px-4 py-20 sm:px-6 lg:px-8 lg:py-32">
           <div className="mx-auto flex w-full max-w-[1200px] flex-col lg:flex-row gap-12 lg:items-center">
             <div data-reveal className="lg:w-1/2 space-y-6">
               <h2 className="text-4xl font-semibold tracking-[-0.02em] md:text-5xl">
-                Clients don&apos;t need an account. They just review.
+                レビューする側はアカウント不要。ただ見て、意見を残すだけ。
               </h2>
               <p className="text-lg text-muted-foreground">
-                If clients can&apos;t adopt the tool, approvals don&apos;t happen. OpenFrame keeps
-                it frictionless.
+                取引先や社外の関係者に確認してもらう場面でも、ハードルなくレビューに参加できます。
               </p>
             </div>
             <div data-reveal className="lg:w-1/2 space-y-4">
               <div className="flex items-start gap-4 border border-border bg-background p-6 transition-transform hover:-translate-y-1">
                 <LinkIcon className="mt-1 h-6 w-6 shrink-0 text-primary" />
                 <div>
-                  <h3 className="text-lg font-semibold">One link. Review in the browser.</h3>
+                  <h3 className="text-lg font-semibold">リンクひとつで、ブラウザからレビュー。</h3>
                 </div>
               </div>
               <div className="flex items-start gap-4 border border-border bg-background p-6 transition-transform hover:-translate-y-1">
                 <Smartphone className="mt-1 h-6 w-6 shrink-0 text-primary" />
                 <div>
-                  <h3 className="text-lg font-semibold">Works great on mobile.</h3>
+                  <h3 className="text-lg font-semibold">モバイルでも快適に使えます。</h3>
                 </div>
               </div>
               <div className="flex items-start gap-4 border border-border bg-background p-6 transition-transform hover:-translate-y-1">
                 <MessageSquare className="mt-1 h-6 w-6 shrink-0 text-primary" />
                 <div>
-                  <h3 className="text-lg font-semibold">
-                    Timestamped notes that are impossible to miss.
-                  </h3>
+                  <h3 className="text-lg font-semibold">見落としようがない、タイムスタンプ付きの指摘。</h3>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* 7) PRICING */}
-        <section
-          id="pricing"
-          className="border-b border-border bg-[#0a0a0a] px-4 py-20 sm:px-6 lg:px-8 lg:py-32"
-        >
-          <div className="mx-auto w-full max-w-[1200px]">
-            <div data-reveal className="mb-16">
-              <h2
-                className="text-3xl font-semibold md:text-5xl text-foreground"
-                style={{ fontFamily: 'monospace', letterSpacing: '-0.02em' }}
-              >
-                Let us run it for you - or deploy it yourself.
-              </h2>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-3">
-              {/* Card 1: Hosted Cloud (recommended) */}
-              <div
-                data-reveal
-                className="relative flex flex-col border border-[#06b6d4]/40 bg-[#141414] p-8"
-              >
-                <span className="absolute -top-3 left-8 bg-[#06b6d4] px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-widest text-black">
-                  Recommended
-                </span>
-                <div className="mb-6">
-                  <p className="font-mono text-[10px] uppercase font-semibold text-muted-foreground tracking-widest mb-4">
-                    Zero setup. Flat pricing, no per-seat fees.
-                  </p>
-                  <h3 className="text-xl font-semibold text-foreground">Hosted Cloud</h3>
-                </div>
-
-                <div className="mb-2 flex items-baseline gap-2">
-                  <span className="text-3xl font-semibold text-[#06b6d4]">$10</span>
-                  <span className="text-[#06b6d4]">/ month</span>
-                </div>
-                <p className="mb-6 text-sm text-muted-foreground">
-                  Starts with a 7-day free trial. No credit card. Cancel anytime.
-                </p>
-
-                <ul className="mb-8 flex-1 space-y-4 text-sm text-foreground/80">
-                  <li className="flex items-start gap-3">
-                    <CheckSquare className="mt-0.5 shrink-0 h-4 w-4 text-[#06b6d4]" />
-                    <span>Unlimited collaborators</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckSquare className="mt-0.5 shrink-0 h-4 w-4 text-[#06b6d4]" />
-                    <span>Timestamped comments + voice notes</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckSquare className="mt-0.5 shrink-0 h-4 w-4 text-[#06b6d4]" />
-                    <span>Annotations + version compare</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckSquare className="mt-0.5 shrink-0 h-4 w-4 text-[#06b6d4]" />
-                    <span>Share links with permissions</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckSquare className="mt-0.5 shrink-0 h-4 w-4 text-[#06b6d4]" />
-                    <span>Exports (PDF/CSV)</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckSquare className="mt-0.5 shrink-0 h-4 w-4 text-[#06b6d4]" />
-                    <span>Unlimited YouTube Video Imports</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckSquare className="mt-0.5 shrink-0 h-4 w-4 text-[#06b6d4]" />
-                    <span>Download original uploaded video</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckSquare className="mt-0.5 shrink-0 h-4 w-4 text-[#06b6d4]" />
-                    <span>Includes: 200 GB Storage</span>
-                  </li>
-                </ul>
-                <p className="mb-8 text-sm text-muted-foreground">
-                  Need more storage? Add 100 GB for $5/mo.
-                </p>
-
-                <CtaLink
-                  href={hostedCtaHref}
-                  className="mt-auto group relative isolate inline-flex h-12 w-full items-center justify-center overflow-hidden bg-[#06b6d4] font-medium text-black transition-colors hover:bg-[#06b6d4]/90 text-sm"
-                >
-                  {isLoggedIn ? 'Open dashboard' : 'Start free trial'}
-                </CtaLink>
-              </div>
-
-              {/* Card 2: Fair Source (Self-hosted) */}
-              <div
-                data-reveal
-                className="relative flex flex-col border border-border/40 bg-[#141414] p-8"
-              >
-                <div className="mb-6">
-                  <h3 className="text-xl font-semibold text-foreground">
-                    Fair Source (Self-hosted)
-                  </h3>
-                </div>
-
-                <div className="mb-8 flex items-baseline gap-2">
-                  <span className="text-3xl font-semibold text-[#06b6d4]">Free</span>
-                </div>
-                <p className="mb-8 text-sm text-muted-foreground">
-                  For teams who want full control and can run their own infrastructure. Licensed
-                  under the{' '}
-                  <a
-                    href="https://fsl.software/"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="underline underline-offset-2 hover:text-foreground"
-                  >
-                    Functional Source License
-                  </a>
-                  .
-                </p>
-
-                <ul className="mb-8 flex-1 space-y-4 text-sm text-foreground/80">
-                  <li className="flex items-start gap-3">
-                    <CheckSquare className="mt-0.5 h-4 w-4 shrink-0 text-[#06b6d4]" />
-                    Full source code — read it, audit it
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckSquare className="mt-0.5 h-4 w-4 shrink-0 text-[#06b6d4]" />
-                    Self-host on your own infrastructure
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckSquare className="mt-0.5 h-4 w-4 shrink-0 text-[#06b6d4]" />
-                    Every release becomes Apache 2.0 open source after two years
-                  </li>
-                </ul>
-
-                <a
-                  href="https://github.com/yusufipk/OpenFrame"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-auto group relative isolate inline-flex h-12 w-full items-center justify-center overflow-hidden border border-border/50 bg-[#0a0a0a] font-medium text-foreground transition-colors hover:bg-white/5 text-sm"
-                >
-                  <Github className="mr-2 h-4 w-4" /> View on GitHub
-                </a>
-              </div>
-
-              {/* Card 3: Studio & Agency */}
-              <div
-                data-reveal
-                className="relative flex flex-col border border-border/40 bg-[#141414] p-8"
-              >
-                <div className="mb-6">
-                  <h3 className="text-xl font-semibold text-foreground">
-                    Need more than the standard limits?
-                  </h3>
-                </div>
-                <div className="mb-6 flex items-baseline gap-2">
-                  <span className="text-3xl font-semibold text-[#06b6d4]">Let&apos;s talk</span>
-                </div>
-
-                <p className="mb-8 text-sm text-foreground/80 leading-relaxed">
-                  Custom capacity and setup help for high-volume production teams. Tell us your
-                  storage, usage, and workflow - we&apos;ll recommend the right approach.
-                </p>
-
-                <a
-                  href="mailto:info@open-frame.net"
-                  className="group relative isolate inline-flex h-12 w-full items-center justify-center overflow-hidden bg-[#0a0a0a] font-medium text-foreground transition-colors hover:bg-white/5 border border-border/50 text-sm"
-                >
-                  Contact us
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 8) SECURITY & PRIVACY */}
+        {/* 7) SECURITY & PRIVACY */}
         <section className="border-b border-border bg-background px-4 py-20 sm:px-6 lg:px-8 lg:py-24">
           <div className="mx-auto w-full max-w-[1200px]">
             <div data-reveal className="mx-auto max-w-4xl">
               <h2 className="text-3xl font-semibold tracking-[-0.02em] md:text-5xl">
-                Security & privacy, by design.
+                セキュリティとプライバシーを、設計段階から。
               </h2>
               <ul className="mt-8 space-y-4 text-base text-muted-foreground md:text-lg">
-                <li>- Permissioned share links (control who can view/comment)</li>
-                <li>- Private-by-default projects</li>
-                <li>- Delete videos and projects anytime</li>
-                <li>- Self-host option for full data control</li>
+                <li>- 権限付きの共有リンク(閲覧・コメントできる相手を制御)</li>
+                <li>- プロジェクトはデフォルトで非公開</li>
+                <li>- いつでも動画・プロジェクトを削除可能</li>
+                <li>- 自社インフラでセルフホスト、データは社外に出ない</li>
               </ul>
             </div>
           </div>
         </section>
 
-        {/* 9) FAQ */}
+        {/* 8) FAQ */}
         <section className="border-b border-border bg-card/10 px-4 py-20 sm:px-6 lg:px-8 lg:py-24">
           <div className="mx-auto w-full max-w-[1200px]">
             <div data-reveal className="mx-auto max-w-4xl">
@@ -838,48 +623,24 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
               <div className="mt-10 space-y-4">
                 {[
                   {
-                    q: 'Do clients need an account?',
-                    a: 'No. They can review in the browser with a share link.',
+                    q: 'レビューする側もアカウントが必要ですか？',
+                    a: 'いいえ。共有リンクがあればブラウザだけでレビューできます。',
                   },
                   {
-                    q: 'What happens if I exceed my storage?',
-                    a: "You can add 100 GB for $5/mo. If you need much more, contact us at info@open-frame.net and we'll help you choose the best setup.",
+                    q: '自社サーバーでホストされていますか？',
+                    a: 'はい。ツナギビトが管理するAWS Lightsail上でセルフホストしており、データは社外の第三者サービスに送られません。',
                   },
                   {
-                    q: 'How is YouTube unlimited?',
-                    a: 'There is no storage limit on YouTube imports. You can import an unlimited amount of unlisted YouTube videos and use all of our review features exactly the same.',
+                    q: 'フィードバックをエクスポートできますか？',
+                    a: 'はい。PDF/CSV形式でアーカイブ・共有用にエクスポートできます。',
                   },
                   {
-                    q: 'Can I self-host?',
-                    a: 'Yes. The full source code is public and ships with a Docker setup for self-hosting. Hosted Cloud is for teams who want zero setup.',
+                    q: 'モバイルでも使えますか？',
+                    a: 'はい。レビュー・コメントともにモバイルから利用できます。',
                   },
                   {
-                    q: 'Is OpenFrame open source?',
-                    a: 'OpenFrame is Fair Source, licensed under the Functional Source License (FSL). You can read and audit the full source code and self-host it, and every release automatically becomes Apache 2.0 open source two years after publication.',
-                  },
-                  {
-                    q: 'Is there a free trial?',
-                    a: 'Yes. Hosted Cloud starts with a 7-day free trial and never asks for a card to begin it. After that it is a flat $10/mo, with no per-seat or per-client fees.',
-                  },
-                  {
-                    q: 'How is this different from sending a Google Drive link?',
-                    a: 'Drive doesn’t give timestamped discussion, voice notes, annotations, or version compare, which is where approval time is actually saved.',
-                  },
-                  {
-                    q: 'Is it mobile-friendly?',
-                    a: 'Yes. Clients can review and comment from mobile.',
-                  },
-                  {
-                    q: 'Can I export feedback?',
-                    a: 'Yes. Export to PDF/CSV for archiving or client handoff.',
-                  },
-                  {
-                    q: 'Who can access my videos?',
-                    a: 'Only people you invite or share a link with (based on permissions you set).',
-                  },
-                  {
-                    q: 'Can I cancel anytime?',
-                    a: 'Yes. Cancel anytime from your billing settings.',
+                    q: '誰が自分の動画にアクセスできますか？',
+                    a: '招待されたメンバー、または権限を設定した共有リンクを持つ人のみです。',
                   },
                 ].map((item) => (
                   <div key={item.q} className="border border-border bg-background p-6">
@@ -892,7 +653,7 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
           </div>
         </section>
 
-        {/* 10) FINAL CTA STRIP */}
+        {/* 9) FINAL CTA STRIP */}
         <section className="border-b border-border bg-background px-4 py-16 sm:px-6 lg:px-8">
           <div
             data-reveal
@@ -900,10 +661,10 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
           >
             <div>
               <h2 className="text-3xl font-semibold tracking-[-0.02em] md:text-4xl">
-                Stop chasing feedback. Start getting approvals.
+                フィードバックを追いかけるのはもう終わり。
               </h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Your first review link takes minutes.
+                最初のレビューリンクは、数分で作れます。
               </p>
             </div>
             <CtaLink
@@ -917,44 +678,26 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
       </main>
 
       <footer className="border-t border-border bg-background px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-[1200px] gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mx-auto grid max-w-[1200px] gap-8 sm:grid-cols-2">
           <div className="flex items-start gap-2">
             <Video className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             <div className="flex flex-col gap-1">
               <span className="font-mono text-xs text-muted-foreground">
-                © 2026 IPEK TECH LLC. All rights reserved.
+                © 2026 合同会社ツナギビト. All rights reserved.
               </span>
-              <span className="font-mono text-xs text-muted-foreground">
-                30 North Gould Street, Suite N, Sheridan, WY 82801, United States
-              </span>
+              <span className="font-mono text-xs text-muted-foreground">社内利用限定ツール</span>
             </div>
           </div>
-          <MarketingCompareLinks />
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 sm:items-end">
             <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
               Legal
             </span>
-            <div className="flex flex-col gap-1.5">
-              <a
-                href="mailto:info@open-frame.net"
-                className="text-xs text-muted-foreground hover:text-foreground"
-              >
-                info@open-frame.net
-              </a>
-              <a
-                href="https://github.com/yusufipk/OpenFrame"
-                className="text-xs text-muted-foreground hover:text-foreground"
-              >
-                GitHub
-              </a>
+            <div className="flex flex-col gap-1.5 sm:items-end">
               <Link href="/terms" className="text-xs text-muted-foreground hover:text-foreground">
-                Terms
+                利用規約
               </Link>
               <Link href="/privacy" className="text-xs text-muted-foreground hover:text-foreground">
-                Privacy
-              </Link>
-              <Link href="/refund" className="text-xs text-muted-foreground hover:text-foreground">
-                Refund Policy
+                プライバシーポリシー
               </Link>
             </div>
           </div>

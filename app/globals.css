@@ -48,72 +48,75 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.147 0.004 49.25);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.147 0.004 49.25);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.147 0.004 49.25);
-  --primary: oklch(0.61 0.11 222);
-  --primary-foreground: oklch(0.98 0.02 201);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.97 0.001 106.424);
-  --muted-foreground: oklch(0.553 0.013 58.071);
-  --accent: oklch(0.61 0.11 222);
-  --accent-foreground: oklch(0.98 0.02 201);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.923 0.003 48.717);
-  --input: oklch(0.923 0.003 48.717);
-  --ring: oklch(0.709 0.01 56.259);
-  --chart-1: oklch(0.87 0.12 207);
-  --chart-2: oklch(0.8 0.13 212);
-  --chart-3: oklch(0.71 0.13 215);
-  --chart-4: oklch(0.61 0.11 222);
-  --chart-5: oklch(0.52 0.09 223);
+  /* つなぐポータルのブランドカラー(オレンジ #E2651E)を基調にしたライトテーマ */
+  --background: #fbf6f1;
+  --foreground: #2b2018;
+  --card: #ffffff;
+  --card-foreground: #2b2018;
+  --popover: #ffffff;
+  --popover-foreground: #2b2018;
+  --primary: #e2651e;
+  --primary-foreground: #fff8f2;
+  --secondary: #fff1e6;
+  --secondary-foreground: #2b2018;
+  --muted: #fff1e6;
+  --muted-foreground: #8a7a6d;
+  --accent: #e2651e;
+  --accent-foreground: #fff8f2;
+  --destructive: #de4b3f;
+  --border: #f0e0d2;
+  --input: #f0e0d2;
+  --ring: #e2651e;
+  --chart-1: #e2651e;
+  --chart-2: #f59e5b;
+  --chart-3: #c9531a;
+  --chart-4: #d98e1b;
+  --chart-5: #2fa968;
   --radius: 0;
-  --sidebar: oklch(0.985 0.001 106.423);
-  --sidebar-foreground: oklch(0.147 0.004 49.25);
-  --sidebar-primary: oklch(0.61 0.11 222);
-  --sidebar-primary-foreground: oklch(0.98 0.02 201);
-  --sidebar-accent: oklch(0.61 0.11 222);
-  --sidebar-accent-foreground: oklch(0.98 0.02 201);
-  --sidebar-border: oklch(0.923 0.003 48.717);
-  --sidebar-ring: oklch(0.709 0.01 56.259);
+  --sidebar: #fff1e6;
+  --sidebar-foreground: #2b2018;
+  --sidebar-primary: #e2651e;
+  --sidebar-primary-foreground: #fff8f2;
+  --sidebar-accent: #e2651e;
+  --sidebar-accent-foreground: #fff8f2;
+  --sidebar-border: #f0e0d2;
+  --sidebar-ring: #e2651e;
 }
 
 .dark {
-  --background: oklch(0.147 0.004 49.25);
-  --foreground: oklch(0.985 0.001 106.423);
-  --card: oklch(0.216 0.006 56.043);
-  --card-foreground: oklch(0.985 0.001 106.423);
-  --popover: oklch(0.216 0.006 56.043);
-  --popover-foreground: oklch(0.985 0.001 106.423);
-  --primary: oklch(0.71 0.13 215);
-  --primary-foreground: oklch(0.3 0.05 230);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.268 0.007 34.298);
-  --muted-foreground: oklch(0.709 0.01 56.259);
-  --accent: oklch(0.71 0.13 215);
-  --accent-foreground: oklch(0.3 0.05 230);
-  --destructive: oklch(0.704 0.191 22.216);
+  /* 同じオレンジを基調にした暗色バリエーション(つなぐポータル自体はライト専用のため、
+     ダークモードはOpenFrame既存のニュートラルをブランドカラーで再配色したもの) */
+  --background: #1a140f;
+  --foreground: #f5ece2;
+  --card: #241b14;
+  --card-foreground: #f5ece2;
+  --popover: #241b14;
+  --popover-foreground: #f5ece2;
+  --primary: #f59e5b;
+  --primary-foreground: #2b1608;
+  --secondary: #332419;
+  --secondary-foreground: #f5ece2;
+  --muted: #332419;
+  --muted-foreground: #b5a697;
+  --accent: #f59e5b;
+  --accent-foreground: #2b1608;
+  --destructive: #de4b3f;
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.553 0.013 58.071);
-  --chart-1: oklch(0.87 0.12 207);
-  --chart-2: oklch(0.8 0.13 212);
-  --chart-3: oklch(0.71 0.13 215);
-  --chart-4: oklch(0.61 0.11 222);
-  --chart-5: oklch(0.52 0.09 223);
-  --sidebar: oklch(0.216 0.006 56.043);
-  --sidebar-foreground: oklch(0.985 0.001 106.423);
-  --sidebar-primary: oklch(0.8 0.13 212);
-  --sidebar-primary-foreground: oklch(0.3 0.05 230);
-  --sidebar-accent: oklch(0.71 0.13 215);
-  --sidebar-accent-foreground: oklch(0.3 0.05 230);
+  --ring: #f59e5b;
+  --chart-1: #f59e5b;
+  --chart-2: #e2651e;
+  --chart-3: #c9531a;
+  --chart-4: #d98e1b;
+  --chart-5: #2fa968;
+  --sidebar: #241b14;
+  --sidebar-foreground: #f5ece2;
+  --sidebar-primary: #f59e5b;
+  --sidebar-primary-foreground: #2b1608;
+  --sidebar-accent: #f59e5b;
+  --sidebar-accent-foreground: #2b1608;
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.553 0.013 58.071);
+  --sidebar-ring: #f59e5b;
 }
 
 @layer base {

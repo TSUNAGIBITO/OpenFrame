@@ -152,7 +152,7 @@ export default function RegisterPageClient({
       <div className="w-full max-w-md">
         <Link href="/" className="flex items-center justify-center gap-2 mb-8">
           <Video className="h-8 w-8 text-primary" />
-          <span className="font-bold text-2xl">OpenFrame</span>
+          <span className="font-bold text-2xl">つなぐレビュー</span>
         </Link>
 
         <Card>
@@ -161,7 +161,7 @@ export default function RegisterPageClient({
               <UserPlus className="h-5 w-5" />
               Create Account
             </CardTitle>
-            <CardDescription>Join OpenFrame to collaborate on video projects</CardDescription>
+            <CardDescription>つなぐレビューに参加して動画レビューをはじめましょう</CardDescription>
             {/* The landing page CTA promises a trial and no card. Say it again here,
                 where the promise is actually kept, rather than making people take the
                 previous page's word for it. Invitees are joining someone else's

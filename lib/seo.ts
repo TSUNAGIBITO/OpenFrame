@@ -25,22 +25,14 @@ export function getSiteUrl(): string {
 }
 
 export const seoConfig = {
-  name: 'OpenFrame',
-  title: 'Fair Source Video Review Platform',
+  name: 'つなぐレビュー',
+  title: '合同会社ツナギビト 動画レビューツール',
   description:
-    'OpenFrame is a fair source video review platform for collecting timestamped feedback with text and voice comments.',
-  keywords: [
-    'fair source video review platform',
-    'video review platform',
-    'video review tool',
-    'timestamped video feedback',
-    'video collaboration',
-    'video annotation',
-    'creative review workflow',
-  ],
+    'つなぐレビューは、合同会社ツナギビト社内向けの動画レビュー・承認ツールです。タイムスタンプ付きのコメントや音声メモをひとつのタイムラインに集約します。',
+  keywords: ['つなぐレビュー', 'ツナギビト', '動画レビュー', '動画承認', 'タイムスタンプフィードバック'],
   url: getSiteUrl(),
   ogImage: '/meta.webp',
   logoPath: '/icon.svg',
   logo: '/icon.svg?v=2',
-  githubUrl: 'https://github.com/yusufipk/OpenFrame',
+  githubUrl: 'https://github.com/TSUNAGIBITO/OpenFrame',
 } as const;

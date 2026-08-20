@@ -44,7 +44,7 @@ export const metadata: Metadata = {
   manifest: '/manifest.webmanifest',
   openGraph: {
     type: 'website',
-    locale: 'en_US',
+    locale: 'ja_JP',
     siteName: seoConfig.name,
     url: seoConfig.url,
     title: `${seoConfig.name} | ${seoConfig.title}`,
@@ -115,7 +115,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="ja"
       className={`${jetbrainsMono.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
@@ -131,7 +131,7 @@ export default function RootLayout({
             }}
           />
         ))}
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <svg aria-hidden="true" className="fixed h-0 w-0">
             <filter id="openframe-noise">
               <feTurbulence
