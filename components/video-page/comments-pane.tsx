@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useState, type ReactNode, type RefObject } from 'react';
+import { memo, useState, type ReactNode, type RefObject, useMemo } from 'react';
 import {
   ArrowUpRight,
   CheckCircle2,
@@ -214,6 +214,15 @@ export const CommentsPane = memo(function CommentsPane({
   assetsPane,
 }: CommentsPaneProps) {
   const [isPaneDraggingOver, setIsPaneDraggingOver] = useState(false);
+  // 口頭・チャットで「コメント3の件」と参照できる通し番号(作成順で安定)。
+  // frame.io の #N 表示に合わせた。返信には振らない(親コメントのみ)
+  const commentNumberById = useMemo(() => {
+    const ordered = [...comments].sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+    return new Map(ordered.map((c, i) => [c.id, i + 1]));
+  }, [comments]);
+
   const formatCommentRange = (timestamp: number, timestampEnd: number | null) => {
     if (timestampEnd === null) return formatTime(timestamp);
     return `${formatTime(timestamp)} - ${formatTime(timestampEnd)}`;
@@ -231,18 +240,11 @@ export const CommentsPane = memo(function CommentsPane({
     <>
       <div
         className={cn(
-          'fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden transition-opacity duration-300',
-          isMobileCommentsOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        )}
-        onClick={() => setIsMobileCommentsOpen(false)}
-      />
-
-      <div
-        className={cn(
-          'bg-card flex flex-col overflow-hidden z-50 relative',
-          'fixed inset-y-0 right-0 w-[85%] sm:w-[400px] shadow-2xl transition-transform duration-300 transform',
-          isMobileCommentsOpen ? 'translate-x-0' : 'translate-x-full',
-          'lg:static lg:w-80 lg:shrink-0 lg:border-l lg:transition-none lg:translate-x-0 lg:shadow-none lg:z-auto',
+          'bg-card flex flex-col overflow-hidden relative',
+          // モバイル: frame.io と同じ「プレーヤー直下に常時表示+内部スクロール」
+          // (以前は右からのドロワーで、コメントの存在に気づきにくかった)
+          'w-full flex-1 min-h-0 border-t',
+          'lg:w-80 lg:flex-none lg:border-t-0 lg:shrink-0 lg:border-l',
           isFullscreenMode && !showComments ? 'hidden' : ''
         )}
         onDragOver={(e) => {
@@ -300,14 +302,6 @@ export const CommentsPane = memo(function CommentsPane({
                 </Badge>
               </Button>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 lg:hidden shrink-0"
-              onClick={() => setIsMobileCommentsOpen(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
           </div>
 
           {activePane === 'comments' && (
@@ -422,6 +416,11 @@ export const CommentsPane = memo(function CommentsPane({
                       </div>
 
                       <div className="flex items-center gap-1 shrink-0">
+                        {commentNumberById.has(comment.id) && (
+                          <span className="text-[11px] font-mono text-muted-foreground px-1">
+                            #{commentNumberById.get(comment.id)}
+                          </span>
+                        )}
                         <button
                           onClick={() =>
                             handleSeekToTimestamp(comment.timestamp, comment.annotationData, {
@@ -429,7 +428,7 @@ export const CommentsPane = memo(function CommentsPane({
                               timestampEnd: comment.timestampEnd,
                             })
                           }
-                          className="flex items-center gap-1 text-xs text-primary hover:underline px-1.5 py-0.5 rounded bg-primary/10 hover:bg-primary/20 transition-colors"
+                          className="flex items-center gap-1 text-xs font-mono text-primary hover:underline px-1.5 py-0.5 rounded bg-primary/10 hover:bg-primary/20 transition-colors"
                           title="このタイムスタンプにジャンプ"
                         >
                           <Clock className="h-3 w-3" />

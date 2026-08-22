@@ -771,7 +771,9 @@ export function VideoPageContent({
 
   return (
     <div className={cn(containerHeight, 'flex flex-col bg-background overflow-hidden')}>
-      <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden min-h-0">
+      {/* モバイルもoverflow-hidden: コメントパネルがプレーヤー直下でflex-1を取り、
+          パネル内部がスクロールする(frame.io流)。ページ全体はスクロールさせない */}
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden min-h-0">
         <div className={cn('flex-1 w-full flex flex-col min-h-0', isFullscreenMode && 'relative')}>
           <VideoPageHeader
             mode={mode}
