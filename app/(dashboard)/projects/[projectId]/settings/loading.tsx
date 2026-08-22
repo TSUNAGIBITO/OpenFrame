@@ -3,7 +3,7 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 
 export default function ProjectSettingsLoading() {
   return (
-    <div className="px-6 lg:px-8 py-8 w-full">
+    <div className="px-6 lg:px-8 py-8 w-full max-w-[1440px] mx-auto">
       <div className="max-w-xl mx-auto space-y-6">
         <Skeleton className="h-4 w-32" />
 

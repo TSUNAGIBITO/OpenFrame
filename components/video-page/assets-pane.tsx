@@ -6,8 +6,10 @@ import { toast } from 'sonner';
 import { toastApiError } from '@/lib/client/api-error';
 import {
   Download,
+  ExternalLink,
   FileVideo,
   Image as ImageIcon,
+  Link2,
   Loader2,
   Mic,
   Pause,
@@ -67,6 +69,15 @@ function getAudioUploadValidationError(file: Blob): string | null {
   return null;
 }
 
+function getLinkHostname(url: string | null): string | null {
+  if (!url) return null;
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return null;
+  }
+}
+
 async function readUploadAudioResponse(response: Response): Promise<UploadAudioResponse | null> {
   const raw = await response.text().catch(() => '');
   const trimmed = raw.trim();
@@ -91,7 +102,7 @@ interface AssetsPaneProps {
   canDownloadAssets: boolean;
   getGuestUploadToken: (intent: 'image' | 'audio') => Promise<string | null>;
   createAsset: (payload: {
-    provider: 'R2_IMAGE' | 'YOUTUBE' | 'BUNNY' | 'R2_AUDIO' | 'R2_VIDEO';
+    provider: 'R2_IMAGE' | 'YOUTUBE' | 'BUNNY' | 'R2_AUDIO' | 'R2_VIDEO' | 'EXTERNAL_LINK';
     displayName?: string;
     sourceUrl: string;
     providerVideoId?: string;
@@ -130,11 +141,15 @@ export const AssetsPane = memo(function AssetsPane({
   onHighlightedAssetHandled,
   directUploadProvider = 'bunny',
 }: AssetsPaneProps) {
-  const [uploadTab, setUploadTab] = useState<'image' | 'youtube' | 'bunny' | 'voice'>('image');
+  const [uploadTab, setUploadTab] = useState<'image' | 'youtube' | 'bunny' | 'voice' | 'link'>(
+    'image'
+  );
   const [imageTitle, setImageTitle] = useState('');
   const [pendingImageFiles, setPendingImageFiles] = useState<File[]>([]);
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [youtubeTitle, setYoutubeTitle] = useState('');
+  const [linkUrl, setLinkUrl] = useState('');
+  const [linkTitle, setLinkTitle] = useState('');
   const [bunnyTitle, setBunnyTitle] = useState('');
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isUploadingBunny, setIsUploadingBunny] = useState(false);
@@ -488,6 +503,34 @@ export const AssetsPane = memo(function AssetsPane({
     if (created) {
       setYoutubeUrl('');
       setYoutubeTitle('');
+    }
+  };
+
+  const handleCreateLinkAsset = async () => {
+    const sourceUrl = linkUrl.trim();
+    const displayName = linkTitle.trim();
+    if (!sourceUrl || !displayName) return;
+
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(sourceUrl);
+    } catch {
+      toast.error('URLの形式が正しくありません');
+      return;
+    }
+    if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+      toast.error('http:// または https:// で始まるURLを入力してください');
+      return;
+    }
+
+    const created = await createAsset({
+      provider: 'EXTERNAL_LINK',
+      sourceUrl,
+      displayName,
+    });
+    if (created) {
+      setLinkUrl('');
+      setLinkTitle('');
     }
   };
 
@@ -1004,6 +1047,18 @@ export const AssetsPane = memo(function AssetsPane({
   );
 
   const renderAssetPreview = (asset: VideoAsset) => {
+    if (asset.kind === 'LINK') {
+      const hostname = getLinkHostname(asset.sourceUrl);
+      return (
+        <div className="h-24 w-36 rounded border bg-muted flex flex-col items-center justify-center gap-1 px-2">
+          <Link2 className="h-6 w-6 text-muted-foreground" />
+          <span className="max-w-full truncate text-[10px] text-muted-foreground font-medium">
+            {hostname || '外部リンク'}
+          </span>
+        </div>
+      );
+    }
+
     if (asset.kind === 'AUDIO') {
       return (
         <div className="h-24 w-36 rounded border bg-muted flex flex-col items-center justify-center gap-1">
@@ -1116,6 +1171,10 @@ export const AssetsPane = memo(function AssetsPane({
       setSelectedAsset(asset);
       return;
     }
+    if (asset.kind === 'LINK') {
+      setSelectedAsset(asset);
+      return;
+    }
     if (asset.provider === 'BUNNY' && !bunnyReadyByAssetId[asset.id]) {
       setBunnyProcessingByAssetId((prev) =>
         prev[asset.id] ? prev : { ...prev, [asset.id]: true }
@@ -1164,14 +1223,15 @@ export const AssetsPane = memo(function AssetsPane({
           <Tabs
             value={uploadTab}
             onValueChange={(value) =>
-              setUploadTab(value as 'image' | 'youtube' | 'bunny' | 'voice')
+              setUploadTab(value as 'image' | 'youtube' | 'bunny' | 'voice' | 'link')
             }
           >
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="image">画像</TabsTrigger>
               <TabsTrigger value="youtube">YouTube</TabsTrigger>
               <TabsTrigger value="bunny">動画</TabsTrigger>
               <TabsTrigger value="voice">音声</TabsTrigger>
+              <TabsTrigger value="link">リンク</TabsTrigger>
             </TabsList>
           </Tabs>
 
@@ -1280,6 +1340,32 @@ export const AssetsPane = memo(function AssetsPane({
               >
                 <Youtube className="h-4 w-4 mr-2" />
                 YouTubeアセットを追加
+              </Button>
+            </div>
+          )}
+
+          {uploadTab === 'link' && (
+            <div className="space-y-2">
+              <Input
+                placeholder="表示名（例: 台本ドキュメント）"
+                value={linkTitle}
+                onChange={(event) => setLinkTitle(event.target.value)}
+              />
+              <Input
+                placeholder="https://drive.google.com/..."
+                value={linkUrl}
+                onChange={(event) => setLinkUrl(event.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Google ドライブなど外部サービスのURLを素材として共有できます。リンクは新しいタブで開きます。
+              </p>
+              <Button
+                className="w-full"
+                disabled={isCreatingAsset || !linkUrl.trim() || !linkTitle.trim()}
+                onClick={handleCreateLinkAsset}
+              >
+                <Link2 className="h-4 w-4 mr-2" />
+                リンクを追加
               </Button>
             </div>
           )}
@@ -1609,6 +1695,43 @@ export const AssetsPane = memo(function AssetsPane({
           ) : (
             <p className="text-sm text-muted-foreground">音声プレビューを表示できません。</p>
           )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={selectedAsset?.kind === 'LINK'}
+        onOpenChange={(open) => !open && setSelectedAsset(null)}
+      >
+        <DialogContent className="max-w-sm">
+          <DialogTitle>{selectedAsset?.displayName || '外部リンク'}</DialogTitle>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 rounded-md border bg-muted p-3">
+              <Link2 className="h-5 w-5 shrink-0 text-muted-foreground" />
+              <div className="min-w-0">
+                <p className="text-sm font-medium">外部リンク素材</p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {getLinkHostname(selectedAsset?.sourceUrl ?? null) ||
+                    selectedAsset?.sourceUrl ||
+                    ''}
+                </p>
+              </div>
+            </div>
+            {selectedAsset?.sourceUrl ? (
+              <Button
+                className="w-full"
+                onClick={() => {
+                  if (selectedAsset?.sourceUrl) {
+                    window.open(selectedAsset.sourceUrl, '_blank', 'noopener');
+                  }
+                }}
+              >
+                <ExternalLink className="h-4 w-4 mr-2" />
+                開く
+              </Button>
+            ) : (
+              <p className="text-sm text-muted-foreground">リンクURLを取得できませんでした。</p>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
 

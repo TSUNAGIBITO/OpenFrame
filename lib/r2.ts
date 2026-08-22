@@ -457,6 +457,41 @@ export async function headVideoObject(key: string): Promise<{
   }
 }
 
+/**
+ * headVideoObject の任意プレフィックス版。サムネイル(`images/`)など、動画以外の
+ * アップロード済みオブジェクトの存在確認に使う。404 は null で返す。
+ */
+export async function headR2Object(key: string): Promise<{
+  contentLength: bigint;
+  contentType: string | undefined;
+} | null> {
+  assertAllowedObjectKey(key);
+
+  try {
+    const result = await r2Client.send(
+      new HeadObjectCommand({
+        Bucket: R2_BUCKET_NAME,
+        Key: key,
+      })
+    );
+
+    const contentLength =
+      typeof result.ContentLength === 'number' && result.ContentLength >= 0
+        ? BigInt(result.ContentLength)
+        : BigInt(0);
+
+    return {
+      contentLength,
+      contentType: result.ContentType,
+    };
+  } catch (error) {
+    const statusCode = (error as { $metadata?: { httpStatusCode?: number } })?.$metadata
+      ?.httpStatusCode;
+    if (statusCode === 404) return null;
+    throw error;
+  }
+}
+
 export async function readVideoObjectBytes(
   key: string,
   byteLength: number

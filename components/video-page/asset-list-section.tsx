@@ -1,7 +1,16 @@
 'use client';
 
 import { memo, type ReactNode } from 'react';
-import { Download, Image as ImageIcon, Loader2, Play, Trash2, Volume2 } from 'lucide-react';
+import {
+  Download,
+  ExternalLink,
+  Image as ImageIcon,
+  Link2,
+  Loader2,
+  Play,
+  Trash2,
+  Volume2,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -12,6 +21,15 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import type { VideoAsset } from '@/components/video-page/types';
+
+function getLinkHostname(url: string | null): string | null {
+  if (!url) return null;
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return null;
+  }
+}
 
 interface AssetListSectionProps {
   assets: VideoAsset[];
@@ -72,6 +90,7 @@ export const AssetListSection = memo(function AssetListSection({
           asset.provider === 'BUNNY' &&
           !!bunnyProcessingByAssetId[asset.id] &&
           !bunnyReadyByAssetId[asset.id];
+        const linkHostname = asset.kind === 'LINK' ? getLinkHostname(asset.sourceUrl) : null;
         return (
           <div
             key={asset.id}
@@ -96,6 +115,9 @@ export const AssetListSection = memo(function AssetListSection({
                   ) : null}
                 </div>
               </div>
+              {linkHostname ? (
+                <p className="text-xs text-muted-foreground truncate">{linkHostname}</p>
+              ) : null}
               <p className="text-xs text-muted-foreground">
                 {asset.uploadedByUser?.name || asset.uploadedByGuestName || '不明'} •{' '}
                 {new Date(asset.createdAt).toLocaleDateString()}
@@ -110,14 +132,18 @@ export const AssetListSection = memo(function AssetListSection({
                       ? '動画を再生'
                       : asset.kind === 'AUDIO'
                         ? '録音を再生'
-                        : '画像を表示'
+                        : asset.kind === 'LINK'
+                          ? 'リンクを表示'
+                          : '画像を表示'
                   }
                   aria-label={
                     asset.kind === 'VIDEO'
                       ? '動画を再生'
                       : asset.kind === 'AUDIO'
                         ? '録音を再生'
-                        : '画像を表示'
+                        : asset.kind === 'LINK'
+                          ? 'リンクを表示'
+                          : '画像を表示'
                   }
                   onClick={() => onViewAsset(asset)}
                 >
@@ -125,12 +151,33 @@ export const AssetListSection = memo(function AssetListSection({
                     <ImageIcon className="h-3 w-3" />
                   ) : asset.kind === 'AUDIO' ? (
                     <Volume2 className="h-3 w-3" />
+                  ) : asset.kind === 'LINK' ? (
+                    <Link2 className="h-3 w-3" />
                   ) : (
                     <Play className="h-3 w-3" />
                   )}
                 </Button>
 
+                {asset.kind === 'LINK' && (
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    className="h-7 w-7"
+                    title="リンクを新しいタブで開く"
+                    aria-label="リンクを新しいタブで開く"
+                    disabled={!asset.sourceUrl}
+                    onClick={() => {
+                      if (asset.sourceUrl) {
+                        window.open(asset.sourceUrl, '_blank', 'noopener');
+                      }
+                    }}
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                  </Button>
+                )}
+
                 {canDownloadAssets &&
+                  asset.kind !== 'LINK' &&
                   asset.provider !== 'YOUTUBE' &&
                   (asset.provider === 'BUNNY' && asset.kind !== 'AUDIO' ? (
                     <DropdownMenu>

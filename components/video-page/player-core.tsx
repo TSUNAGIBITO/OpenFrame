@@ -9,6 +9,7 @@ import {
   MessageSquare,
   MessageSquareOff,
   Minimize,
+  Music,
   Pause,
   Play,
   SkipBack,
@@ -32,6 +33,7 @@ import {
   type AnnotationStroke,
 } from '@/components/annotation-canvas';
 import { SILENT_ABOVE_SPEED } from '@/components/video-page/hooks/video-player-utils';
+import { isAudioOnlyMediaPath } from '@/lib/video-upload-validation';
 import type { BunnyQualityOption, CommentMarker } from '@/components/video-page/types';
 
 interface PlayerCoreProps {
@@ -165,6 +167,10 @@ export const PlayerCore = memo(function PlayerCore({
   handleSeekToTimestamp,
   commentMarkers,
 }: PlayerCoreProps) {
+  // 音声(Podcast)レビュー: R2 直接アップロードで拡張子が音声のみの場合、真っ黒な
+  // 映像領域に「音声コンテンツ」であることを控えめに示す(再生は video 要素のまま)。
+  const isAudioOnlySource = activeProviderId === 'r2' && isAudioOnlyMediaPath(embedUrl);
+
   return (
     <>
       <div
@@ -223,6 +229,17 @@ export const PlayerCore = memo(function PlayerCore({
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             />
+          )}
+
+          {/* 音声コンテンツの控えめなオーバーレイ。中央の再生ボタンと重ならないよう
+              少し上にずらし、pointer-events-none で操作を妨げない。 */}
+          {isAudioOnlySource && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="flex -translate-y-16 flex-col items-center gap-2 text-white/60">
+                <Music className="h-12 w-12" />
+                <span className="text-sm font-medium">音声コンテンツ</span>
+              </div>
+            </div>
           )}
 
           <div

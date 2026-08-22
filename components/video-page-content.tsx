@@ -26,6 +26,7 @@ import { useVersionDurationSync } from '@/components/video-page/hooks/use-versio
 import { CommentComposer } from '@/components/video-page/comment-composer';
 import { CommentsPane } from '@/components/video-page/comments-pane';
 import { AssetsPane } from '@/components/video-page/assets-pane';
+import { PlanningVideoView } from '@/components/video-page/planning-video-view';
 import { ApprovalRequestDialog } from '@/components/video-page/approval-request-dialog';
 import { ApprovalRequestsPanel } from '@/components/video-page/approval-requests-panel';
 import type {
@@ -699,6 +700,54 @@ export function VideoPageContent({
     );
   }
 
+  // 企画のみ(バージョン0件)のコンテンツ: プレーヤーの代わりに素材集め+
+  // バージョン1アップロード導線を出す(ダッシュボードからのアクセスのみ)
+  if (!error && video && video.versions.length === 0 && mode === 'dashboard') {
+    return (
+      <PlanningVideoView
+        backHref={backHref}
+        title={video.title}
+        projectName={video.project.name}
+        description={video.description ?? null}
+        // access.canEdit のプロキシ(canRequestApproval は API 側で canEdit と同値)
+        canEdit={canRequestApproval}
+        directUploadsEnabled={directUploadsEnabled}
+        showVersionDialog={showVersionDialog}
+        setShowVersionDialog={setShowVersionDialog}
+        newVersionMode={newVersionMode}
+        setNewVersionMode={setNewVersionMode}
+        newVersionUrl={newVersionUrl}
+        handleNewVersionUrlChange={handleNewVersionUrlChange}
+        newVersionUrlError={newVersionUrlError}
+        newVersionSource={newVersionSource}
+        newVersionFile={newVersionFile}
+        setNewVersionFile={setNewVersionFile}
+        newVersionLabel={newVersionLabel}
+        setNewVersionLabel={setNewVersionLabel}
+        newVersionUploadStatus={newVersionUploadStatus}
+        newVersionUploadProgress={newVersionUploadProgress}
+        isCreatingVersion={isCreatingVersion}
+        onCreateVersion={handleCreateVersion}
+        videoId={videoId}
+        assets={assets}
+        isLoadingAssets={isLoadingAssets}
+        isCreatingAsset={isCreatingAsset}
+        deletingAssetIds={deletingAssetIds}
+        activeDownloadAssetId={activeDownloadAssetId}
+        canUploadAssets={canUploadAssets}
+        canDownloadAssets={canDownloadAssets}
+        getGuestUploadToken={getGuestUploadToken}
+        createAsset={createAsset}
+        deleteAsset={deleteAsset}
+        downloadAsset={downloadAsset}
+        hasMoreAssets={hasMoreAssets}
+        isLoadingMoreAssets={isLoadingMoreAssets}
+        loadMoreAssets={loadMoreAssets}
+        directUploadProvider={directUploadProvider}
+      />
+    );
+  }
+
   if (error || !video || !activeVersion) {
     return (
       <VideoPageError
@@ -748,6 +797,7 @@ export function VideoPageContent({
             projectId={projectId}
             videoId={videoId}
             directUploadsEnabled={directUploadsEnabled}
+            directUploadProvider={directUploadProvider}
             showVersionDialog={showVersionDialog}
             setShowVersionDialog={setShowVersionDialog}
             newVersionMode={newVersionMode}

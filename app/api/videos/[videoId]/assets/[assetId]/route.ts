@@ -40,6 +40,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       return apiErrors.forbidden('削除できるのは自分がアップロードしたアセットのみです');
     }
 
+    // EXTERNAL_LINK (リンク素材) は外部 URL の登録のみで R2 / Bunny 上のオブジェクトを
+    // 持たないため、以降の provider 別クリーンアップ分岐にはどれにも入らない
+    // (DB レコードの削除だけで完結する)。
     let shouldDeleteImageObject = false;
     let shouldDeleteAudioObject = false;
     let shouldDeleteVideoObject = false;

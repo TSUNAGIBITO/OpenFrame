@@ -21,8 +21,8 @@ export interface CommentTag {
 export interface VideoAsset {
   id: string;
   videoId: string;
-  kind: 'IMAGE' | 'VIDEO' | 'AUDIO';
-  provider: 'R2_IMAGE' | 'YOUTUBE' | 'BUNNY' | 'R2_AUDIO' | 'R2_VIDEO';
+  kind: 'IMAGE' | 'VIDEO' | 'AUDIO' | 'LINK';
+  provider: 'R2_IMAGE' | 'YOUTUBE' | 'BUNNY' | 'R2_AUDIO' | 'R2_VIDEO' | 'EXTERNAL_LINK';
   displayName: string;
   sourceUrl: string | null;
   providerVideoId: string | null;

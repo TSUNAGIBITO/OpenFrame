@@ -1,6 +1,12 @@
 import { db } from '@/lib/db';
 import { getConfiguredMaxVideoUploadBytes } from '@/lib/feature-flags';
-import { deleteR2Object, deleteVideoObject, headVideoObject, readVideoObjectBytes } from '@/lib/r2';
+import {
+  deleteR2Object,
+  deleteVideoObject,
+  headR2Object,
+  headVideoObject,
+  readVideoObjectBytes,
+} from '@/lib/r2';
 import { parseR2UploadToken, verifyR2UploadToken } from '@/lib/r2-upload-token';
 import {
   objectKeyToVideoProxyPath,
@@ -62,6 +68,67 @@ function hasKnownVideoMagicBytes(bytes: Uint8Array): boolean {
     bytes[9] === 0x56 &&
     bytes[10] === 0x49 &&
     bytes[11] === 0x20
+  ) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * 音声(Podcast)アップロードの objectKey 拡張子。`.ogg` は動画側の magic bytes
+ * (OggS) で既に通るため、ここには「音声のみ」の拡張子だけを載せる。
+ */
+const AUDIO_OBJECT_EXTENSIONS = new Set(['mp3', 'm4a', 'wav', 'aac', 'flac']);
+
+function objectKeyExtension(objectKey: string): string {
+  return objectKey.split('.').pop()?.toLowerCase() ?? '';
+}
+
+function hasKnownAudioMagicBytes(bytes: Uint8Array): boolean {
+  // ID3 タグ (mp3)
+  if (bytes.length >= 3 && bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33) {
+    return true;
+  }
+  // MPEG audio / ADTS AAC のフレーム同期 (0xFF 0xEx-0xFx)
+  if (bytes.length >= 2 && bytes[0] === 0xff && ((bytes[1] ?? 0) & 0xe0) === 0xe0) {
+    return true;
+  }
+  // ftyp ボックス (m4a)
+  if (bytes.length >= 12) {
+    const box = String.fromCharCode(bytes[4] ?? 0, bytes[5] ?? 0, bytes[6] ?? 0, bytes[7] ?? 0);
+    if (box === 'ftyp') return true;
+  }
+  // fLaC
+  if (
+    bytes.length >= 4 &&
+    bytes[0] === 0x66 &&
+    bytes[1] === 0x4c &&
+    bytes[2] === 0x61 &&
+    bytes[3] === 0x43
+  ) {
+    return true;
+  }
+  // RIFF....WAVE (wav)
+  if (
+    bytes.length >= 12 &&
+    bytes[0] === 0x52 &&
+    bytes[1] === 0x49 &&
+    bytes[2] === 0x46 &&
+    bytes[3] === 0x46 &&
+    bytes[8] === 0x57 &&
+    bytes[9] === 0x41 &&
+    bytes[10] === 0x56 &&
+    bytes[11] === 0x45
+  ) {
+    return true;
+  }
+  // OggS (ogg)
+  if (
+    bytes.length >= 4 &&
+    bytes[0] === 0x4f &&
+    bytes[1] === 0x67 &&
+    bytes[2] === 0x67 &&
+    bytes[3] === 0x53
   ) {
     return true;
   }
@@ -167,10 +234,27 @@ export async function finalizeR2VideoUpload(
     return cancelPendingUpload('Uploaded video size does not match upload request');
   }
 
+  // 拡張子が音声のみのアップロードは音声側の magic bytes で検証する。
+  // (音声を許可するのは R2 直接アップロード経路のみ。動画側の判定は従来のまま。)
+  const isAudioObject = AUDIO_OBJECT_EXTENSIONS.has(objectKeyExtension(objectKey));
   const headerBytes = await readVideoObjectBytes(objectKey, 64);
-  if (!headerBytes || !hasKnownVideoMagicBytes(headerBytes)) {
-    return cancelPendingUpload('Uploaded file is not a valid video');
+  const hasKnownMagicBytes =
+    !!headerBytes &&
+    (isAudioObject ? hasKnownAudioMagicBytes(headerBytes) : hasKnownVideoMagicBytes(headerBytes));
+  if (!hasKnownMagicBytes) {
+    return cancelPendingUpload(
+      isAudioObject ? 'Uploaded file is not a valid audio file' : 'Uploaded file is not a valid video'
+    );
   }
+
+  // 音声にはサムネイルが無い(クライアントの captureVideoThumbnail が null を返し、
+  // サムネイルはアップロードされない)。存在しないオブジェクトを指す URL を DB に
+  // 保存しないよう、実体を確認できない場合はプレースホルダーへフォールバックする。
+  const thumbnailHead = await headR2Object(uploadSession.thumbnailObjectKey).catch(() => null);
+  const thumbnailProxyUrl =
+    thumbnailHead && thumbnailHead.contentLength > BigInt(0)
+      ? `/api/upload/image/${thumbnailFilename}`
+      : '/placeholder-video-thumbnail.png';
 
   return {
     ok: true,
@@ -181,6 +265,6 @@ export async function finalizeR2VideoUpload(
     reservationId: uploadSession.reservationId,
     billedUserId: uploadSession.billedUserId,
     thumbnailObjectKey: uploadSession.thumbnailObjectKey,
-    thumbnailProxyUrl: `/api/upload/image/${thumbnailFilename}`,
+    thumbnailProxyUrl,
   };
 }

@@ -55,7 +55,7 @@ const YOUTUBE_TITLE_CACHE_TTL_MS = 5 * 60 * 1000;
 type AssetWithViewerFields = {
   id: string;
   videoId: string;
-  kind: 'IMAGE' | 'VIDEO' | 'AUDIO';
+  kind: 'IMAGE' | 'VIDEO' | 'AUDIO' | 'LINK';
   provider: VideoAssetProvider;
   displayName: string;
   sourceUrl: string;
@@ -274,10 +274,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       assets: pagedAssets.map((asset) =>
         shapeAssetForViewer(
           asset,
-          // R2_AUDIO proxy URLs have no auth gate — expose them to any viewer so guests can preview audio
+          // R2_AUDIO proxy URLs have no auth gate — expose them to any viewer so guests can preview audio.
+          // EXTERNAL_LINK assets are only a URL: without it the asset is unusable, so any viewer may see it.
           context.canDownloadAssets ||
             ((asset.provider === VideoAssetProvider.R2_AUDIO ||
-              asset.provider === VideoAssetProvider.R2_VIDEO) &&
+              asset.provider === VideoAssetProvider.R2_VIDEO ||
+              asset.provider === VideoAssetProvider.EXTERNAL_LINK) &&
               context.hasViewAccess),
           includeDeleteMetadata ? canDeleteAssetForViewer(asset, context) : false
         )
@@ -337,7 +339,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       provider !== VideoAssetProvider.YOUTUBE &&
       provider !== VideoAssetProvider.BUNNY &&
       provider !== VideoAssetProvider.R2_AUDIO &&
-      provider !== VideoAssetProvider.R2_VIDEO
+      provider !== VideoAssetProvider.R2_VIDEO &&
+      provider !== VideoAssetProvider.EXTERNAL_LINK
     ) {
       return apiErrors.badRequest('プロバイダーが正しくありません');
     }
@@ -352,7 +355,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     let sourceUrl = '';
     let providerVideoId: string | null = null;
     let thumbnailUrl: string | null = null;
-    let kind: 'IMAGE' | 'VIDEO' | 'AUDIO' = 'IMAGE';
+    let kind: 'IMAGE' | 'VIDEO' | 'AUDIO' | 'LINK' = 'IMAGE';
     let assetSizeBytes = BigInt(0);
 
     const billedUserId = context.video.project.workspace.ownerId;
@@ -493,6 +496,26 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       };
     }
 
+    if (provider === VideoAssetProvider.EXTERNAL_LINK) {
+      // リンク素材: ファイル本体は保存せず、外部 URL をそのまま登録する。
+      // ストレージを一切消費しないため、クォータ・予約の枠組みには乗せない。
+      sourceUrl = typeof body?.sourceUrl === 'string' ? body.sourceUrl.trim() : '';
+      const sourceUrlError = validateUrl(sourceUrl, 'リンク URL');
+      if (sourceUrlError) return apiErrors.badRequest(sourceUrlError);
+
+      const trimmedDisplayName = requestedDisplayName?.trim() ?? '';
+      if (!trimmedDisplayName) {
+        return apiErrors.badRequest('リンク素材には表示名が必要です');
+      }
+      displayName = sanitizeAssetDisplayName(trimmedDisplayName, 'リンク');
+
+      // アップロードを伴わないため、クライアントが reservationId を送ってきても無視する
+      // (誤って/悪意で送られた ID を catch 節の releaseStorageReservation に渡さない)。
+      reservationId = null;
+      kind = 'LINK';
+      assetSizeBytes = BigInt(0);
+    }
+
     if (provider === VideoAssetProvider.BUNNY) {
       sourceUrl = typeof body?.sourceUrl === 'string' ? body.sourceUrl.trim() : '';
       providerVideoId =
@@ -587,8 +610,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // quota check below, Bunny included. Leaving Bunny out read its own storage as
     // zero, and on an account whose storage is all Bunny that made the fallback a
     // check that could not fail.
+    // EXTERNAL_LINK never consumes storage (reservationId is forced null above), so the
+    // fallback quota check is unreachable for it — skip the Bunny HTTP call like YOUTUBE.
     const preFetchedBunnyBytes =
-      provider === VideoAssetProvider.YOUTUBE ? null : await getUserBunnyStorageBytes(billedUserId);
+      provider === VideoAssetProvider.YOUTUBE || provider === VideoAssetProvider.EXTERNAL_LINK
+        ? null
+        : await getUserBunnyStorageBytes(billedUserId);
 
     // The ceiling this account is actually held to, read for the fallback below.
     // It used to compare against the plan limit, which is 200 GiB whoever is
@@ -708,7 +735,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     const response = successResponse(
-      shapeAssetForViewer(created, context.canDownloadAssets, true),
+      shapeAssetForViewer(
+        created,
+        // EXTERNAL_LINK は URL がアセットの実体なので、GET と同様に閲覧者へ常に公開する
+        context.canDownloadAssets || provider === VideoAssetProvider.EXTERNAL_LINK,
+        true
+      ),
       201
     );
     if (isGuest && guestIdentity?.shouldSetCookie) {

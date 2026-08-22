@@ -14,6 +14,7 @@ interface SerializedProject {
   workspaceName: string | null;
   memberCount: number;
   videoCount: number;
+  thumbnailUrl: string | null;
 }
 
 interface DashboardClientProps {
@@ -36,7 +37,7 @@ export function DashboardClient({
   directUploadProvider,
 }: DashboardClientProps) {
   return (
-    <div className="px-6 lg:px-8 py-8 w-full">
+    <div className="px-6 lg:px-8 py-8 w-full max-w-[1440px] mx-auto">
       <VideoDragDropUploader
         canUpload={canUploadVideos && directUploadsEnabled}
         directUploadProvider={directUploadProvider}

@@ -106,7 +106,7 @@ export default async function WorkspacePage({ params, searchParams }: WorkspaceP
   const totalPages = Math.ceil(workspace._count.projects / pageSize);
 
   return (
-    <div className="px-6 lg:px-8 py-8 w-full">
+    <div className="px-6 lg:px-8 py-8 w-full max-w-[1440px] mx-auto">
       <VideoDragDropUploader
         workspaceId={workspaceId}
         canUpload={isAdmin && workspace._count.projects > 0 && isDirectFileUploadEnabled()}

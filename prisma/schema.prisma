@@ -95,6 +95,7 @@ enum VideoAssetKind {
   IMAGE
   VIDEO
   AUDIO
+  LINK
 }
 
 enum VideoAssetProvider {
@@ -103,6 +104,7 @@ enum VideoAssetProvider {
   BUNNY
   R2_AUDIO
   R2_VIDEO
+  EXTERNAL_LINK
 }
 
 model DownloadEgressEvent {

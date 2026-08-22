@@ -138,8 +138,9 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
     return {
       id: video.id,
       title: video.title,
-      thumbnailUrl:
-        activeVersion?.thumbnailUrl || 'https://via.placeholder.com/320x180?text=No+Thumbnail',
+      // バージョン0件(企画のみ)は空文字にして VideoCard 側の「素材準備中」表示に落とす
+      // (外部プレースホルダー画像は CSP の img-src で弾かれてスピナーが出続けるため使わない)
+      thumbnailUrl: activeVersion?.thumbnailUrl || '',
       currentVersion: video._count.versions,
       commentCount: activeVersion?._count.comments || 0,
       duration: formatDuration(activeVersion?.duration),
@@ -174,7 +175,7 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
   if (!isAuthenticated && isPublic) {
     return (
       <GuestGate>
-        <div className="px-6 lg:px-8 py-8 w-full">
+        <div className="px-6 lg:px-8 py-8 w-full max-w-[1440px] mx-auto">
           {/* Back link */}
           <div className="mb-6">
             <Link
@@ -206,7 +207,7 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
   }
 
   return (
-    <div className="px-6 lg:px-8 py-8 w-full">
+    <div className="px-6 lg:px-8 py-8 w-full max-w-[1440px] mx-auto">
       {/* Back link */}
       <div className="mb-6">
         <Link

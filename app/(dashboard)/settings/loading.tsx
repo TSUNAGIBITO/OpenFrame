@@ -25,7 +25,7 @@ function SettingsCardSkeleton({ rows }: { rows: number }) {
 
 export default function SettingsLoading() {
   return (
-    <div className="px-6 lg:px-8 py-8 w-full">
+    <div className="px-6 lg:px-8 py-8 w-full max-w-[1440px] mx-auto">
       <div className="max-w-2xl mx-auto space-y-6">
         <div>
           <Skeleton className="h-9 w-56" />

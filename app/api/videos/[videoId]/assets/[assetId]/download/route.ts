@@ -116,6 +116,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     if (asset.provider === VideoAssetProvider.YOUTUBE) {
       return apiErrors.badRequest('YouTube のアセットはダウンロードできません');
     }
+    if (asset.provider === VideoAssetProvider.EXTERNAL_LINK) {
+      // リンク素材はファイル本体を保存しないためダウンロード対象外。リンクを直接開く。
+      return apiErrors.badRequest('リンク素材はダウンロードできません。リンクを新しいタブで開いてください');
+    }
 
     if (asset.provider === VideoAssetProvider.R2_IMAGE) {
       const fileName = extractImageFileNameFromProxyUrl(asset.sourceUrl);

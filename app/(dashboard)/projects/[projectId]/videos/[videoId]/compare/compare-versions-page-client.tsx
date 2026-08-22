@@ -979,6 +979,14 @@ function YouTubePanel({
         } as YT.PlayerVars,
         events: {
           onReady: () => {
+            // レビュー画面では自動生成字幕を常にオフにする(視聴者のYouTube設定に依存させない)
+            try {
+              const p = player as unknown as { unloadModule?: (module: string) => void };
+              p.unloadModule?.('captions');
+              p.unloadModule?.('cc');
+            } catch {
+              /* ignore */
+            }
             onRegister(version.id, player);
           },
         },

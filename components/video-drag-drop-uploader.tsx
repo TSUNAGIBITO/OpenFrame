@@ -27,7 +27,7 @@ import { isTrialStorageError, toastApiError } from '@/lib/client/api-error';
 import {
   cleanupPendingProjectUpload,
   getDefaultTitleFromFile,
-  isVideoFile,
+  isUploadableMediaFile,
   uploadProjectVideo,
   type ActiveTusUpload,
   type PendingProjectUploadCleanup,
@@ -360,16 +360,18 @@ export function VideoDragDropUploader({
         return;
       }
 
-      const videoFiles = files.filter(isVideoFile);
+      // 音声(Podcast)は R2 直接アップロードのときのみ許可(Bunny は動画専用)
+      const mediaLabel = directUploadProvider === 'r2' ? '動画・音声' : '動画';
+      const videoFiles = files.filter((file) => isUploadableMediaFile(file, directUploadProvider));
       const invalidCount = files.length - videoFiles.length;
 
       if (videoFiles.length === 0) {
-        toast.error('有効な動画ファイルをドロップしてください');
+        toast.error(`有効な${mediaLabel}ファイルをドロップしてください`);
         return;
       }
 
       if (invalidCount > 0) {
-        toast.error(`${invalidCount}件のファイルをスキップしました(動画ではありません)`);
+        toast.error(`${invalidCount}件のファイルをスキップしました(${mediaLabel}ではありません)`);
       }
 
       if (fixedProjectId) {
@@ -381,7 +383,14 @@ export function VideoDragDropUploader({
       setDialogOpen(true);
       void ensureProjectsLoaded();
     },
-    [canUpload, ensureProjectsLoaded, fixedProjectId, fixedProjectName, uploadQueueToProject]
+    [
+      canUpload,
+      directUploadProvider,
+      ensureProjectsLoaded,
+      fixedProjectId,
+      fixedProjectName,
+      uploadQueueToProject,
+    ]
   );
 
   useEffect(() => {

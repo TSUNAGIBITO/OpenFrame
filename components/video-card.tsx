@@ -322,12 +322,17 @@ export function VideoCard({
                       }, 10000);
                     }}
                   />
+                ) : video.currentVersion === 0 ? (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-gradient-to-br from-primary/15 via-muted to-muted text-xs text-muted-foreground font-medium">
+                    <span>素材準備中</span>
+                    <span className="text-[11px] text-muted-foreground/80">動画は未アップロード</span>
+                  </div>
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center bg-muted/80 text-xs text-muted-foreground font-medium">
                     サムネイルを表示できません
                   </div>
                 )}
-                {!imgError && (
+                {!imgError && video.currentVersion > 0 && (
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <Play className="h-12 w-12 text-white" fill="white" />
                   </div>
@@ -344,7 +349,7 @@ export function VideoCard({
                   <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Badge variant="secondary" className="text-xs">
-                        v{video.currentVersion}
+                        {video.currentVersion === 0 ? '企画' : `v${video.currentVersion}`}
                       </Badge>
                       <span className="text-xs">{video.duration}</span>
                     </span>
@@ -364,7 +369,7 @@ export function VideoCard({
                   <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Badge variant="secondary" className="text-xs">
-                        v{video.currentVersion}
+                        {video.currentVersion === 0 ? '企画' : `v${video.currentVersion}`}
                       </Badge>
                       <span className="text-xs">{video.duration}</span>
                     </span>

@@ -31,7 +31,8 @@ import { isTrialStorageError } from '@/lib/client/api-error';
 import {
   cleanupPendingProjectUpload,
   getDefaultTitleFromFile,
-  isVideoFile,
+  isUploadableMediaFile,
+  uploadAcceptForProvider,
   uploadProjectVideo,
   type ActiveTusUpload,
   type PendingProjectUploadCleanup,
@@ -57,7 +58,7 @@ export default function NewVideoPageClient({
   const [videoSource, setVideoSource] = useState<VideoSource | null>(null);
   const [urlError, setUrlError] = useState('');
 
-  const [uploadMode, setUploadMode] = useState<'url' | 'file'>('url');
+  const [uploadMode, setUploadMode] = useState<'url' | 'file' | 'planning'>('url');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadStatus, setUploadStatus] = useState('');
@@ -198,8 +199,11 @@ export default function NewVideoPageClient({
       const validFiles: File[] = [];
       let invalidCount = 0;
 
+      // 音声(Podcast)は R2 直接アップロードのときのみ許可(Bunny は動画専用)
+      const mediaLabel = directUploadProvider === 'r2' ? '動画・音声' : '動画';
+
       for (const file of incoming) {
-        if (!isVideoFile(file)) {
+        if (!isUploadableMediaFile(file, directUploadProvider)) {
           invalidCount += 1;
           continue;
         }
@@ -207,13 +211,13 @@ export default function NewVideoPageClient({
       }
 
       if (validFiles.length === 0) {
-        setSubmitError('有効な動画ファイルを選択してください。');
+        setSubmitError(`有効な${mediaLabel}ファイルを選択してください。`);
         return;
       }
 
       if (invalidCount > 0) {
         setSubmitError(
-          `${invalidCount}件のファイルをスキップしました（動画ではありません）。`
+          `${invalidCount}件のファイルをスキップしました（${mediaLabel}ではありません）。`
         );
       } else {
         setSubmitError('');
@@ -240,7 +244,7 @@ export default function NewVideoPageClient({
         }));
       }
     },
-    [formData.title, setSubmitError]
+    [directUploadProvider, formData.title, setSubmitError]
   );
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -408,6 +412,38 @@ export default function NewVideoPageClient({
     setCurrentUploadIndex(0);
 
     try {
+      // 企画のみ: 動画なしでコンテンツの箱を作り、素材集め→編集者へのバトンパスに使う
+      if (uploadMode === 'planning') {
+        const planningTitle = formData.title.trim();
+        if (!planningTitle) {
+          setSubmitError('タイトルを入力してください');
+          setIsLoading(false);
+          return;
+        }
+
+        const response = await fetch(`/api/projects/${projectId}/videos`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: planningTitle,
+            description: formData.description.trim() || null,
+            planningOnly: true,
+          }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          setSubmitError(data.error || '企画の作成に失敗しました', data);
+          return;
+        }
+
+        const createdId = data?.data?.id;
+        router.push(
+          createdId ? `/projects/${projectId}/videos/${createdId}` : `/projects/${projectId}`
+        );
+        return;
+      }
+
       if (uploadMode === 'url') {
         if (!videoSource) {
           setUrlError('有効な動画URLを入力してください');
@@ -510,11 +546,11 @@ export default function NewVideoPageClient({
         <CardContent>
           <Tabs
             value={uploadMode}
-            onValueChange={(v) => !isLoading && setUploadMode(v as 'url' | 'file')}
+            onValueChange={(v) => !isLoading && setUploadMode(v as 'url' | 'file' | 'planning')}
             className="mb-6"
           >
             <TabsList
-              className={`grid w-full ${directUploadsEnabled ? 'grid-cols-2' : 'grid-cols-1'}`}
+              className={`grid w-full ${directUploadsEnabled ? 'grid-cols-3' : 'grid-cols-2'}`}
             >
               <TabsTrigger value="url" disabled={isLoading}>
                 URLを貼り付け
@@ -524,11 +560,20 @@ export default function NewVideoPageClient({
                   直接アップロード
                 </TabsTrigger>
               ) : null}
+              <TabsTrigger value="planning" disabled={isLoading}>
+                企画のみ作成
+              </TabsTrigger>
             </TabsList>
           </Tabs>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {uploadMode === 'url' ? (
+            {uploadMode === 'planning' ? (
+              <div className="rounded-md border border-dashed border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+                動画はまだアップロードしません。タイトルだけでコンテンツを作成し、素材(参考資料・
+                サムネイル案・台本など)を集めてから、編集者が完成した動画をバージョン1として
+                アップロードします。
+              </div>
+            ) : uploadMode === 'url' ? (
               <div className="space-y-2">
                 <Label htmlFor="url">動画URL</Label>
                 <div className="relative">
@@ -587,7 +632,9 @@ export default function NewVideoPageClient({
                             <span className="font-semibold">クリックしてアップロード</span> またはドラッグ＆ドロップ
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            複数の動画に対応 · MP4、WebM、MOV など
+                            {directUploadProvider === 'r2'
+                              ? '複数の動画・音声に対応 · MP4、MOV、MP3、WAV など'
+                              : '複数の動画に対応 · MP4、WebM、MOV など'}
                           </p>
                         </>
                       ) : selectedFiles.length === 1 ? (
@@ -616,7 +663,7 @@ export default function NewVideoPageClient({
                       ref={fileInputRef}
                       id="file"
                       type="file"
-                      accept="video/*"
+                      accept={uploadAcceptForProvider(directUploadProvider)}
                       multiple
                       className="hidden"
                       onChange={handleFileChange}
@@ -679,21 +726,24 @@ export default function NewVideoPageClient({
                   <Input
                     id="title"
                     placeholder={
-                      isFetchingMeta
-                        ? 'タイトルを取得中...'
-                        : uploadMode === 'file' && isMultiFileUpload
-                          ? '複数ファイルのアップロードでは使用されません'
-                          : '動画のタイトル（空欄の場合は動画から自動入力されます）'
+                      uploadMode === 'planning'
+                        ? '企画・コンテンツのタイトル'
+                        : isFetchingMeta
+                          ? 'タイトルを取得中...'
+                          : uploadMode === 'file' && isMultiFileUpload
+                            ? '複数ファイルのアップロードでは使用されません'
+                            : '動画のタイトル（空欄の場合は動画から自動入力されます）'
                     }
                     value={formData.title}
                     onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
+                    required={uploadMode === 'planning'}
                     disabled={isLoading || (uploadMode === 'file' && isMultiFileUpload)}
                   />
                   {uploadMode === 'file' && isMultiFileUpload ? (
                     <p className="text-xs text-muted-foreground">
                       各ファイルはファイル名がタイトルとして使われます。
                     </p>
-                  ) : (
+                  ) : uploadMode === 'planning' ? null : (
                     <p className="text-xs text-muted-foreground">
                       空欄のままにすると元の動画のタイトルが使われます
                     </p>
@@ -766,13 +816,16 @@ export default function NewVideoPageClient({
                 disabled={
                   isLoading ||
                   (uploadMode === 'url' && !videoSource) ||
-                  (uploadMode === 'file' && selectedFiles.length === 0)
+                  (uploadMode === 'file' && selectedFiles.length === 0) ||
+                  (uploadMode === 'planning' && !formData.title.trim())
                 }
               >
                 {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                {uploadMode === 'file' && selectedFiles.length > 1
-                  ? `${selectedFiles.length}件の動画をアップロード`
-                  : '動画を追加'}
+                {uploadMode === 'planning'
+                  ? '企画を作成'
+                  : uploadMode === 'file' && selectedFiles.length > 1
+                    ? `${selectedFiles.length}件の動画をアップロード`
+                    : '動画を追加'}
               </Button>
               <Button
                 type="button"

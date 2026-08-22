@@ -16,6 +16,12 @@ const VIDEO_CONTENT_TYPE_MAP: Record<string, string> = {
   m4v: 'video/mp4',
   mkv: 'video/x-matroska',
   avi: 'video/x-msvideo',
+  // 音声(Podcast)レビュー対応: R2 直接アップロードで許可される音声拡張子
+  mp3: 'audio/mpeg',
+  m4a: 'audio/mp4',
+  wav: 'audio/wav',
+  aac: 'audio/aac',
+  flac: 'audio/flac',
 };
 
 function getVideoContentType(filename: string): string {

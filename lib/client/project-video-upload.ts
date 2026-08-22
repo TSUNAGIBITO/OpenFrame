@@ -7,6 +7,9 @@ import { apiRequestError } from '@/lib/client/api-error';
 
 export const VIDEO_FILE_EXTENSIONS = ['mp4', 'webm', 'ogg', 'mov', 'm4v', 'mkv'];
 
+/** 音声(Podcast)レビュー対応。R2(S3)直接アップロード経路のみ許可(Bunny は動画専用)。 */
+export const AUDIO_FILE_EXTENSIONS = ['mp3', 'm4a', 'wav', 'aac', 'ogg', 'flac'];
+
 export type ActiveTusUpload = { abort: (shouldTerminate?: boolean) => Promise<unknown> | void };
 
 export type PendingProjectUploadCleanup =
@@ -31,6 +34,26 @@ export function isVideoFile(file: File): boolean {
   if (file.type.startsWith('video/')) return true;
   const ext = file.name.split('.').pop()?.toLowerCase();
   return !!ext && VIDEO_FILE_EXTENSIONS.includes(ext);
+}
+
+export function isAudioFile(file: File): boolean {
+  if (file.type.startsWith('audio/')) return true;
+  const ext = file.name.split('.').pop()?.toLowerCase();
+  return !!ext && AUDIO_FILE_EXTENSIONS.includes(ext);
+}
+
+/**
+ * レビュー対象としてアップロード可能なメディアか。音声を許可するのは R2(S3)
+ * 直接アップロード経路のみで、Bunny 経路は動画専用のまま。
+ */
+export function isUploadableMediaFile(file: File, provider: DirectUploadProvider): boolean {
+  if (isVideoFile(file)) return true;
+  return provider === 'r2' && isAudioFile(file);
+}
+
+/** ファイル選択 input の accept 属性。R2 のときだけ音声も受け付ける。 */
+export function uploadAcceptForProvider(provider: DirectUploadProvider): string {
+  return provider === 'r2' ? 'video/*,audio/*' : 'video/*';
 }
 
 export function extractVideoFiles(dataTransfer: DataTransfer | null): File[] {

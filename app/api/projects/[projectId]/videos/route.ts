@@ -109,7 +109,37 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       duration,
       uploadToken,
       objectKey,
+      planningOnly,
     } = body;
+
+    // 企画のみ作成: 動画本体なしでコンテンツの箱だけ作り、素材を集めてから
+    // 編集者がバージョン1をアップロードする「バトンパス」フロー
+    if (planningOnly === true) {
+      if (!title || typeof title !== 'string' || !title.trim()) {
+        return apiErrors.badRequest('タイトルを入力してください');
+      }
+
+      const lastPlanned = await db.video.findFirst({
+        where: { projectId },
+        orderBy: { position: 'desc' },
+      });
+
+      const plannedVideo = await db.video.create({
+        data: {
+          title: title.trim(),
+          description: typeof description === 'string' ? description.trim() || null : null,
+          position: (lastPlanned?.position ?? -1) + 1,
+          projectId,
+        },
+        include: {
+          versions: true,
+          _count: { select: { versions: true } },
+        },
+      });
+
+      const plannedResponse = successResponse(plannedVideo, 201);
+      return withCacheControl(plannedResponse, 'private, no-store');
+    }
 
     if (!title || !videoUrl) {
       return apiErrors.badRequest('タイトルと動画 URL を入力してください');

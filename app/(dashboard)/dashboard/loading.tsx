@@ -29,7 +29,7 @@ function ProjectCardSkeleton() {
 
 export default function DashboardLoading() {
   return (
-    <div className="px-6 lg:px-8 py-8 w-full">
+    <div className="px-6 lg:px-8 py-8 w-full max-w-[1440px] mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
           <Skeleton className="h-9 w-40" />

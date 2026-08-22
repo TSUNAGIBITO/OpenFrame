@@ -29,6 +29,7 @@ import { VersionDeleteDialog } from '@/components/video-page/version-delete-dial
 import { VersionActionsDialog } from '@/components/video-page/version-actions-dialog';
 import type {
   BunnyDownloadPreference,
+  DirectUploadProvider,
   DownloadTarget,
   Version,
 } from '@/components/video-page/types';
@@ -58,6 +59,7 @@ interface VideoPageHeaderProps {
   projectId?: string;
   videoId: string;
   directUploadsEnabled: boolean;
+  directUploadProvider?: DirectUploadProvider;
   showVersionDialog: boolean;
   setShowVersionDialog: (open: boolean) => void;
   newVersionMode: 'url' | 'file';
@@ -106,6 +108,7 @@ export const VideoPageHeader = memo(function VideoPageHeader({
   projectId,
   videoId,
   directUploadsEnabled,
+  directUploadProvider = 'bunny',
   showVersionDialog,
   setShowVersionDialog,
   newVersionMode,
@@ -262,6 +265,7 @@ export const VideoPageHeader = memo(function VideoPageHeader({
                   open={showVersionDialog}
                   onOpenChange={setShowVersionDialog}
                   directUploadsEnabled={directUploadsEnabled}
+                  directUploadProvider={directUploadProvider}
                   newVersionMode={newVersionMode}
                   onNewVersionModeChange={setNewVersionMode}
                   newVersionUrl={newVersionUrl}

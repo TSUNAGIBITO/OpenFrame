@@ -19,7 +19,7 @@ function VideoCardSkeleton() {
 
 export default function ProjectLoading() {
   return (
-    <div className="px-6 lg:px-8 py-8 w-full">
+    <div className="px-6 lg:px-8 py-8 w-full max-w-[1440px] mx-auto">
       <div className="mb-6">
         <Skeleton className="h-4 w-32" />
       </div>

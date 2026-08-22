@@ -25,8 +25,8 @@ import {
 } from '@/lib/feature-flags';
 import {
   buildVideoObjectKey,
-  getVideoExtensionFromMime,
-  resolveVideoContentType,
+  getMediaExtensionFromMime,
+  resolveMediaContentType,
   videoProxyPathFromFilename,
 } from '@/lib/video-upload-validation';
 import { logError } from '@/lib/logger';
@@ -112,14 +112,15 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return apiErrors.badRequest(uploadTooLargeMessage(maxBytes));
     }
 
-    const contentType = resolveVideoContentType(fileName, contentTypeInput);
+    // レビュー対象は動画に加えて音声(Podcast)も許可する(R2 直接アップロード経路のみ)
+    const contentType = resolveMediaContentType(fileName, contentTypeInput);
     if (!contentType) {
-      return apiErrors.badRequest('対応していない動画形式です');
+      return apiErrors.badRequest('対応していない動画・音声形式です');
     }
 
-    const ext = getVideoExtensionFromMime(contentType);
+    const ext = getMediaExtensionFromMime(contentType);
     if (!ext) {
-      return apiErrors.badRequest('対応していない動画形式です');
+      return apiErrors.badRequest('対応していない動画・音声形式です');
     }
 
     const quotaError = await enforceStorageQuota(

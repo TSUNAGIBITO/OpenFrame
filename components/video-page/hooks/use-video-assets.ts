@@ -8,7 +8,7 @@ import { apiRequestError, toastApiError } from '@/lib/client/api-error';
 type BunnyDownloadPreference = 'original' | 'compressed';
 
 type CreateAssetPayload = {
-  provider: 'R2_IMAGE' | 'YOUTUBE' | 'BUNNY' | 'R2_AUDIO' | 'R2_VIDEO';
+  provider: 'R2_IMAGE' | 'YOUTUBE' | 'BUNNY' | 'R2_AUDIO' | 'R2_VIDEO' | 'EXTERNAL_LINK';
   displayName?: string;
   sourceUrl: string;
   providerVideoId?: string;

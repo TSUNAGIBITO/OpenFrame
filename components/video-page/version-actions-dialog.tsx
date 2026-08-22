@@ -24,11 +24,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { VideoSource } from '@/lib/video-providers';
+import {
+  isUploadableMediaFile,
+  uploadAcceptForProvider,
+} from '@/lib/client/project-video-upload';
+import type { DirectUploadProvider } from '@/components/video-page/types';
 
 interface VersionActionsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   directUploadsEnabled: boolean;
+  /** 音声(Podcast)は R2 直接アップロードのときのみ許可(Bunny は動画専用) */
+  directUploadProvider?: DirectUploadProvider;
   newVersionMode: 'url' | 'file';
   onNewVersionModeChange: (mode: 'url' | 'file') => void;
   newVersionUrl: string;
@@ -50,6 +57,7 @@ export const VersionActionsDialog = memo(function VersionActionsDialog({
   open,
   onOpenChange,
   directUploadsEnabled,
+  directUploadProvider = 'bunny',
   newVersionMode,
   onNewVersionModeChange,
   newVersionUrl,
@@ -126,7 +134,9 @@ export const VersionActionsDialog = memo(function VersionActionsDialog({
             </div>
           ) : (
             <div className="space-y-2">
-              <Label htmlFor="versionFile">動画ファイル</Label>
+              <Label htmlFor="versionFile">
+                {directUploadProvider === 'r2' ? '動画・音声ファイル' : '動画ファイル'}
+              </Label>
               <div className="flex items-center justify-center w-full">
                 <label
                   htmlFor="versionFile"
@@ -149,21 +159,29 @@ export const VersionActionsDialog = memo(function VersionActionsDialog({
                         <p className="mb-1 text-sm text-muted-foreground">
                           <span className="font-semibold">クリックしてアップロード</span> またはドラッグ＆ドロップ
                         </p>
-                        <p className="text-xs text-muted-foreground">MP4、WebM、OGG</p>
+                        <p className="text-xs text-muted-foreground">
+                          {directUploadProvider === 'r2'
+                            ? 'MP4、WebM、MP3、WAV など'
+                            : 'MP4、WebM、OGG'}
+                        </p>
                       </>
                     )}
                   </div>
                   <input
                     id="versionFile"
                     type="file"
-                    accept="video/*"
+                    accept={uploadAcceptForProvider(directUploadProvider)}
                     className="hidden"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
-                      if (file && file.type.startsWith('video/')) {
+                      if (file && isUploadableMediaFile(file, directUploadProvider)) {
                         onNewVersionFileChange(file);
                       } else {
-                        toast.error('有効な動画ファイルを選択してください');
+                        toast.error(
+                          directUploadProvider === 'r2'
+                            ? '有効な動画・音声ファイルを選択してください'
+                            : '有効な動画ファイルを選択してください'
+                        );
                       }
                     }}
                     disabled={isCreatingVersion}

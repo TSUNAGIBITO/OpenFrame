@@ -311,6 +311,17 @@ export function useVideoPlayer({
         playerRef.current = new YT.Player(iframeRef.current, {
           events: {
             onReady: (event: YT.PlayerEvent) => {
+              // 視聴者のYouTube側設定によっては自動生成字幕が勝手に表示され、
+              // クリエイティブの確認を妨げるため、レビュー画面では常に字幕を外す
+              try {
+                const target = event.target as unknown as {
+                  unloadModule?: (module: string) => void;
+                };
+                target.unloadModule?.('captions');
+                target.unloadModule?.('cc');
+              } catch {
+                /* ignore */
+              }
               setIsReady(true);
               const dur = event.target.getDuration();
               if (dur > 0) setVideoDuration(dur);

@@ -122,6 +122,18 @@ export default async function DashboardPage({
         workspace: {
           select: { id: true, name: true },
         },
+        // カードのサムネイル用: 最近更新された動画のアクティブバージョンから1枚拝借する
+        videos: {
+          orderBy: { updatedAt: 'desc' },
+          take: 1,
+          select: {
+            versions: {
+              where: { isActive: true },
+              take: 1,
+              select: { thumbnailUrl: true },
+            },
+          },
+        },
         _count: {
           select: {
             videos: true,
@@ -148,6 +160,7 @@ export default async function DashboardPage({
     workspaceName: p.workspace?.name ?? null,
     memberCount: p._count.members + 1,
     videoCount: p._count.videos,
+    thumbnailUrl: p.videos[0]?.versions[0]?.thumbnailUrl ?? null,
   }));
 
   return (
