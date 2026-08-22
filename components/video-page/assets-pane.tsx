@@ -37,6 +37,7 @@ import {
   type BunnyPreviewPlayerHandle,
 } from '@/components/video-page/bunny-preview-player';
 import { AssetListSection } from '@/components/video-page/asset-list-section';
+import { resolveGoogleDriveEmbedUrl } from '@/lib/google-drive-embed';
 import type { DirectUploadProvider, VideoAsset } from '@/components/video-page/types';
 import { uploadAssetVideoToR2 } from '@/lib/client/r2-asset-video-upload';
 import {
@@ -1702,37 +1703,53 @@ export const AssetsPane = memo(function AssetsPane({
         open={selectedAsset?.kind === 'LINK'}
         onOpenChange={(open) => !open && setSelectedAsset(null)}
       >
-        <DialogContent className="max-w-sm">
-          <DialogTitle>{selectedAsset?.displayName || '外部リンク'}</DialogTitle>
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 rounded-md border bg-muted p-3">
-              <Link2 className="h-5 w-5 shrink-0 text-muted-foreground" />
-              <div className="min-w-0">
-                <p className="text-sm font-medium">外部リンク素材</p>
-                <p className="text-xs text-muted-foreground truncate">
-                  {getLinkHostname(selectedAsset?.sourceUrl ?? null) ||
-                    selectedAsset?.sourceUrl ||
-                    ''}
-                </p>
+        {(() => {
+          // Google ドライブのフォルダ/ファイルはアプリ内に埋め込み表示できる
+          // (「リンクを知っている全員」共有が前提。閉じている場合は iframe 内に
+          // Google 側の権限エラーが出るだけで、下の「開く」ボタンはそのまま使える)
+          const driveEmbedUrl = resolveGoogleDriveEmbedUrl(selectedAsset?.sourceUrl);
+          return (
+            <DialogContent className={driveEmbedUrl ? 'max-w-4xl w-[92vw]' : 'max-w-sm'}>
+              <DialogTitle>{selectedAsset?.displayName || '外部リンク'}</DialogTitle>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 rounded-md border bg-muted p-3">
+                  <Link2 className="h-5 w-5 shrink-0 text-muted-foreground" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium">外部リンク素材</p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {getLinkHostname(selectedAsset?.sourceUrl ?? null) ||
+                        selectedAsset?.sourceUrl ||
+                        ''}
+                    </p>
+                  </div>
+                </div>
+                {driveEmbedUrl && (
+                  <iframe
+                    src={driveEmbedUrl}
+                    title={selectedAsset?.displayName || 'Google ドライブ'}
+                    className="h-[60vh] w-full rounded-md border bg-background"
+                  />
+                )}
+                {selectedAsset?.sourceUrl ? (
+                  <Button
+                    className="w-full"
+                    variant={driveEmbedUrl ? 'outline' : 'default'}
+                    onClick={() => {
+                      if (selectedAsset?.sourceUrl) {
+                        window.open(selectedAsset.sourceUrl, '_blank', 'noopener');
+                      }
+                    }}
+                  >
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    {driveEmbedUrl ? 'Google ドライブで開く' : '開く'}
+                  </Button>
+                ) : (
+                  <p className="text-sm text-muted-foreground">リンクURLを取得できませんでした。</p>
+                )}
               </div>
-            </div>
-            {selectedAsset?.sourceUrl ? (
-              <Button
-                className="w-full"
-                onClick={() => {
-                  if (selectedAsset?.sourceUrl) {
-                    window.open(selectedAsset.sourceUrl, '_blank', 'noopener');
-                  }
-                }}
-              >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                開く
-              </Button>
-            ) : (
-              <p className="text-sm text-muted-foreground">リンクURLを取得できませんでした。</p>
-            )}
-          </div>
-        </DialogContent>
+            </DialogContent>
+          );
+        })()}
       </Dialog>
 
       <Dialog

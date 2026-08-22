@@ -89,7 +89,8 @@ export function buildContentSecurityPolicy(): string {
     "style-src 'self' 'unsafe-inline'",
     `img-src ${imgSrcParts.join(' ')}`,
     `media-src ${mediaSrcParts.join(' ')}`,
-    "frame-src 'self' https://www.youtube.com https://iframe.mediadelivery.net",
+    // drive/docs.google.com はリンク素材の Google ドライブ埋め込みプレビュー用
+    "frame-src 'self' https://www.youtube.com https://iframe.mediadelivery.net https://drive.google.com https://docs.google.com",
     `connect-src ${connectSrcParts.join(' ')}`,
     // next/font self-hosts Google Fonts at build time — no external font origin needed
     "font-src 'self'",
