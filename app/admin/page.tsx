@@ -116,7 +116,7 @@ export default async function AdminDashboardPage() {
         <h2 className="text-3xl font-bold tracking-tight">ダッシュボード概要</h2>
         <RefreshR2StatsButton />
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">総ユーザー数</CardTitle>
@@ -217,7 +217,7 @@ export default async function AdminDashboardPage() {
       {isStripeBillingEnabled() && stripeStats && (
         <>
           <h3 className="text-xl font-semibold tracking-tight pt-2">請求・売上</h3>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">月次経常収益(MRR)</CardTitle>

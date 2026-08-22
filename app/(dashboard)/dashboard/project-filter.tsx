@@ -268,7 +268,7 @@ export function ProjectFilter({
       {/* Projects */}
       {projects.length > 0 ? (
         viewMode === 'card' ? (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {projects.map((project) => (
               <Link key={project.id} href={`/projects/${project.id}`}>
                 <Card className="h-full overflow-hidden pt-0 transition-colors hover:bg-accent/50 cursor-pointer">

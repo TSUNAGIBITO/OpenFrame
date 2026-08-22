@@ -169,7 +169,7 @@ export default async function WorkspacePage({ params, searchParams }: WorkspaceP
       {/* Projects Grid */}
       {workspace.projects.length > 0 ? (
         <>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {workspace.projects.map((project: (typeof workspace.projects)[number]) => (
               <Link key={project.id} href={`/projects/${project.id}`}>
                 <Card className="h-full transition-colors hover:bg-accent/50 cursor-pointer">

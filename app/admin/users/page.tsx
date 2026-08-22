@@ -539,7 +539,7 @@ export default async function AdminUsersPage({
         <h2 className="text-3xl font-bold tracking-tight">ユーザー</h2>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Bunny Stream ストレージ</CardTitle>

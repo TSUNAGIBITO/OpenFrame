@@ -177,7 +177,7 @@ export default async function AdminFeedbackDetailPage({
                 スクリーンショットは添付されていません。
               </div>
             ) : (
-              <div className="grid gap-3 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 {screenshotItems.map((screenshot, index) => (
                   <a
                     key={screenshot.id}

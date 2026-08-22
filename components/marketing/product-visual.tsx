@@ -40,7 +40,7 @@ export function ProductVisual({ variant }: ProductVisualProps) {
   if (variant === 'version-compare') {
     return (
       <div className="border border-border bg-card p-4">
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {['V2', 'V3'].map((version) => (
             <div key={version} className="border border-border/60 bg-background p-3">
               <div className="mb-3 flex items-center justify-between text-[10px] uppercase tracking-[0.14em] text-muted-foreground">

@@ -301,7 +301,7 @@ export default function FeedbackPage() {
                       {feedbackScreenshotFiles.length}/5枚選択中
                     </p>
                     {feedbackScreenshotPreviewUrls.length > 0 && (
-                      <div className="grid gap-2 sm:grid-cols-2">
+                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                         {feedbackScreenshotPreviewUrls.map((previewUrl, index) => (
                           <div key={`${previewUrl}-${index}`} className="rounded-md border p-2">
                             <Image

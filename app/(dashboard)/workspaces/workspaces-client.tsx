@@ -78,7 +78,7 @@ export function WorkspacesClient({
 
       {/* Workspaces Grid */}
       {workspaces.length > 0 ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {workspaces.map((workspace) => (
             <Link key={workspace.id} href={`/workspaces/${workspace.id}`}>
               <Card className="h-full transition-colors hover:bg-accent/50 cursor-pointer">

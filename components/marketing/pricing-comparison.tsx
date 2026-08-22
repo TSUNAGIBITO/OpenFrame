@@ -9,7 +9,7 @@ interface PricingComparisonProps {
 export function PricingComparison({ rows, footnote, competitorName }: PricingComparisonProps) {
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {rows.map((row) => (
           <div key={row.label} className="border border-border bg-card p-5">
             <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">{row.label}</p>

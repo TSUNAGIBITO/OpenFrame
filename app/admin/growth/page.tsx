@@ -108,7 +108,7 @@ export default async function AdminGrowthPage() {
         <h2 className="text-3xl font-bold tracking-tight">グロース</h2>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">アクティブ有料</CardTitle>
@@ -203,7 +203,7 @@ export default async function AdminGrowthPage() {
             {scoreboard.weeks.length}週間の期間全体における各ステップを、母数を添えて表示しています。最も低い率が改善すべきステップです。
           </p>
         </CardHeader>
-        <CardContent className="grid gap-4 sm:grid-cols-3 lg:grid-cols-5 text-sm">
+        <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-5 text-sm">
           <div>
             <div className="text-muted-foreground">訪問者 → 登録</div>
             <div className="text-lg font-semibold">

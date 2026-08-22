@@ -134,7 +134,7 @@ export function PlanningVideoView(props: PlanningVideoViewProps) {
           {description && <p className="mt-2 text-sm text-muted-foreground">{description}</p>}
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1fr_400px]">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_400px]">
           {/* 説明 */}
           <div className="flex flex-col items-center justify-center rounded-md border border-dashed border-border bg-card/30 p-10 text-center">
             <FileVideo className="mb-4 h-12 w-12 text-muted-foreground" />

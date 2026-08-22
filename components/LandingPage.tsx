@@ -90,15 +90,6 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
     const cleanupHandlers: Array<() => void> = [];
 
     const ctx = gsap.context(() => {
-      // General Reveal Animations
-      gsap.from('[data-hero-copy]', {
-        y: 40,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.15,
-        ease: 'power4.out',
-      });
-
       // Voice Notes Waveform Animation
       const waveformBars = gsap.utils.toArray<HTMLElement>('.voice-bar');
       waveformBars.forEach((bar, index) => {
@@ -315,7 +306,7 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
               </h2>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-4 relative">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-4 relative">
               {[
                 { label: '動画をアップロード', icon: Upload },
                 { label: 'レビューリンクを共有', icon: Share2 },
@@ -524,7 +515,7 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
                 >
                   コアワークフロー
                 </p>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {coreWorkflowFeatures.map((feat) => (
                     <div
                       key={feat.title}
@@ -546,7 +537,7 @@ export function LandingPage({ isLoggedIn }: LandingPageProps) {
                 >
                   作業を加速する機能
                 </p>
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {workflowAcceleratorFeatures.map((feat) => (
                     <div
                       key={feat.title}
