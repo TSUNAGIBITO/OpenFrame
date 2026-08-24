@@ -61,6 +61,7 @@ type AssetWithViewerFields = {
   sourceUrl: string;
   providerVideoId: string | null;
   thumbnailUrl: string | null;
+  isMaterial: boolean;
   uploadedByUserId?: string | null;
   uploadedByGuestName: string | null;
   uploadedByGuestIdentityId?: string | null;
@@ -110,6 +111,7 @@ function shapeAssetForViewer(
     sourceUrl: canExposeSource ? asset.sourceUrl : null,
     providerVideoId: canExposeSource ? asset.providerVideoId : null,
     thumbnailUrl: canExposeSource ? asset.thumbnailUrl : null,
+    isMaterial: asset.isMaterial,
     uploadedByUserId: asset.uploadedByUserId ?? null,
     uploadedByGuestName: asset.uploadedByGuestName,
     createdAt: asset.createdAt,
@@ -257,6 +259,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         sourceUrl: true,
         providerVideoId: true,
         thumbnailUrl: true,
+        isMaterial: true,
         uploadedByUserId: includeDeleteMetadata,
         uploadedByGuestName: true,
         uploadedByGuestIdentityId: includeDeleteMetadata,
@@ -351,6 +354,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const requestedDisplayName = typeof body?.displayName === 'string' ? body.displayName : null;
     // Optional reservation ID created by the upload route for atomic quota accounting
     reservationId = typeof body?.reservationId === 'string' ? body.reservationId.trim() : null;
+    // 撮影者が編集者に渡す未編集の生素材フラグ(#68)。動画アセットのみ意味を持つ
+    const isMaterial = body?.isMaterial === true;
     let displayName = '';
     let sourceUrl = '';
     let providerVideoId: string | null = null;
@@ -703,6 +708,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           providerVideoId,
           thumbnailUrl,
           sizeBytes: assetSizeBytes,
+          // 素材(未編集フッテージ)は動画アセットのみ対象。他kindでのtrueは無視する
+          isMaterial: kind === 'VIDEO' && isMaterial,
           uploadedByUserId: context.viewerUserId,
           uploadedByGuestIdentityId: context.viewerUserId
             ? null
@@ -724,6 +731,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           sourceUrl: true,
           providerVideoId: true,
           thumbnailUrl: true,
+          isMaterial: true,
           uploadedByGuestName: true,
           createdAt: true,
           updatedAt: true,

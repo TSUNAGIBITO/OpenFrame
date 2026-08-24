@@ -107,6 +107,11 @@ export const AssetListSection = memo(function AssetListSection({
               <div className="flex items-start justify-between gap-2">
                 <p className="text-sm font-medium truncate">{asset.displayName}</p>
                 <div className="flex items-center gap-1 shrink-0">
+                  {asset.isMaterial ? (
+                    <Badge variant="outline" className="text-[10px]">
+                      素材
+                    </Badge>
+                  ) : null}
                   {isBunnyProcessing ? (
                     <Badge variant="secondary" className="text-[10px] gap-1">
                       <Loader2 className="h-2.5 w-2.5 animate-spin" />

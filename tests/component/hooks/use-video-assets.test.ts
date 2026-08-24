@@ -30,6 +30,7 @@ function makeAsset(overrides: Partial<VideoAsset> = {}): VideoAsset {
     sourceUrl: '/api/upload/image/proj1/ref.png',
     providerVideoId: null,
     thumbnailUrl: null,
+    isMaterial: false,
     uploadedByUserId: 'user1',
     uploadedByGuestName: null,
     createdAt: '2026-01-01T00:00:00.000Z',

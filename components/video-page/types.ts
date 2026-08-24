@@ -27,6 +27,7 @@ export interface VideoAsset {
   sourceUrl: string | null;
   providerVideoId: string | null;
   thumbnailUrl: string | null;
+  isMaterial: boolean;
   uploadedByUserId: string | null;
   uploadedByGuestName: string | null;
   createdAt: string;

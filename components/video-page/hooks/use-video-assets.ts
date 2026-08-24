@@ -16,6 +16,7 @@ type CreateAssetPayload = {
   uploadToken?: string;
   objectKey?: string;
   reservationId?: string | null;
+  isMaterial?: boolean;
 };
 
 interface UseVideoAssetsParams {

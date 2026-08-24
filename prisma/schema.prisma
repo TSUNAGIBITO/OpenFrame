@@ -409,6 +409,8 @@ model VideoAsset {
   billedUserId             String
   billedUser               User               @relation("VideoAssetBilledTo", fields: [billedUserId], references: [id], onDelete: Cascade)
   sizeBytes                BigInt             @default(0) @map("size_bytes")
+  // 撮影者が編集者に渡す未編集の生素材フラグ。完成版・参考素材との区別用(#68)
+  isMaterial               Boolean            @default(false)
   createdAt                DateTime           @default(now())
   updatedAt                DateTime           @updatedAt
 
@@ -417,6 +419,7 @@ model VideoAsset {
   @@index([provider])
   @@index([providerVideoId])
   @@index([videoId, createdAt(sort: Desc)])
+  @@index([videoId, isMaterial])
   @@map("video_assets")
 }
 

@@ -111,6 +111,7 @@ interface AssetsPaneProps {
     uploadToken?: string;
     objectKey?: string;
     reservationId?: string | null;
+    isMaterial?: boolean;
   }) => Promise<VideoAsset | null>;
   deleteAsset: (assetId: string) => Promise<boolean>;
   downloadAsset: (asset: VideoAsset, preference?: 'original' | 'compressed') => Promise<void>;
@@ -152,6 +153,7 @@ export const AssetsPane = memo(function AssetsPane({
   const [linkUrl, setLinkUrl] = useState('');
   const [linkTitle, setLinkTitle] = useState('');
   const [bunnyTitle, setBunnyTitle] = useState('');
+  const [isMaterialUpload, setIsMaterialUpload] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isUploadingBunny, setIsUploadingBunny] = useState(false);
   const [bunnyProgress, setBunnyProgress] = useState(0);
@@ -617,6 +619,7 @@ export const AssetsPane = memo(function AssetsPane({
           uploadToken: initData.uploadToken,
           thumbnailUrl,
           displayName: bunnyTitle.trim() || file.name,
+          isMaterial: isMaterialUpload,
         });
         if (!createdAsset) {
           throw new Error('Failed to finalize Bunny asset');
@@ -641,7 +644,7 @@ export const AssetsPane = memo(function AssetsPane({
         setBunnyUploadLabel('');
       }
     },
-    [videoId, bunnyTitle, bunnyCdnHostname, createAsset]
+    [videoId, bunnyTitle, bunnyCdnHostname, createAsset, isMaterialUpload]
   );
 
   const handleR2FileUpload = useCallback(
@@ -672,6 +675,7 @@ export const AssetsPane = memo(function AssetsPane({
           reservationId: uploadResult.reservationId,
           thumbnailUrl: uploadResult.thumbnailUrl ?? undefined,
           displayName: bunnyTitle.trim() || file.name,
+          isMaterial: isMaterialUpload,
         });
         if (!createdAsset) {
           throw new Error('Failed to finalize video asset');
@@ -687,7 +691,7 @@ export const AssetsPane = memo(function AssetsPane({
         setBunnyUploadLabel('');
       }
     },
-    [videoId, bunnyTitle, createAsset]
+    [videoId, bunnyTitle, createAsset, isMaterialUpload]
   );
 
   const handleVideoFileUpload = useCallback(
@@ -717,7 +721,10 @@ export const AssetsPane = memo(function AssetsPane({
       }
 
       if (bunnyInputRef.current) bunnyInputRef.current.value = '';
-      if (successCount > 0) setBunnyTitle('');
+      if (successCount > 0) {
+        setBunnyTitle('');
+        setIsMaterialUpload(false);
+      }
 
       if (successCount > 0 && failCount === 0) {
         toast.success(successCount === 1 ? '動画をアップロードしました' : `${successCount}件の動画をアップロードしました`);
@@ -1384,6 +1391,18 @@ export const AssetsPane = memo(function AssetsPane({
               <p className="text-xs text-muted-foreground">
                 複数の動画ファイルをこのパネルにドロップすると、順番にアップロードします。
               </p>
+              <label className="flex items-start gap-2 rounded-md border p-3 text-sm">
+                <input
+                  type="checkbox"
+                  className="mt-0.5"
+                  checked={isMaterialUpload}
+                  onChange={(event) => setIsMaterialUpload(event.target.checked)}
+                  disabled={isUploadingBunny || isCreatingAsset}
+                />
+                <span>
+                  撮影素材として登録する(未編集フッテージ。編集者への受け渡し用)
+                </span>
+              </label>
               <Button
                 variant="outline"
                 className="w-full"
