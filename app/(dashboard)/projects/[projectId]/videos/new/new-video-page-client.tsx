@@ -88,6 +88,8 @@ export default function NewVideoPageClient({
     title: '',
     description: '',
   });
+  // つなぐホスティング(Castopod)への転送先(#66)。番組制作の企画のときだけ任意で設定
+  const [castopodShowId, setCastopodShowId] = useState('');
   const isUploadingFile = isLoading && uploadMode === 'file';
   const isMultiFileUpload = selectedFiles.length > 1;
   const leaveWarningMessage =
@@ -428,6 +430,7 @@ export default function NewVideoPageClient({
             title: planningTitle,
             description: formData.description.trim() || null,
             planningOnly: true,
+            castopodShowId: castopodShowId.trim() || null,
           }),
         });
 
@@ -768,6 +771,24 @@ export default function NewVideoPageClient({
                     </p>
                   ) : null}
                 </div>
+
+                {uploadMode === 'planning' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="castopod-show-id">
+                      つなぐホスティング配信先(任意)
+                    </Label>
+                    <Input
+                      id="castopod-show-id"
+                      placeholder="Castopod番組ID（Podcast企画のときだけ入力）"
+                      value={castopodShowId}
+                      onChange={(e) => setCastopodShowId(e.target.value)}
+                      disabled={isLoading}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      設定すると、承認が完了するたびにつなぐホスティング(Castopod)へ下書きとして自動転送されます(公開は別途手動)。
+                    </p>
+                  </div>
+                )}
               </>
             ) : null}
 

@@ -7,6 +7,7 @@ import { rateLimit } from '@/lib/rate-limit';
 import { apiErrors, successResponse, withCacheControl } from '@/lib/api-response';
 import { logError } from '@/lib/logger';
 import { eventKey, recordEvent } from '@/lib/analytics/record';
+import { createDraftEpisode } from '@/lib/castopod';
 
 type RouteParams = { params: Promise<{ requestId: string }> };
 
@@ -219,6 +220,32 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }).catch((error) => {
         logError('Approval completed notification failed:', error);
       });
+
+      // つなぐホスティング(Castopod)への転送(#66)。企画作成時に転送先(castopodShowId)を
+      // 設定した動画のみ対象。draft作成のみで公開はしない(実際の配信タイミングは
+      // Castopod管理画面での人間の判断に委ねる)。失敗しても承認自体は成立済みなので
+      // レスポンスは失敗させず、ログのみ残す。
+      //
+      // 【既知の制約】Castopod側の自前追加APIが音声ファイルの差し替えに対応していないため、
+      // 承認のたびに新規draftを作成する(既存draftの更新はしない)。同じ動画を何度も
+      // 再承認すると複数draftが積み上がる点は許容する(古い音声のまま静かに残るより安全)。
+      const castopodShowId = approvalRequest.version.video.castopodShowId;
+      if (castopodShowId && approvalRequest.version.providerId === 'direct') {
+        try {
+          const episode = await createDraftEpisode({
+            castopodShowId,
+            videoId: approvalRequest.version.video.id,
+            title: updated.version.video.title,
+            audioUrl: approvalRequest.version.originalUrl,
+          });
+          await db.video.update({
+            where: { id: approvalRequest.version.video.id },
+            data: { castopodEpisodeId: String(episode.id) },
+          });
+        } catch (error) {
+          logError('Castopod transfer failed:', error);
+        }
+      }
     } else if (updated.status === 'REJECTED') {
       notifyUsers([updated.requestedById], {
         type: 'approval_rejected',

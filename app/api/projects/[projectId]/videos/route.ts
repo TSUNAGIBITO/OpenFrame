@@ -110,6 +110,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       uploadToken,
       objectKey,
       planningOnly,
+      castopodShowId,
     } = body;
 
     // 企画のみ作成: 動画本体なしでコンテンツの箱だけ作り、素材を集めてから
@@ -130,6 +131,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           description: typeof description === 'string' ? description.trim() || null : null,
           position: (lastPlanned?.position ?? -1) + 1,
           projectId,
+          // つなぐホスティング(Castopod)への転送先(#66)。Podcast企画のときだけ任意設定
+          castopodShowId:
+            typeof castopodShowId === 'string' && castopodShowId.trim()
+              ? castopodShowId.trim()
+              : null,
         },
         include: {
           versions: true,

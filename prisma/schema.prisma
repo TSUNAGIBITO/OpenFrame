@@ -341,16 +341,22 @@ model Video {
   // Project relation
   projectId   String
   project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
+
+  // つなぐホスティング(Castopod)への転送先(#66)。企画作成時に任意設定。
+  // castopodEpisodeId は初回転送でCastopod側に作られたdraftのIDを保持し、
+  // 再承認時に同じdraftを更新する(重複作成防止)
+  castopodShowId    String?
+  castopodEpisodeId String?
+
   // Timestamps
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   // Relations
   versions    VideoVersion[]
   assets      VideoAsset[]
   shareLinks  ShareLink[]
-  
+
   @@index([projectId])
   @@map("videos")
 }
