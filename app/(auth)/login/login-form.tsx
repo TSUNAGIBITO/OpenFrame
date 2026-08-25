@@ -57,6 +57,7 @@ function LoginFormInner({ googleEnabled, githubEnabled }: LoginFormInnerProps) {
   const [password, setPassword] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
   const [showVerifiedSuccess, setShowVerifiedSuccess] = useState(false);
+  const [showPasswordResetSuccess, setShowPasswordResetSuccess] = useState(false);
   const callbackUrl = getSafeCallbackUrl(searchParams.get('callbackUrl'));
   const isInvitationFlow = isInvitationCallbackUrl(callbackUrl);
   const registerHref = buildRegisterHref(callbackUrl);
@@ -67,6 +68,9 @@ function LoginFormInner({ googleEnabled, githubEnabled }: LoginFormInnerProps) {
     }
     if (searchParams.get('verified') === 'true') {
       setShowVerifiedSuccess(true);
+    }
+    if (searchParams.get('passwordReset') === 'true') {
+      setShowPasswordResetSuccess(true);
     }
     const errorCode = searchParams.get('error');
     if (errorCode) {
@@ -139,6 +143,12 @@ function LoginFormInner({ googleEnabled, githubEnabled }: LoginFormInnerProps) {
         {showVerifiedSuccess && (
           <div className="p-3 rounded-md bg-green-500/10 text-green-600 text-sm mb-4">
             メールアドレスを確認しました。サインインできます。
+          </div>
+        )}
+
+        {showPasswordResetSuccess && (
+          <div className="p-3 rounded-md bg-green-500/10 text-green-600 text-sm mb-4">
+            パスワードを再設定しました。新しいパスワードでサインインしてください。
           </div>
         )}
 
@@ -240,7 +250,12 @@ function LoginFormInner({ googleEnabled, githubEnabled }: LoginFormInnerProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">パスワード</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">パスワード</Label>
+              <Link href="/forgot-password" className="text-xs text-primary hover:underline">
+                パスワードをお忘れですか？
+              </Link>
+            </div>
             <Input
               id="password"
               type="password"

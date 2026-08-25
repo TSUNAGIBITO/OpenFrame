@@ -90,6 +90,10 @@ export const RATE_LIMIT_CONFIGS: Record<string, RateLimitConfig> = {
   'verify-email': { windowMs: 15 * 60 * 1000, maxRequests: 20 }, // 20 per 15 min (clicked link)
   'resend-verification': { windowMs: 60 * 60 * 1000, maxRequests: 5 }, // 5 per hour
 
+  // Password reset — same shape as resend-verification (request) / verify-email (consume)
+  'forgot-password': { windowMs: 60 * 60 * 1000, maxRequests: 5 }, // 5 per hour
+  'reset-password': { windowMs: 15 * 60 * 1000, maxRequests: 10 }, // 10 per 15 min (clicked link + submit)
+
   // Onboarding — one-time action, very strict. Both are keyed by user id, not IP:
   // an office behind one address must not be able to lock its colleagues out of
   // finishing onboarding.
