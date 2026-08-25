@@ -79,8 +79,17 @@ export async function consumePasswordResetToken(
   const email = record.identifier.slice(IDENTIFIER_PREFIX.length);
   const hashedPassword = await bcrypt.hash(newPassword, 12);
 
+  // Clicking the reset link is proof of mailbox access — the same proof email
+  // verification exists to establish. Without this, an account created before
+  // email verification was required (or that never clicked its original
+  // verification link) resets its password successfully here and then gets
+  // silently blocked by the emailVerified check in lib/auth.ts's authorize(),
+  // which surfaces as an indistinguishable "wrong password" error.
   const [updated] = await db.$transaction([
-    db.user.updateMany({ where: { email }, data: { password: hashedPassword } }),
+    db.user.updateMany({
+      where: { email },
+      data: { password: hashedPassword, emailVerified: new Date() },
+    }),
     db.verificationToken.delete({ where: { token: tokenHash } }),
   ]);
 

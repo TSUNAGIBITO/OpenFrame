@@ -35,7 +35,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         // Find user by email
         const user = await db.user.findUnique({
-          where: { email: email.toLowerCase() },
+          where: { email: email.trim().toLowerCase() },
         });
 
         // Always perform bcrypt comparison to prevent timing attacks
