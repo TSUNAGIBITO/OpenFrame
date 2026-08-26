@@ -95,7 +95,8 @@ export default function NewVideoPageClient({
     title: '',
     description: '',
   });
-  // つなぐホスティング(Castopod)への転送先(#66)。番組制作の企画のときだけ任意で設定
+  // つなぐホスティング(Castopod)への転送先(#66)。プロジェクトのデフォルトを初期値にしつつ
+  // 動画ごとに上書きできる(2026-08-26拡張。企画作成に加え直接アップロードでも設定可能)
   const [castopodShowId, setCastopodShowId] = useState('');
   const [castopodShows, setCastopodShows] = useState<{ id: number; handle: string; title: string }[]>(
     []
@@ -111,10 +112,21 @@ export default function NewVideoPageClient({
       .catch(() => {
         // 一覧取得に失敗しても「配信先なし」で企画作成は続行できる(fail-safe)
       });
+    fetch(`/api/projects/${projectId}`)
+      .then((res) => res.json())
+      .then((payload) => {
+        const defaultShowId = payload?.data?.castopodShowId;
+        if (!cancelled && typeof defaultShowId === 'string' && defaultShowId) {
+          setCastopodShowId(defaultShowId);
+        }
+      })
+      .catch(() => {
+        // 取得失敗時は「配信先なし」のまま(動画側で個別に選び直せる)
+      });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [projectId]);
   const isUploadingFile = isLoading && uploadMode === 'file';
   const isMultiFileUpload = selectedFiles.length > 1;
   const leaveWarningMessage =
@@ -345,6 +357,7 @@ export default function NewVideoPageClient({
       provider: directUploadProvider,
       title,
       description,
+      castopodShowId: castopodShowId.trim() || null,
       bunnyCdnHostname,
       onProgress: (progress) => {
         setUploadProgress(progress);
@@ -797,7 +810,7 @@ export default function NewVideoPageClient({
                   ) : null}
                 </div>
 
-                {uploadMode === 'planning' && (
+                {uploadMode !== 'url' && (
                   <div className="space-y-2">
                     <Label htmlFor="castopod-show-id">
                       つなぐホスティング配信先(任意)
@@ -808,7 +821,7 @@ export default function NewVideoPageClient({
                       disabled={isLoading}
                     >
                       <SelectTrigger id="castopod-show-id">
-                        <SelectValue placeholder="配信先を選択(Podcast企画のときだけ)" />
+                        <SelectValue placeholder="配信先を選択" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="__none__">連携しない</SelectItem>
@@ -820,7 +833,7 @@ export default function NewVideoPageClient({
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-muted-foreground">
-                      設定すると、承認が完了するたびにつなぐホスティング(Castopod)へ下書きとして自動転送されます(公開は別途手動)。
+                      設定すると、承認が完了するたびにつなぐホスティング(Castopod)へ下書きとして自動転送されます(公開は別途手動)。プロジェクトのデフォルトが設定されている場合は自動で選択済みです。
                     </p>
                   </div>
                 )}

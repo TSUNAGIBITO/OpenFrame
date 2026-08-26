@@ -23,6 +23,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -86,7 +93,11 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
     description: '',
     visibility: 'PRIVATE' as Visibility,
     allowDownloads: false,
+    castopodShowId: '',
   });
+  const [castopodShows, setCastopodShows] = useState<{ id: number; handle: string; title: string }[]>(
+    []
+  );
 
   // Tag management state
   const [tags, setTags] = useState<CommentTag[]>([]);
@@ -111,11 +122,20 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
             description: project.description || '',
             visibility: project.visibility || 'PRIVATE',
             allowDownloads: project.allowDownloads ?? false,
+            castopodShowId: project.castopodShowId || '',
           });
         }
       })
       .catch(() => setError('プロジェクトの読み込みに失敗しました'))
       .finally(() => setIsLoading(false));
+
+    // Fetch Castopod shows (配信先デフォルトのドロップダウン用)
+    fetch('/api/castopod/shows')
+      .then((res) => res.json())
+      .then((payload) => setCastopodShows(payload?.data?.shows || []))
+      .catch(() => {
+        // 一覧取得に失敗しても他の設定項目は保存できる(fail-safe)
+      });
 
     // Fetch tags
     fetch(`/api/projects/${projectId}/tags`)
@@ -390,6 +410,34 @@ export default function ProjectSettingsPageClient({ projectId }: ProjectSettings
                       )}
                     </div>
                   </button>
+                </div>
+
+                <div className="space-y-3 rounded-xl border p-4">
+                  <div>
+                    <Label className="text-sm font-medium">つなぐホスティング配信先(デフォルト)</Label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      このプロジェクトで新しく動画を追加する際、配信先の初期値として使われます(動画ごとに個別に上書きも可能です)。
+                    </p>
+                  </div>
+                  <Select
+                    value={formData.castopodShowId || '__none__'}
+                    onValueChange={(v) =>
+                      setFormData((prev) => ({ ...prev, castopodShowId: v === '__none__' ? '' : v }))
+                    }
+                    disabled={isSaving}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="配信先を選択" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">連携しない</SelectItem>
+                      {castopodShows.map((show) => (
+                        <SelectItem key={show.id} value={String(show.id)}>
+                          {show.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {error && (

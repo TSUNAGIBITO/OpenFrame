@@ -103,6 +103,7 @@ export async function uploadProjectVideo(
     provider: DirectUploadProvider;
     title?: string;
     description?: string | null;
+    castopodShowId?: string | null;
     bunnyCdnHostname?: string | null;
   } & ProjectVideoUploadProgress
 ): Promise<void> {
@@ -110,6 +111,7 @@ export async function uploadProjectVideo(
     provider,
     title: titleOverride,
     description = null,
+    castopodShowId = null,
     bunnyCdnHostname = resolvePublicBunnyCdnHostname(),
     onProgress,
     onStatus,
@@ -151,6 +153,7 @@ export async function uploadProjectVideo(
         body: JSON.stringify({
           title,
           description,
+          castopodShowId,
           videoUrl: uploaded.proxyUrl,
           providerId: 'r2',
           videoId: uploaded.objectKey,
@@ -251,6 +254,7 @@ export async function uploadProjectVideo(
       body: JSON.stringify({
         title,
         description,
+        castopodShowId,
         videoUrl: `https://iframe.mediadelivery.net/embed/${libraryId}/${videoId}`,
         providerId: 'bunny',
         videoId,

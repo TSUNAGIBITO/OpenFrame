@@ -231,7 +231,11 @@ model Project {
 
   // Whether non-admin viewers may download project media
   allowDownloads Boolean @default(false)
-  
+
+  // つなぐホスティング(Castopod)配信先のデフォルト(2026-08-26追加)。この番組IDを
+  // 「企画のみ作成」で新しい動画を作る際の初期値として使う(動画側で個別に上書き可能)。
+  castopodShowId String?
+
   // Ownership
   ownerId     String
   owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)

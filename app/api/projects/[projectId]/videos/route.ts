@@ -298,6 +298,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           description: description?.trim() || null,
           position: nextPosition,
           projectId,
+          // つなぐホスティング(Castopod)への転送先(#66拡張、2026-08-26)。直接アップロード
+          // (r2/bunny)の動画にも、企画のみ作成と同様に任意設定できるようにした
+          castopodShowId:
+            typeof castopodShowId === 'string' && castopodShowId.trim()
+              ? castopodShowId.trim()
+              : null,
           versions: {
             create: {
               versionNumber: 1,

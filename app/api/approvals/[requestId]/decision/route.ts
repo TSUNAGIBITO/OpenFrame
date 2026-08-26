@@ -234,8 +234,15 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       // 【既知の制約】Castopod側の自前追加APIが音声ファイルの差し替えに対応していないため、
       // 承認のたびに新規draftを作成する(既存draftの更新はしない)。同じ動画を何度も
       // 再承認すると複数draftが積み上がる点は許容する(古い音声のまま静かに残るより安全)。
+      //
+      // 【2026-08-26修正】'direct' という値は実際には一度も保存されない(スキーマの
+      // コメントが古く、実際の値は 'youtube'/'vimeo'/'r2'/'bunny')。判定は「外部動画
+      // プラットフォームへのリンクではない(=このアプリへ実体をアップロード済み)」に
+      // 修正した。DirectUploadProvider型('bunny'|'r2')と同じ意味。
       const castopodShowId = approvalRequest.version.video.castopodShowId;
-      if (castopodShowId && approvalRequest.version.providerId === 'direct') {
+      const isDirectlyHostedVersion =
+        approvalRequest.version.providerId === 'r2' || approvalRequest.version.providerId === 'bunny';
+      if (castopodShowId && isDirectlyHostedVersion) {
         try {
           const episode = await createDraftEpisode({
             castopodShowId,
