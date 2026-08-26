@@ -24,7 +24,7 @@ export async function GET() {
       settings ?? {
         telegramChatId: null,
         telegramEnabled: false,
-        emailEnabled: false,
+        emailEnabled: true,
         onNewVideo: true,
         onNewVersion: true,
         onNewComment: true,
@@ -79,7 +79,7 @@ export async function PUT(request: NextRequest) {
         userId: session.user.id,
         telegramChatId: telegramChatId || null,
         telegramEnabled: !!telegramEnabled,
-        emailEnabled: !!emailEnabled,
+        emailEnabled: emailEnabled ?? true,
         onNewVideo: onNewVideo ?? true,
         onNewVersion: onNewVersion ?? true,
         onNewComment: onNewComment ?? true,

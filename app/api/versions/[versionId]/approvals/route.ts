@@ -4,6 +4,7 @@ import { auth, checkProjectAccess } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { getApprovalCandidatesForProject } from '@/lib/approval-workflow';
 import { notifyUsers } from '@/lib/notifications';
+import { notifyApprovalRequestToSecretary } from '@/lib/secretary-webhook';
 import { rateLimit } from '@/lib/rate-limit';
 import { apiErrors, successResponse, withCacheControl } from '@/lib/api-response';
 import { logError } from '@/lib/logger';
@@ -181,6 +182,26 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }).catch((error) => {
       logError('Approval request notification failed:', error);
     });
+
+    // いずみさん(Slack Bot)経由の通知+つなぐポータルへのタスク作成(2026-08-26追加)。
+    // secretary側の /api/webhooks/openframe-approval に橋渡しするだけで、Notion/Slackの
+    // 認証情報はこのアプリには持たせない。env未設定なら関数側でfail-safeに何もしない
+    const candidateEmailById = new Map(candidates.map((c) => [c.id, c.email]));
+    for (const approverId of approverIds) {
+      const approverEmail = candidateEmailById.get(approverId);
+      if (!approverEmail) continue;
+      notifyApprovalRequestToSecretary({
+        approverEmail,
+        requesterName,
+        projectName: version.video.project.name,
+        videoTitle: version.video.title,
+        versionLabel,
+        message: message || undefined,
+        url: requestUrl,
+      }).catch((error) => {
+        logError('Secretary webhook notification failed:', error);
+      });
+    }
 
     const response = successResponse({ request: created }, 201);
     return withCacheControl(response, 'private, no-store');

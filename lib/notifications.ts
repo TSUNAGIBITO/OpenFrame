@@ -507,14 +507,45 @@ function shouldSendEvent(
   return false;
 }
 
+// ユーザーが一度も通知設定を保存していない(NotificationSettingの行が無い)場合に使う
+// 既定値。/api/settings/notifications のGETが返す既定値と揃えてある。Telegramは
+// chat ID の紐付けが別途必要な性質上オプトイン(false)のまま、Emailは全員が
+// 持っているチャネルなのでオプトアウト(true)にしている(2026-08-26変更。以前は
+// 未設定=全チャネルOFFで、承認依頼を送っても相手が設定ページを一度も開いていなければ
+// 何も届かず気づきにくいという問題があった)。
+const DEFAULT_NOTIFICATION_SETTINGS = {
+  telegramChatId: null as string | null,
+  telegramEnabled: false,
+  emailEnabled: true,
+  onNewVideo: true,
+  onNewVersion: true,
+  onNewComment: true,
+  onNewReply: true,
+  onApprovalEvents: true,
+  timezone: 'UTC',
+};
+
 export async function notifyUsers(userIds: string[], event: NotificationEvent): Promise<void> {
   try {
     const dedupedUserIds = Array.from(new Set(userIds.filter(Boolean)));
     if (dedupedUserIds.length === 0) return;
 
-    const settingsList = await db.notificationSetting.findMany({
-      where: { userId: { in: dedupedUserIds } },
-      include: { user: { select: { email: true } } },
+    const [existingSettings, users] = await Promise.all([
+      db.notificationSetting.findMany({
+        where: { userId: { in: dedupedUserIds } },
+      }),
+      db.user.findMany({
+        where: { id: { in: dedupedUserIds } },
+        select: { id: true, email: true },
+      }),
+    ]);
+    const settingsByUserId = new Map(existingSettings.map((s) => [s.userId, s]));
+    const emailByUserId = new Map(users.map((u) => [u.id, u.email]));
+
+    const settingsList = dedupedUserIds.map((userId) => {
+      const existing = settingsByUserId.get(userId);
+      const base = existing ?? { userId, ...DEFAULT_NOTIFICATION_SETTINGS };
+      return { ...base, user: { email: emailByUserId.get(userId) ?? null } };
     });
 
     await Promise.allSettled(
