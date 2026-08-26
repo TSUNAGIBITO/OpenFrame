@@ -7,7 +7,7 @@ import { rateLimit } from '@/lib/rate-limit';
 import { apiErrors, successResponse, withCacheControl } from '@/lib/api-response';
 import { logError } from '@/lib/logger';
 import { eventKey, recordEvent } from '@/lib/analytics/record';
-import { createDraftEpisode } from '@/lib/castopod';
+import { buildEpisodeAdminUrl, createDraftEpisode, getShowHandle } from '@/lib/castopod';
 
 type RouteParams = { params: Promise<{ requestId: string }> };
 
@@ -185,6 +185,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     if (!updated) return apiErrors.notFound('Approval request');
 
+    let castopodTransfer:
+      | { status: 'success'; episodeId: string; adminUrl: string | null }
+      | { status: 'failed' }
+      | undefined;
+
     const actorName = session.user.name || 'A team member';
     const versionLabel = updated.version.versionLabel || `Version ${updated.version.versionNumber}`;
     const baseUrl = process.env.NEXTAUTH_URL || '';
@@ -242,8 +247,19 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             where: { id: approvalRequest.version.video.id },
             data: { castopodEpisodeId: String(episode.id) },
           });
+          // 管理画面への直リンクはベストエフォート(取得に失敗しても転送自体は成功扱い。
+          // handleが分からない場合はリンク無しでフロント側が成功メッセージのみ表示する)
+          let adminUrl: string | null = null;
+          try {
+            const handle = await getShowHandle(castopodShowId);
+            if (handle) adminUrl = buildEpisodeAdminUrl(handle, episode.id);
+          } catch (linkError) {
+            logError('Castopod admin link resolution failed:', linkError);
+          }
+          castopodTransfer = { status: 'success', episodeId: String(episode.id), adminUrl };
         } catch (error) {
           logError('Castopod transfer failed:', error);
+          castopodTransfer = { status: 'failed' };
         }
       }
     } else if (updated.status === 'REJECTED') {
@@ -260,7 +276,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       });
     }
 
-    const response = successResponse({ request: updated });
+    const response = successResponse({ request: updated, castopodTransfer });
     return withCacheControl(response, 'private, no-store');
   } catch (error) {
     if (error instanceof Error) {

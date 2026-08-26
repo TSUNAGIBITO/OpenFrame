@@ -16,6 +16,12 @@ interface UseApprovalsParams {
   currentUserId: string | null;
 }
 
+export interface CastopodTransferResult {
+  status: 'success' | 'failed';
+  episodeId?: string;
+  adminUrl?: string | null;
+}
+
 export function useApprovals({ projectId, activeVersionId, currentUserId }: UseApprovalsParams) {
   const [requests, setRequests] = useState<ApprovalRequest[]>([]);
   const [candidates, setCandidates] = useState<ApprovalCandidate[]>([]);
@@ -24,6 +30,7 @@ export function useApprovals({ projectId, activeVersionId, currentUserId }: UseA
   const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
   const [isSubmittingDecision, setIsSubmittingDecision] = useState(false);
   const [isCancelingRequest, setIsCancelingRequest] = useState(false);
+  const [castopodTransfer, setCastopodTransfer] = useState<CastopodTransferResult | null>(null);
   const [error, setError] = useState('');
 
   const fetchRequests = useCallback(async () => {
@@ -98,6 +105,7 @@ export function useApprovals({ projectId, activeVersionId, currentUserId }: UseA
     async (requestId: string, decision: 'APPROVED' | 'REJECTED', note?: string) => {
       setIsSubmittingDecision(true);
       setError('');
+      setCastopodTransfer(null);
       try {
         const res = await fetch(`/api/approvals/${requestId}/decision`, {
           method: 'POST',
@@ -108,6 +116,9 @@ export function useApprovals({ projectId, activeVersionId, currentUserId }: UseA
         if (!res.ok) {
           setError(payload?.error || 'Failed to submit approval decision');
           return false;
+        }
+        if (payload?.data?.castopodTransfer) {
+          setCastopodTransfer(payload.data.castopodTransfer);
         }
         await fetchRequests();
         return true;
@@ -170,6 +181,7 @@ export function useApprovals({ projectId, activeVersionId, currentUserId }: UseA
     isCancelingRequest,
     activePendingRequest,
     myPendingDecision,
+    castopodTransfer,
     error,
     setError,
     fetchRequests,

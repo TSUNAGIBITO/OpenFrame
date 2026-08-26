@@ -21,6 +21,13 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   parseVideoUrl,
   fetchVideoMetadata,
   getThumbnailUrl,
@@ -90,6 +97,24 @@ export default function NewVideoPageClient({
   });
   // つなぐホスティング(Castopod)への転送先(#66)。番組制作の企画のときだけ任意で設定
   const [castopodShowId, setCastopodShowId] = useState('');
+  const [castopodShows, setCastopodShows] = useState<{ id: number; handle: string; title: string }[]>(
+    []
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/castopod/shows')
+      .then((res) => res.json())
+      .then((payload) => {
+        if (!cancelled) setCastopodShows(payload?.data?.shows || []);
+      })
+      .catch(() => {
+        // 一覧取得に失敗しても「配信先なし」で企画作成は続行できる(fail-safe)
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   const isUploadingFile = isLoading && uploadMode === 'file';
   const isMultiFileUpload = selectedFiles.length > 1;
   const leaveWarningMessage =
@@ -777,13 +802,23 @@ export default function NewVideoPageClient({
                     <Label htmlFor="castopod-show-id">
                       つなぐホスティング配信先(任意)
                     </Label>
-                    <Input
-                      id="castopod-show-id"
-                      placeholder="Castopod番組ID（Podcast企画のときだけ入力）"
-                      value={castopodShowId}
-                      onChange={(e) => setCastopodShowId(e.target.value)}
+                    <Select
+                      value={castopodShowId || '__none__'}
+                      onValueChange={(v) => setCastopodShowId(v === '__none__' ? '' : v)}
                       disabled={isLoading}
-                    />
+                    >
+                      <SelectTrigger id="castopod-show-id">
+                        <SelectValue placeholder="配信先を選択(Podcast企画のときだけ)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__none__">連携しない</SelectItem>
+                        {castopodShows.map((show) => (
+                          <SelectItem key={show.id} value={String(show.id)}>
+                            {show.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <p className="text-xs text-muted-foreground">
                       設定すると、承認が完了するたびにつなぐホスティング(Castopod)へ下書きとして自動転送されます(公開は別途手動)。
                     </p>

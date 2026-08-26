@@ -253,6 +253,7 @@ export function VideoPageContent({
     isSubmittingDecision: isSubmittingApprovalDecision,
     isCancelingRequest: isCancelingApprovalRequest,
     activePendingRequest,
+    castopodTransfer: approvalCastopodTransfer,
     error: approvalError,
     setError: setApprovalError,
     fetchRequests: fetchApprovalRequests,
@@ -1067,6 +1068,7 @@ export function VideoPageContent({
             isLoadingRequests={isLoadingApprovals}
             isSubmittingDecision={isSubmittingApprovalDecision}
             isCancelingRequest={isCancelingApprovalRequest}
+            castopodTransfer={approvalCastopodTransfer}
             error={approvalError}
             onRefresh={fetchApprovalRequests}
             onSubmitDecision={submitApprovalDecision}

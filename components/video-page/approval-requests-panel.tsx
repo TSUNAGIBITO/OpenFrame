@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { CheckCircle2, Clock3, Loader2, RefreshCcw, ShieldX, XCircle } from 'lucide-react';
+import { CheckCircle2, Clock3, ExternalLink, Loader2, RefreshCcw, ShieldX, XCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -13,6 +13,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import type { ApprovalRequest } from '@/components/video-page/types';
+import type { CastopodTransferResult } from '@/components/video-page/hooks/use-approvals';
 
 interface ApprovalRequestsPanelProps {
   open: boolean;
@@ -24,6 +25,7 @@ interface ApprovalRequestsPanelProps {
   isLoadingRequests: boolean;
   isSubmittingDecision: boolean;
   isCancelingRequest: boolean;
+  castopodTransfer?: CastopodTransferResult | null;
   error: string;
   onRefresh: () => void;
   onSubmitDecision: (
@@ -87,6 +89,7 @@ export function ApprovalRequestsPanel({
   isLoadingRequests,
   isSubmittingDecision,
   isCancelingRequest,
+  castopodTransfer,
   error,
   onRefresh,
   onSubmitDecision,
@@ -159,6 +162,33 @@ export function ApprovalRequestsPanel({
           {error ? (
             <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
               {error}
+            </div>
+          ) : null}
+
+          {castopodTransfer?.status === 'success' ? (
+            <div className="rounded-md border border-emerald-600/40 bg-emerald-600/10 p-3 space-y-2">
+              <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                <CheckCircle2 className="h-4 w-4" />
+                つなぐホスティングへ下書きとして転送しました
+              </p>
+              {castopodTransfer.adminUrl ? (
+                <Button size="sm" variant="outline" asChild className="gap-1.5">
+                  <a href={castopodTransfer.adminUrl} target="_blank" rel="noreferrer">
+                    Castopodで確認
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                </Button>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  管理画面へのリンクは取得できませんでしたが、転送自体は成功しています。Castopodの管理画面から確認してください。
+                </p>
+              )}
+            </div>
+          ) : null}
+
+          {castopodTransfer?.status === 'failed' ? (
+            <div className="rounded-md border border-amber-600/40 bg-amber-600/10 p-3 text-sm text-amber-700 dark:text-amber-400">
+              承認は完了しましたが、つなぐホスティングへの自動転送に失敗しました。手動でCastopodへアップロードしてください。
             </div>
           ) : null}
 

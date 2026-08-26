@@ -48,6 +48,41 @@ export interface CastopodEpisode {
   cover_url: string;
 }
 
+export interface CastopodShow {
+  id: number;
+  handle: string;
+  title: string;
+}
+
+/**
+ * 配信先(番組)選択肢の一覧。企画作成フォームのドロップダウン用(#66拡張、2026-08-26)。
+ * Castopod REST API のレスポンス形は配列/{data:[...]}のどちらの実装もありうるため両対応。
+ */
+export async function listShows(): Promise<CastopodShow[]> {
+  const raw = await callCastopod<{ data?: CastopodShow[] } | CastopodShow[]>('/podcasts', {
+    method: 'GET',
+  });
+  return Array.isArray(raw) ? raw : (raw.data ?? []);
+}
+
+/** 承認完了時の転送成功後、管理画面への直リンクを組み立てるためのhandle取得 */
+export async function getShowHandle(showId: string): Promise<string | null> {
+  const show = await callCastopod<CastopodShow>(`/podcasts/${showId}`, { method: 'GET' });
+  return show?.handle ?? null;
+}
+
+/**
+ * Castopod管理画面のエピソード編集ページへの直リンクを組み立てる。
+ * ルーティングは一般的なCastopodの慣例(/cp-admin/{show}/episodes/{id}/edit)に基づく
+ * 推測であり、実機で未検証。ズレていた場合は番組一覧ページ(/cp-admin/{show})への
+ * リンクにフォールバックしても機能自体は損なわれない。
+ */
+export function buildEpisodeAdminUrl(showHandle: string, episodeId: number | string): string | null {
+  const c = cfg();
+  if (!c) return null;
+  return `${c.base}/cp-admin/${showHandle}/episodes/${episodeId}/edit`;
+}
+
 /**
  * 承認済みバージョンをCastopodにdraftエピソードとして作成する(公開はしない)。
  * 実際の配信タイミングはCastopod管理画面での人間の判断に委ねる。
