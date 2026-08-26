@@ -248,7 +248,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             castopodShowId,
             videoId: approvalRequest.version.video.id,
             title: updated.version.video.title,
-            audioUrl: approvalRequest.version.originalUrl,
+            videoUrl: approvalRequest.version.originalUrl,
           });
           await db.video.update({
             where: { id: approvalRequest.version.video.id },

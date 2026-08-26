@@ -86,19 +86,23 @@ export function buildEpisodeAdminUrl(showHandle: string, episodeId: number | str
 /**
  * 承認済みバージョンをCastopodにdraftエピソードとして作成する(公開はしない)。
  * 実際の配信タイミングはCastopod管理画面での人間の判断に委ねる。
+ *
+ * 【2026-08-26修正】以前は動画ファイルの中身をそのまま `audio_file` として、
+ * ファイル名だけ `episode.mp3` と偽って送っていた(実データはmp4で、音声として
+ * 正しくデコードできる保証がなかった)。動画対応(castopod-overrides側で
+ * video_url パラメータを追加、サーバー側でffmpeg抽出した本物の音声を
+ * audio に格納する)に合わせ、ここでは動画URLをそのまま渡すだけにする。
+ * ファイルの再ダウンロード・再アップロードをOpenFrame側で行わないため、
+ * Vercel関数のペイロード/タイムアウト制約も回避できる。
  */
 export async function createDraftEpisode(params: {
   castopodShowId: string;
   videoId: string;
   title: string;
-  audioUrl: string;
+  videoUrl: string;
 }): Promise<CastopodEpisode> {
   const c = cfg();
   if (!c) throw new Error('Castopod連携が未設定です');
-
-  const audioRes = await fetch(params.audioUrl, { signal: AbortSignal.timeout(60_000) });
-  if (!audioRes.ok) throw new Error(`承認済みコンテンツの取得に失敗しました: ${audioRes.status}`);
-  const audioBlob = await audioRes.blob();
 
   const form = new FormData();
   form.set('title', params.title);
@@ -109,7 +113,7 @@ export async function createDraftEpisode(params: {
   form.set('type', 'full');
   form.set('created_by', String(c.userId));
   form.set('updated_by', String(c.userId));
-  form.set('audio_file', audioBlob, 'episode.mp3');
+  form.set('video_url', params.videoUrl);
 
   return callCastopod<CastopodEpisode>('/episodes', { method: 'POST', body: form });
 }
