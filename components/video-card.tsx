@@ -7,6 +7,7 @@ import {
   Play,
   MessageSquare,
   Clock,
+  Clock3,
   MoreVertical,
   Loader2,
   Link as LinkIcon,
@@ -19,6 +20,7 @@ import {
   CheckSquare,
   Check,
   FolderInput,
+  XCircle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -59,6 +61,38 @@ import { resolvePublicBunnyCdnHostname } from '@/lib/bunny-cdn';
 import { MoveVideosDialog } from '@/components/move-videos-dialog';
 import { cn } from '@/lib/utils';
 
+export type VideoApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+// アクティブバージョンの最新承認依頼ステータスのバッジ
+// (スタイルは components/video-page/approval-requests-panel.tsx の statusBadge に合わせる)
+function approvalStatusBadge(status: VideoApprovalStatus | null | undefined) {
+  if (status === 'PENDING') {
+    return (
+      <Badge variant="secondary" className="gap-1 text-xs">
+        <Clock3 className="h-3 w-3" />
+        承認待ち
+      </Badge>
+    );
+  }
+  if (status === 'APPROVED') {
+    return (
+      <Badge className="gap-1 text-xs bg-emerald-600 hover:bg-emerald-600">
+        <CheckCircle2 className="h-3 w-3" />
+        承認済み
+      </Badge>
+    );
+  }
+  if (status === 'REJECTED') {
+    return (
+      <Badge variant="destructive" className="gap-1 text-xs">
+        <XCircle className="h-3 w-3" />
+        差し戻し
+      </Badge>
+    );
+  }
+  return null;
+}
+
 interface VideoCardProps {
   video: {
     id: string;
@@ -68,6 +102,7 @@ interface VideoCardProps {
     commentCount: number;
     duration: string;
     lastUpdated: string;
+    approvalStatus?: VideoApprovalStatus | null;
   };
   projectId: string;
   canManage: boolean;
@@ -353,6 +388,7 @@ export function VideoCard({
                       </Badge>
                       <span className="text-xs">{video.duration}</span>
                     </span>
+                    {approvalStatusBadge(video.approvalStatus)}
                     <span className="flex items-center gap-1">
                       <MessageSquare className="h-3.5 w-3.5" />
                       {video.commentCount}
@@ -373,6 +409,7 @@ export function VideoCard({
                       </Badge>
                       <span className="text-xs">{video.duration}</span>
                     </span>
+                    {approvalStatusBadge(video.approvalStatus)}
                     <span className="flex items-center gap-1">
                       <MessageSquare className="h-3.5 w-3.5" />
                       {video.commentCount}

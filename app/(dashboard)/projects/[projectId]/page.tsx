@@ -115,6 +115,12 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
           take: 1,
           include: {
             _count: { select: { comments: true } },
+            // アクティブバージョンの最新承認依頼(バッジ表示用)。ネストselect+take:1でN+1を避ける
+            approvalRequests: {
+              orderBy: { createdAt: 'desc' },
+              take: 1,
+              select: { status: true },
+            },
           },
         },
         _count: { select: { versions: true } },
@@ -135,6 +141,8 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
   // Transform videos for VideoCard component
   const videos = paginatedVideos.map((video) => {
     const activeVersion = video.versions[0];
+    // 最新の承認依頼が取消(CANCELED)の場合はバッジを出さない
+    const latestApprovalStatus = activeVersion?.approvalRequests[0]?.status ?? null;
     return {
       id: video.id,
       title: video.title,
@@ -146,6 +154,7 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
       duration: formatDuration(activeVersion?.duration),
       lastUpdated: formatRelativeTime(video.updatedAt),
       updatedAt: video.updatedAt.toISOString(),
+      approvalStatus: latestApprovalStatus === 'CANCELED' ? null : latestApprovalStatus,
     };
   });
 

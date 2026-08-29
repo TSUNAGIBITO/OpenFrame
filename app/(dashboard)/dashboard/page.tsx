@@ -113,7 +113,7 @@ export default async function DashboardPage({
     ...(ws && ws !== 'all' ? { workspaceId: ws } : {}),
   };
 
-  const [projects, totalProjects] = await Promise.all([
+  const [projects, totalProjects, pendingDecisions] = await Promise.all([
     db.project.findMany({
       skip,
       take: pageSize,
@@ -146,7 +146,47 @@ export default async function DashboardPage({
     db.project.count({
       where: queryWhere,
     }),
+    // 自分が承認者として未回答の承認依頼(依頼自体もPENDINGのもの)。
+    // @@index([approverId, status]) が効き、1ユーザーの承認待ちは実運用で少数のため
+    // take無しで全件数を取り、表示は先頭5件に絞る(追加クエリはこの1本のみ)
+    db.approvalDecision.findMany({
+      where: {
+        approverId: session.user.id,
+        status: 'PENDING',
+        request: { status: 'PENDING' },
+      },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        request: {
+          select: {
+            requestedBy: { select: { name: true } },
+            version: {
+              select: {
+                video: {
+                  select: {
+                    id: true,
+                    title: true,
+                    project: { select: { id: true, name: true } },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    }),
   ]);
+
+  const pendingApprovalCount = pendingDecisions.length;
+  const pendingApprovals = pendingDecisions.slice(0, 5).map((decision) => ({
+    decisionId: decision.id,
+    videoId: decision.request.version.video.id,
+    videoTitle: decision.request.version.video.title,
+    projectId: decision.request.version.video.project.id,
+    projectName: decision.request.version.video.project.name,
+    requesterName: decision.request.requestedBy.name ?? '不明なユーザー',
+  }));
 
   const totalPages = Math.ceil(totalProjects / pageSize);
 
@@ -165,6 +205,8 @@ export default async function DashboardPage({
 
   return (
     <DashboardClient
+      pendingApprovals={pendingApprovals}
+      pendingApprovalCount={pendingApprovalCount}
       serializedProjects={serializedProjects}
       workspaces={workspaces}
       totalPages={totalPages}

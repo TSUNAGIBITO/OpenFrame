@@ -66,6 +66,8 @@ interface SerializedVideo {
   duration: string;
   lastUpdated: string;
   updatedAt: string;
+  // アクティブバージョンの最新承認依頼ステータス(なし・取消時はnull)
+  approvalStatus: 'PENDING' | 'APPROVED' | 'REJECTED' | null;
 }
 
 interface ProjectContentClientProps {
