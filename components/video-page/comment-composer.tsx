@@ -15,7 +15,7 @@ import type { AnnotationStroke } from '@/components/annotation-canvas';
 import { ImageAttachmentStrip } from '@/components/video-page/image-attachments';
 import { MAX_COMMENT_IMAGES } from '@/lib/comment-images';
 import { MentionTextarea } from '@/components/video-page/mention-textarea';
-import type { CommentTag, VideoAsset } from '@/components/video-page/types';
+import type { CommentTag, MentionUser, VideoAsset } from '@/components/video-page/types';
 
 interface CommentComposerProps {
   isRecording: boolean;
@@ -58,6 +58,7 @@ interface CommentComposerProps {
   projectId?: string;
   pauseVideoForAnnotation: () => void;
   assets: VideoAsset[];
+  mentionUsers?: MentionUser[];
 }
 
 export const CommentComposer = memo(function CommentComposer({
@@ -101,6 +102,7 @@ export const CommentComposer = memo(function CommentComposer({
   projectId,
   pauseVideoForAnnotation,
   assets,
+  mentionUsers,
 }: CommentComposerProps) {
   const rangeButtonLabel =
     commentRangeStart === null || commentRangeEnd !== null ? '開始点を設定' : '終了点を設定';
@@ -177,6 +179,7 @@ export const CommentComposer = memo(function CommentComposer({
             value={commentText}
             onChange={setCommentText}
             assets={assets}
+            users={mentionUsers}
             rows={1}
             className="resize-none text-sm"
           />
@@ -274,6 +277,7 @@ export const CommentComposer = memo(function CommentComposer({
                 value={commentText}
                 onChange={setCommentText}
                 assets={assets}
+                users={mentionUsers}
                 rows={6}
                 className="resize-none text-sm min-h-[180px] w-full"
                 onKeyDown={(e) => {

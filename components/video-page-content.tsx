@@ -31,6 +31,7 @@ import { ApprovalRequestDialog } from '@/components/video-page/approval-request-
 import { ApprovalRequestsPanel } from '@/components/video-page/approval-requests-panel';
 import type {
   CommentMarker,
+  MentionUser,
   PlayerAdapter,
   VideoPageCommentsActions,
   VideoPageCompareActions,
@@ -154,6 +155,28 @@ export function VideoPageContent({
   });
 
   const isGuest = video ? !video.isAuthenticated : false;
+
+  // @メンション候補(メンバー)。認証済みユーザーのみ取得する — ゲストには
+  // メンバー一覧を見せない(APIも401/403で拒否する)。
+  const [mentionUsers, setMentionUsers] = useState<MentionUser[]>([]);
+  useEffect(() => {
+    if (!video?.isAuthenticated || !projectId) return;
+    let cancelled = false;
+    fetch(`/api/projects/${projectId}/mention-candidates`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((body) => {
+        if (!cancelled && Array.isArray(body?.data?.users)) {
+          setMentionUsers(body.data.users);
+        }
+      })
+      .catch(() => {
+        // メンション候補が取れなくてもコメント自体は書けるので黙って諦める
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [video?.isAuthenticated, projectId]);
+
   const canInitializePlayer = mode !== 'watch' || !isGuest || guestNameConfirmed;
   const normalizedGuestName = guestName.trim();
   const canUploadAssets = !!video?.canUploadAssets;
@@ -961,6 +984,7 @@ export function VideoPageContent({
           isUploadingReplyAudio={isUploadingReplyAudio}
           isUploadingReplyImage={isUploadingReplyImage}
           assets={assets}
+          mentionUsers={mentionUsers}
           onAssetMentionClick={handleAssetMentionClick}
           activePane={activeSidePane}
           setActivePane={setActiveSidePane}
@@ -1028,6 +1052,7 @@ export function VideoPageContent({
               projectId={projectId}
               pauseVideoForAnnotation={composerActions.onPauseVideoForAnnotation}
               assets={assets}
+              mentionUsers={mentionUsers}
             />
           }
         />

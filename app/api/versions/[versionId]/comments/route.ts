@@ -27,6 +27,7 @@ import {
   UPLOAD_RESERVATION_PURPOSES,
 } from '@/lib/storage-quota';
 import { isValidEmailAddress, normalizeEmail } from '@/lib/email-validation';
+import { dispatchMentionNotifications } from '@/lib/comment-mentions';
 
 type RouteParams = { params: Promise<{ versionId: string }> };
 const SAFE_AUDIO_PATH =
@@ -511,6 +512,25 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Notify project owner (fire-and-forget, skip self-notifications)
     const commentAuthorName = session?.user?.name || guestName || 'Someone';
     const isOwnProject = session?.user?.id === project.ownerId;
+    {
+      const mins = Math.floor(parsedTimestamp / 60);
+      const secs = Math.floor(parsedTimestamp % 60);
+      // @メンションされたメンバーへのポータル通知(fire-and-forget)
+      dispatchMentionNotifications({
+        content: content?.trim(),
+        authorUserId: session?.user?.id || null,
+        authorName: commentAuthorName,
+        project: {
+          id: project.id,
+          ownerId: project.ownerId,
+          workspaceId: project.workspace.id,
+          name: project.name,
+        },
+        videoId: version.video.id,
+        videoTitle: version.video.title || 'Untitled Video',
+        timestampLabel: `${mins}:${secs.toString().padStart(2, '0')}`,
+      }).catch((err) => logError('Mention notification failed:', err));
+    }
     if (!isOwnProject) {
       const baseUrl = process.env.NEXTAUTH_URL || '';
       const videoTitle = version.video.title || 'Untitled Video';

@@ -18,6 +18,12 @@ export interface CommentTag {
   color: string;
 }
 
+export interface MentionUser {
+  id: string;
+  name: string | null;
+  image: string | null;
+}
+
 export interface VideoAsset {
   id: string;
   videoId: string;

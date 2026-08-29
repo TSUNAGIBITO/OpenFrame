@@ -47,6 +47,7 @@ import type {
   CommentReply,
   CommentTag,
   Version,
+  MentionUser,
   VideoAsset,
 } from '@/components/video-page/types';
 
@@ -130,6 +131,7 @@ interface CommentsPaneProps {
   isUploadingReplyImage: boolean;
   composer: ReactNode;
   assets: VideoAsset[];
+  mentionUsers?: MentionUser[];
   onAssetMentionClick: (assetId: string) => void;
   activePane: 'comments' | 'assets';
   setActivePane: (pane: 'comments' | 'assets') => void;
@@ -208,6 +210,7 @@ export const CommentsPane = memo(function CommentsPane({
   isUploadingReplyImage,
   composer,
   assets,
+  mentionUsers,
   onAssetMentionClick,
   activePane,
   setActivePane,
@@ -494,6 +497,7 @@ export const CommentsPane = memo(function CommentsPane({
                           value={editText}
                           onChange={setEditText}
                           assets={assets}
+                          users={mentionUsers}
                           rows={2}
                           className="resize-none text-sm mb-1"
                           autoFocus
@@ -777,6 +781,7 @@ export const CommentsPane = memo(function CommentsPane({
                                     value={editText}
                                     onChange={setEditText}
                                     assets={assets}
+                                    users={mentionUsers}
                                     rows={2}
                                     className="resize-none text-sm mb-1"
                                     autoFocus
@@ -999,6 +1004,7 @@ export const CommentsPane = memo(function CommentsPane({
                               value={replyText}
                               onChange={setReplyText}
                               assets={assets}
+                              users={mentionUsers}
                               placeholder="メモを追加（任意）..."
                               rows={1}
                               className="resize-none text-sm"
@@ -1063,6 +1069,7 @@ export const CommentsPane = memo(function CommentsPane({
                                 value={replyText}
                                 onChange={setReplyText}
                                 assets={assets}
+                                users={mentionUsers}
                                 placeholder="返信を入力..."
                                 rows={2}
                                 className="resize-none text-sm flex-1"

@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import { Image as ImageIcon, Video, Volume2 } from 'lucide-react';
+import { Image as ImageIcon, UserRound, Video, Volume2 } from 'lucide-react';
 import type { VideoAsset } from '@/components/video-page/types';
 
 const URL_REGEX = /(https?:\/\/[^\s]+)/g;
-const ASSET_MENTION_REGEX = /@\[(.+?)\]\(asset:([a-z0-9]+)\)/gi;
+const MENTION_REGEX = /@\[(.+?)\]\((asset|user):([\w-]+)\)/gi;
 
 interface CommentRichTextProps {
   text: string;
@@ -41,7 +41,7 @@ export function CommentRichText({ text, onAssetMentionClick, assets = [] }: Comm
   const nodes: React.ReactNode[] = [];
   let lastIndex = 0;
 
-  for (const match of text.matchAll(ASSET_MENTION_REGEX)) {
+  for (const match of text.matchAll(MENTION_REGEX)) {
     const mentionIndex = match.index ?? -1;
     if (mentionIndex < 0) continue;
 
@@ -49,8 +49,24 @@ export function CommentRichText({ text, onAssetMentionClick, assets = [] }: Comm
       nodes.push(...renderUrls(text.slice(lastIndex, mentionIndex), `s${lastIndex}`));
     }
 
+    if (match[2] === 'user') {
+      const userLabel = match[1] || 'メンバー';
+      nodes.push(
+        <span
+          key={`user-mention-${match[3]}-${mentionIndex}`}
+          className="inline-flex max-w-full items-center gap-1 rounded bg-amber-500/15 px-1.5 py-0.5 font-medium text-amber-600 dark:text-amber-300 align-middle"
+          title={userLabel}
+        >
+          <UserRound className="h-3 w-3 shrink-0" />
+          <span className="truncate max-w-[190px] sm:max-w-[240px]">@{userLabel}</span>
+        </span>
+      );
+      lastIndex = mentionIndex + match[0].length;
+      continue;
+    }
+
     const fallbackLabel = match[1] || 'アセット';
-    const assetId = match[2] || '';
+    const assetId = match[3] || '';
     const matchedAsset = assets.find((asset) => asset.id === assetId);
     const label = matchedAsset?.displayName || fallbackLabel;
     const assetKind = matchedAsset?.kind;
