@@ -183,6 +183,51 @@ describe('validateAnnotationStrokes', () => {
     expect(validateAnnotationStrokes([value])).toBeNull();
   });
 
+  it('accepts a legacy stroke without kind and omits kind from the copy', () => {
+    const result = validateAnnotationStrokes([stroke()]);
+
+    expect(result).toEqual([{ points: [{ x: 1, y: 2 }], color: '#FF3B30', width: 4 }]);
+    expect(Object.keys(result![0]).sort()).toEqual(['color', 'points', 'width']);
+  });
+
+  it('accepts an explicit pen kind and keeps it in the copy', () => {
+    expect(validateAnnotationStrokes([stroke({ kind: 'pen' })])).toEqual([
+      { kind: 'pen', points: [{ x: 1, y: 2 }], color: '#FF3B30', width: 4 },
+    ]);
+  });
+
+  it.each(['arrow', 'rect'] as const)('accepts a %s stroke with exactly two points', (kind) => {
+    const points = [
+      { x: 0.1, y: 0.2 },
+      { x: 0.8, y: 0.9 },
+    ];
+
+    expect(validateAnnotationStrokes([stroke({ kind, points })])).toEqual([
+      { kind, points, color: '#FF3B30', width: 4 },
+    ]);
+  });
+
+  it.each<[string, number]>([
+    ['arrow', 1],
+    ['arrow', 3],
+    ['rect', 0],
+    ['rect', 3],
+  ])('rejects a %s stroke with %s points instead of two', (kind, count) => {
+    const points = Array.from({ length: count }, () => ({ x: 0.5, y: 0.5 }));
+
+    expect(validateAnnotationStrokes([stroke({ kind, points })])).toBeNull();
+  });
+
+  it.each([
+    ['an unknown string', 'circle'],
+    ['an empty string', ''],
+    ['null', null],
+    ['a number', 1],
+    ['an object', { kind: 'pen' }],
+  ])('rejects a stroke whose kind is %s', (_label, kind) => {
+    expect(validateAnnotationStrokes([stroke({ kind })])).toBeNull();
+  });
+
   it('drops unexpected stroke properties instead of copying them through', () => {
     const input = [{ ...stroke(), tool: 'eraser', onClick: 'alert(1)' }];
 
