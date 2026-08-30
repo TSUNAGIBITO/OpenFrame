@@ -7,6 +7,8 @@ import {
   ChevronDown,
   Circle,
   Clapperboard,
+  ChevronDown,
+  ChevronUp,
   Clock,
   Download,
   FileText,
@@ -283,9 +285,11 @@ export const CommentsPane = memo(function CommentsPane({
       <div
         className={cn(
           'bg-card flex flex-col overflow-hidden relative',
-          // モバイル: frame.io と同じ「プレーヤー直下に常時表示+内部スクロール」
-          // (以前は右からのドロワーで、コメントの存在に気づきにくかった)
-          'w-full flex-1 min-h-0 border-t',
+          // モバイル: プレーヤー直下の折りたたみパネル。折りたたみ中はスリムな
+          // バーだけ残して動画に画面を譲り、展開すると内部スクロールで全機能
+          // (以前の常時flex-1は縦画面で動画が圧迫され「スマホで見れない」問題があった)
+          'w-full min-h-0 border-t',
+          isMobileCommentsOpen ? 'flex-1' : 'flex-none',
           'lg:w-80 lg:flex-none lg:border-t-0 lg:shrink-0 lg:border-l',
           isFullscreenMode && !showComments ? 'hidden' : ''
         )}
@@ -311,12 +315,25 @@ export const CommentsPane = memo(function CommentsPane({
           );
         }}
       >
+        <button
+          type="button"
+          className="lg:hidden shrink-0 w-full flex items-center justify-between gap-2 px-4 py-2.5 text-sm font-medium"
+          onClick={() => setIsMobileCommentsOpen(!isMobileCommentsOpen)}
+          aria-expanded={isMobileCommentsOpen}
+        >
+          <span className="flex items-center gap-2 min-w-0">
+            <MessageSquare className="h-4 w-4 shrink-0" />
+            コメント
+            <Badge variant="secondary">{comments.length}</Badge>
+          </span>
+          {isMobileCommentsOpen ? <ChevronDown className="h-4 w-4 shrink-0" /> : <ChevronUp className="h-4 w-4 shrink-0" />}
+        </button>
         {isPaneDraggingOver && (
           <div className="absolute inset-0 z-20 flex items-center justify-center border-2 border-dashed border-primary bg-primary/10 pointer-events-none">
             <p className="text-sm font-medium text-primary">画像をドロップして添付</p>
           </div>
         )}
-        <div className="shrink-0 p-4 border-b lg:cursor-default space-y-2">
+        <div className={cn('shrink-0 p-4 border-b lg:cursor-default space-y-2', !isMobileCommentsOpen && 'max-lg:hidden')}>
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1 min-w-0 overflow-x-auto">
               <Button
@@ -502,7 +519,7 @@ export const CommentsPane = memo(function CommentsPane({
           )}
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className={cn('flex-1 overflow-y-auto', !isMobileCommentsOpen && 'max-lg:hidden')}>
           <div
             className={cn(activePane === 'assets' ? 'block p-4' : 'hidden')}
             aria-hidden={activePane !== 'assets'}
@@ -1343,7 +1360,9 @@ export const CommentsPane = memo(function CommentsPane({
           </div>
         </div>
 
-        {activePane === 'comments' ? composer : null}
+        <div className={cn('contents', !isMobileCommentsOpen && 'max-lg:hidden')}>
+          {activePane === 'comments' ? composer : null}
+        </div>
       </div>
     </>
   );
