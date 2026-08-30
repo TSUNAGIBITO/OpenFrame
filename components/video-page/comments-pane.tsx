@@ -7,7 +7,6 @@ import {
   ChevronDown,
   Circle,
   Clapperboard,
-  ChevronDown,
   ChevronUp,
   Clock,
   Download,
