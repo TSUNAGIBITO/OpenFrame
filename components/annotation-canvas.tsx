@@ -2,9 +2,15 @@
 
 import { useRef, useEffect, useCallback, useState, forwardRef, useImperativeHandle } from 'react';
 import { Button } from '@/components/ui/button';
-import { Undo2, Trash2, Minus, Plus, X } from 'lucide-react';
+import { Undo2, Trash2, Minus, Plus, X, Pen, ArrowUpRight, Square } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+
+export type AnnotationTool = 'pen' | 'arrow' | 'rect';
 
 export interface AnnotationStroke {
+  // 省略時は 'pen'(既存の保存済みデータとの互換のため必ず optional)
+  kind?: AnnotationTool;
+  // 'arrow' / 'rect' は [始点, 終点] の2点固定。'pen' はフリーハンドの軌跡
   points: { x: number; y: number }[];
   color: string;
   width: number;
@@ -31,6 +37,12 @@ const MAX_WIDTH = 10;
 // Reference canvas width for stroke scaling
 const REF_WIDTH = 1000;
 
+const TOOLS: { id: AnnotationTool; icon: LucideIcon; label: string }[] = [
+  { id: 'pen', icon: Pen, label: 'ペン' },
+  { id: 'arrow', icon: ArrowUpRight, label: '矢印' },
+  { id: 'rect', icon: Square, label: '四角形' },
+];
+
 export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, AnnotationCanvasProps>(
   function AnnotationCanvas(
     { mode, strokes: initialStrokes, onConfirm, onCancel, onDismiss },
@@ -42,6 +54,7 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, AnnotationCan
     const [currentStroke, setCurrentStroke] = useState<AnnotationStroke | null>(null);
     const [color, setColor] = useState(DEFAULT_COLOR);
     const [width, setWidth] = useState(DEFAULT_WIDTH);
+    const [tool, setTool] = useState<AnnotationTool>('pen');
     const isDrawingRef = useRef(false);
     void onConfirm;
 
@@ -72,6 +85,48 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, AnnotationCan
           ctx.lineWidth = s.width * scale;
           ctx.lineCap = 'round';
           ctx.lineJoin = 'round';
+
+          if (s.kind === 'rect') {
+            const x0 = s.points[0].x * canvas.width;
+            const y0 = s.points[0].y * canvas.height;
+            const x1 = s.points[1].x * canvas.width;
+            const y1 = s.points[1].y * canvas.height;
+            // 枠線のみ(塗りつぶしなし)
+            ctx.strokeRect(
+              Math.min(x0, x1),
+              Math.min(y0, y1),
+              Math.abs(x1 - x0),
+              Math.abs(y1 - y0)
+            );
+            return;
+          }
+
+          if (s.kind === 'arrow') {
+            const x0 = s.points[0].x * canvas.width;
+            const y0 = s.points[0].y * canvas.height;
+            const x1 = s.points[1].x * canvas.width;
+            const y1 = s.points[1].y * canvas.height;
+            const angle = Math.atan2(y1 - y0, x1 - x0);
+            // 矢じりは線幅に比例させる
+            const headLen = Math.max(ctx.lineWidth * 3, 10 * scale);
+            ctx.beginPath();
+            ctx.moveTo(x0, y0);
+            ctx.lineTo(x1, y1);
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(
+              x1 - headLen * Math.cos(angle - Math.PI / 6),
+              y1 - headLen * Math.sin(angle - Math.PI / 6)
+            );
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(
+              x1 - headLen * Math.cos(angle + Math.PI / 6),
+              y1 - headLen * Math.sin(angle + Math.PI / 6)
+            );
+            ctx.stroke();
+            return;
+          }
+
+          // 'pen'(kind 省略の既存データを含む)はフリーハンド描画
           ctx.beginPath();
           ctx.moveTo(s.points[0].x * canvas.width, s.points[0].y * canvas.height);
           for (let i = 1; i < s.points.length; i++) {
@@ -153,9 +208,14 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, AnnotationCan
         const pt = getPoint(e);
         if (!pt) return;
         isDrawingRef.current = true;
-        setCurrentStroke({ points: [pt], color, width });
+        // ペンは kind を付けない(既存データと同じ形を保つ)。矢印/四角形は始点+終点の2点で持つ
+        setCurrentStroke(
+          tool === 'pen'
+            ? { points: [pt], color, width }
+            : { kind: tool, points: [pt, pt], color, width }
+        );
       },
-      [mode, color, width, getPoint]
+      [mode, tool, color, width, getPoint]
     );
 
     const handlePointerMove = useCallback(
@@ -167,6 +227,10 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, AnnotationCan
         if (!pt) return;
         setCurrentStroke((prev) => {
           if (!prev) return prev;
+          // 矢印/四角形はドラッグ中に終点だけ更新(ライブプレビュー)
+          if (prev.kind === 'arrow' || prev.kind === 'rect') {
+            return { ...prev, points: [prev.points[0], pt] };
+          }
           return { ...prev, points: [...prev.points, pt] };
         });
       },
@@ -181,7 +245,14 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, AnnotationCan
         isDrawingRef.current = false;
         setCurrentStroke((prev) => {
           if (prev && prev.points.length >= 2) {
-            setStrokes((s) => [...s, prev]);
+            // ドラッグせずクリックしただけの矢印/四角形(始点=終点)は確定しない
+            const degenerateShape =
+              (prev.kind === 'arrow' || prev.kind === 'rect') &&
+              prev.points[0].x === prev.points[1].x &&
+              prev.points[0].y === prev.points[1].y;
+            if (!degenerateShape) {
+              setStrokes((s) => [...s, prev]);
+            }
           }
           return null;
         });
@@ -241,6 +312,24 @@ export const AnnotationCanvas = forwardRef<AnnotationCanvasHandle, AnnotationCan
 
         {/* Toolbar */}
         <div className="absolute top-3 left-1/2 -translate-x-1/2 flex items-center justify-center flex-wrap gap-x-2 gap-y-2 w-[calc(100%-24px)] max-w-fit bg-background/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg border z-[70]">
+          {/* Tools */}
+          <div className="flex items-center gap-1">
+            {TOOLS.map(({ id, icon: Icon, label }) => (
+              <Button
+                key={id}
+                variant={tool === id ? 'secondary' : 'ghost'}
+                size="icon"
+                className="h-7 w-7"
+                onClick={() => setTool(id)}
+                title={label}
+              >
+                <Icon className="h-4 w-4" />
+              </Button>
+            ))}
+          </div>
+
+          <div className="hidden sm:block w-px h-6 bg-border mx-1" />
+
           {/* Colors */}
           <div className="flex items-center justify-center flex-wrap gap-1.5">
             {COLORS.map((c) => (

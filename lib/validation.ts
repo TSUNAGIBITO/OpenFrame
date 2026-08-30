@@ -18,6 +18,15 @@ const MAX_POINTS_PER_STROKE = 2000;
 const MIN_STROKE_WIDTH = 1;
 const MAX_STROKE_WIDTH = 20;
 
+type AnnotationStrokeKind = 'pen' | 'arrow' | 'rect';
+
+type ValidatedAnnotationStroke = {
+  kind?: AnnotationStrokeKind;
+  points: { x: number; y: number }[];
+  color: string;
+  width: number;
+};
+
 /**
  * Validates and returns a safe copy of annotation stroke data.
  *
@@ -25,24 +34,35 @@ const MAX_STROKE_WIDTH = 20;
  * by AnnotationCanvas. Rejects anything that could trigger prototype pollution
  * or carry unexpected properties into the renderer.
  *
+ * `kind` is optional: absent (legacy freehand data) or 'pen' means a freehand
+ * polyline; 'arrow' and 'rect' require exactly two points (start + end).
+ * Any other kind value rejects the whole payload.
+ *
  * Returns null when the input is absent or structurally invalid.
  */
-export function validateAnnotationStrokes(
-  data: unknown
-): { points: { x: number; y: number }[]; color: string; width: number }[] | null {
+export function validateAnnotationStrokes(data: unknown): ValidatedAnnotationStroke[] | null {
   if (data === null || data === undefined) return null;
   if (!Array.isArray(data)) return null;
   if (data.length > MAX_STROKES) return null;
 
-  const result: { points: { x: number; y: number }[]; color: string; width: number }[] = [];
+  const result: ValidatedAnnotationStroke[] = [];
 
   for (const stroke of data) {
     if (stroke === null || typeof stroke !== 'object' || Array.isArray(stroke)) return null;
 
-    const { points, color, width } = stroke as Record<string, unknown>;
+    const { kind, points, color, width } = stroke as Record<string, unknown>;
+
+    let safeKind: AnnotationStrokeKind | undefined;
+    if (kind === 'pen' || kind === 'arrow' || kind === 'rect') {
+      safeKind = kind;
+    } else if (kind !== undefined) {
+      return null;
+    }
 
     if (!Array.isArray(points)) return null;
     if (points.length > MAX_POINTS_PER_STROKE) return null;
+    // Arrow/rect are defined by exactly two points: start + end
+    if ((safeKind === 'arrow' || safeKind === 'rect') && points.length !== 2) return null;
 
     const safePoints: { x: number; y: number }[] = [];
     for (const pt of points) {
@@ -66,7 +86,12 @@ export function validateAnnotationStrokes(
       return null;
     }
 
-    result.push({ points: safePoints, color, width });
+    // Omit kind entirely when absent so legacy payloads re-serialize unchanged
+    result.push(
+      safeKind === undefined
+        ? { points: safePoints, color, width }
+        : { kind: safeKind, points: safePoints, color, width }
+    );
   }
 
   return result;
