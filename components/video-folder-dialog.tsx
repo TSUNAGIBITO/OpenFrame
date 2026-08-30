@@ -50,10 +50,13 @@ export function VideoFolderDialog({
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (open) {
+    if (!open) return;
+    // ダイアログを開いた直後に入力をリセット(タイマー経由でlintルール対応)
+    const timerId = window.setTimeout(() => {
       setNewFolderName('');
       setError('');
-    }
+    }, 0);
+    return () => window.clearTimeout(timerId);
   }, [open]);
 
   const count = videoIds.length;

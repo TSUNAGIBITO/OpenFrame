@@ -69,6 +69,8 @@ const REVIEWED_MIGRATIONS = [
   '20260801120000_add_acquisition_analytics',
   '20260818120000_add_upload_reservation_purpose',
   '20260820120000_add_comment_images',
+  '20260830100000_add_notifications',
+  '20260830120000_add_transcripts',
   '20260830140000_add_video_folder',
 ];
 

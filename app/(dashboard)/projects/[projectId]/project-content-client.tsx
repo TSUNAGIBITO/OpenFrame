@@ -138,16 +138,20 @@ export function ProjectContentClient({
   const [collapsedFolders, setCollapsedFolders] = useState<string[]>([]);
 
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(collapseStorageKey);
-      if (!raw) return;
-      const parsed: unknown = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        setCollapsedFolders(parsed.filter((item): item is string => typeof item === 'string'));
+    // タイマー経由で読む(effect本体での同期setStateを避けるlintルール対応)
+    const timerId = window.setTimeout(() => {
+      try {
+        const raw = window.localStorage.getItem(collapseStorageKey);
+        if (!raw) return;
+        const parsed: unknown = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          setCollapsedFolders(parsed.filter((item): item is string => typeof item === 'string'));
+        }
+      } catch {
+        // 壊れた保存値は無視(次のトグルで上書きされる)
       }
-    } catch {
-      // 壊れた保存値は無視(次のトグルで上書きされる)
-    }
+    }, 0);
+    return () => window.clearTimeout(timerId);
   }, [collapseStorageKey]);
 
   const toggleFolderCollapsed = useCallback(

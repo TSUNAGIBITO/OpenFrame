@@ -78,6 +78,11 @@ import * as videoVersionRoute from '@/app/api/projects/[projectId]/videos/[video
 import * as projectsRoute from '@/app/api/projects/route';
 import * as searchRoute from '@/app/api/search/route';
 import * as settingsNotificationsRoute from '@/app/api/settings/notifications/route';
+import * as castopodShowsRoute from '@/app/api/castopod/shows/route';
+import * as appNotificationsRoute from '@/app/api/notifications/route';
+import * as mentionCandidatesRoute from '@/app/api/projects/[projectId]/mention-candidates/route';
+import * as projectShareLinkRoute from '@/app/api/projects/[projectId]/share/route';
+import * as versionTranscriptRoute from '@/app/api/versions/[versionId]/transcript/route';
 import * as settingsStorageRoute from '@/app/api/settings/storage/route';
 import * as uploadAudioFileRoute from '@/app/api/upload/audio/[filename]/route';
 import * as uploadAudioRoute from '@/app/api/upload/audio/route';
@@ -146,7 +151,7 @@ vi.mock('@/lib/r2', async (importOriginal) => {
 // The count guard
 // ---------------------------------------------------------------------------
 // Bump this only together with a new entry in ROUTE_CASES or in PUBLIC_ROUTES.
-const EXPECTED_ROUTE_MODULE_COUNT = 64;
+const EXPECTED_ROUTE_MODULE_COUNT = 73;
 
 /**
  * Routes that are public by design, and why. Everything else must reject an
@@ -194,6 +199,28 @@ const PUBLIC_ROUTES: ReadonlyMap<string, string> = new Map([
     // in the stripe-signature header. Covered in
     // tests/api/stripe-webhook.test.ts, including the rejection of a bad one.
     'Stripe webhook, authenticated by an HMAC signature',
+  ],
+  [
+    'auth/forgot-password/route.ts',
+    // パスワードを忘れた(=サインインできない)ユーザーが使う入口。IPレート制限+
+    // メール存在有無に関わらず同一応答。tests/api では 2026-08-25 実装時に未登録だった
+    'password reset request, rate limited, pre-auth by definition',
+  ],
+  [
+    'auth/reset-password/route.ts',
+    // メール内のリンクから遷移。ワンタイムトークンで認証されるためセッション不要
+    'password reset, authenticated by a single-use token',
+  ],
+  [
+    'internal/transcribe/route.ts',
+    // 文字起こしワーカー専用。セッションではなく TRANSCRIBE_INTERNAL_SECRET の
+    // 固定Bearerで認証し、未設定なら503・不一致なら401を返す(fail-safe)。
+    'transcription worker API, authenticated by a fixed internal bearer token',
+  ],
+  [
+    'internal/transcribe/media/route.ts',
+    // 同上。ワーカーがメディア実体を取得する口。同じ固定Bearerで認証
+    'transcription worker media fetch, authenticated by a fixed internal bearer token',
   ],
 ]);
 
@@ -563,6 +590,34 @@ const ROUTE_CASES: readonly RouteCase[] = [
     module: projectsRoute,
     url: () => '/api/projects',
     body: { name: 'anon project', workspaceId: 'anything' },
+  },
+  {
+    file: 'castopod/shows/route.ts',
+    module: castopodShowsRoute,
+    url: () => '/api/castopod/shows',
+  },
+  {
+    file: 'notifications/route.ts',
+    module: appNotificationsRoute,
+    url: () => '/api/notifications',
+    body: { action: 'markAllRead' },
+  },
+  {
+    file: 'projects/[projectId]/mention-candidates/route.ts',
+    module: mentionCandidatesRoute,
+    url: () => '/api/projects/anything/mention-candidates',
+  },
+  {
+    file: 'projects/[projectId]/share/route.ts',
+    module: projectShareLinkRoute,
+    url: () => '/api/projects/anything/share',
+    body: {},
+  },
+  {
+    file: 'versions/[versionId]/transcript/route.ts',
+    module: versionTranscriptRoute,
+    url: () => '/api/versions/anything/transcript',
+    body: {},
   },
   { file: 'search/route.ts', module: searchRoute, url: () => '/api/search?q=test' },
   {
