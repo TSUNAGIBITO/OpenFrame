@@ -83,6 +83,17 @@ export function useVideoPlayer({
   const [isReady, setIsReady] = useState(false);
   const [bunnyPlaybackState, setBunnyPlaybackState] = useState<BunnyPlaybackState>('none');
   const [currentTime, setCurrentTime] = useState(0);
+  // ループ再生。isLooping=全体ループ、loopRange設定時はA-B区間ループ
+  const [isLooping, setIsLooping] = useState(false);
+  const [loopRange, setLoopRange] = useState<{ start: number; end: number } | null>(null);
+  const isLoopingRef = useRef(false);
+  const loopRangeRef = useRef<{ start: number; end: number } | null>(null);
+  useEffect(() => {
+    isLoopingRef.current = isLooping;
+  }, [isLooping]);
+  useEffect(() => {
+    loopRangeRef.current = loopRange;
+  }, [loopRange]);
   const [videoDuration, setVideoDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -934,7 +945,21 @@ export function useVideoPlayer({
     const interval = setInterval(() => {
       if (!isDragging && playerRef.current) {
         if (playerRef.current.getCurrentTime) {
-          setCurrentTime(playerRef.current.getCurrentTime());
+          const tick = playerRef.current.getCurrentTime();
+          setCurrentTime(tick);
+
+          // ループ処理(250ms粒度で十分)。A-B区間があれば区間末尾で先頭へ、
+          // なければ動画末尾で0秒へ戻して再生を続ける
+          if (isLoopingRef.current && playerRef.current.seekTo) {
+            const range = loopRangeRef.current;
+            if (range && tick >= range.end) {
+              playerRef.current.seekTo(range.start, true);
+              playerRef.current.playVideo();
+            } else if (!range && durationRef.current > 0 && tick >= durationRef.current - 0.3) {
+              playerRef.current.seekTo(0, true);
+              playerRef.current.playVideo();
+            }
+          }
         }
       }
     }, 250);
@@ -1085,15 +1110,24 @@ export function useVideoPlayer({
             ? playerState === ytPlayingState || playerState === ytBufferingState
             : isPlaying;
         const hasRangeEnd = options?.timestampEnd !== undefined && options.timestampEnd !== null;
-        const shouldPauseAfterSeek = options?.pauseAfterSeek || hasRangeEnd;
 
-        playerRef.current.seekTo(timestamp, true);
-        if (shouldPauseAfterSeek) {
-          playerRef.current.pauseVideo();
-        } else if (wasPlayingBeforeSeek) {
+        // ループ有効中にレンジコメントへ飛んだら、その区間をA-Bループにして再生する
+        if (hasRangeEnd && isLoopingRef.current) {
+          const rangeEnd = options?.timestampEnd as number;
+          setLoopRange(rangeEnd > timestamp ? { start: timestamp, end: rangeEnd } : null);
+          playerRef.current.seekTo(timestamp, true);
           playerRef.current.playVideo();
         } else {
-          playerRef.current.pauseVideo();
+          const shouldPauseAfterSeek = options?.pauseAfterSeek || hasRangeEnd;
+
+          playerRef.current.seekTo(timestamp, true);
+          if (shouldPauseAfterSeek) {
+            playerRef.current.pauseVideo();
+          } else if (wasPlayingBeforeSeek) {
+            playerRef.current.playVideo();
+          } else {
+            playerRef.current.pauseVideo();
+          }
         }
       }
       if (annotation) {
@@ -1353,6 +1387,13 @@ export function useVideoPlayer({
     };
   }, [isDragging, timeFromClientX, endScrub]);
 
+  const handleLoopToggle = useCallback(() => {
+    setIsLooping((prev) => {
+      if (prev) setLoopRange(null);
+      return !prev;
+    });
+  }, []);
+
   return {
     isReady,
     bunnyPlaybackState,
@@ -1384,6 +1425,9 @@ export function useVideoPlayer({
     handleSeekToTimestamp,
     handleMuteToggle,
     handleFrameModeToggle,
+    handleLoopToggle,
+    isLooping,
+    loopRange,
     handleSkip,
     handleSpeedChange,
     handleQualityChange,

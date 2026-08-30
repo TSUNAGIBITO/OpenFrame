@@ -9,6 +9,7 @@ import {
   Clock,
   Download,
   FileText,
+  Filter,
   FolderOpen,
   Image as ImageIcon,
   Loader2,
@@ -216,6 +217,41 @@ export const CommentsPane = memo(function CommentsPane({
   setActivePane,
   assetsPane,
 }: CommentsPaneProps) {
+  // タグ・作成者での絞り込み(このペイン内のみ。タイムラインのマーカーには影響しない)
+  const [filterTagId, setFilterTagId] = useState<string | null>(null);
+  const [filterAuthorKey, setFilterAuthorKey] = useState<string | null>(null);
+
+  const commentAuthorKey = (authorId: string | null, label: string) =>
+    authorId ? `user:${authorId}` : `guest:${label}`;
+
+  const filterTagOptions = useMemo(() => {
+    const map = new Map<string, { name: string; color: string }>();
+    for (const comment of comments) {
+      if (comment.tag) map.set(comment.tag.id, { name: comment.tag.name, color: comment.tag.color });
+    }
+    return [...map.entries()];
+  }, [comments]);
+
+  const filterAuthorOptions = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const comment of comments) {
+      const label = comment.author?.name || comment.guestName || '匿名';
+      map.set(commentAuthorKey(comment.authorId, label), label);
+    }
+    return [...map.entries()];
+  }, [comments]);
+
+  const matchesCommentFilters = (comment: Comment) => {
+    if (filterTagId && comment.tagId !== filterTagId) return false;
+    if (filterAuthorKey) {
+      const label = comment.author?.name || comment.guestName || '匿名';
+      if (commentAuthorKey(comment.authorId, label) !== filterAuthorKey) return false;
+    }
+    return true;
+  };
+  const visibleComments = sortedComments.filter(matchesCommentFilters);
+  const hasActiveCommentFilters = filterTagId !== null || filterAuthorKey !== null;
+
   const [isPaneDraggingOver, setIsPaneDraggingOver] = useState(false);
   // 口頭・チャットで「コメント3の件」と参照できる通し番号(作成順で安定)。
   // frame.io の #N 表示に合わせた。返信には振らない(親コメントのみ)
@@ -323,6 +359,74 @@ export const CommentsPane = memo(function CommentsPane({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
+                    variant={hasActiveCommentFilters ? 'default' : 'outline'}
+                    size="sm"
+                    className="h-8 px-2"
+                    aria-label="コメントを絞り込み"
+                    title="タグ・作成者で絞り込み"
+                  >
+                    <Filter className="h-4 w-4" />
+                    <ChevronDown className="h-4 w-4 ml-0.5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  {hasActiveCommentFilters && (
+                    <>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setFilterTagId(null);
+                          setFilterAuthorKey(null);
+                        }}
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        絞り込みを解除
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
+                  {filterTagOptions.map(([tagId, tag]) => (
+                    <DropdownMenuItem
+                      key={tagId}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setFilterTagId((prev) => (prev === tagId ? null : tagId));
+                      }}
+                    >
+                      <span
+                        className="h-2.5 w-2.5 rounded-full mr-2 shrink-0"
+                        style={{ backgroundColor: tag.color }}
+                      />
+                      <span className="flex-1 truncate">{tag.name}</span>
+                      {filterTagId === tagId && <CheckCircle2 className="h-4 w-4 ml-2" />}
+                    </DropdownMenuItem>
+                  ))}
+                  {filterTagOptions.length > 0 && filterAuthorOptions.length > 0 && (
+                    <DropdownMenuSeparator />
+                  )}
+                  {filterAuthorOptions.map(([authorKey, label]) => (
+                    <DropdownMenuItem
+                      key={authorKey}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setFilterAuthorKey((prev) => (prev === authorKey ? null : authorKey));
+                      }}
+                    >
+                      <Avatar className="h-4 w-4 mr-2">
+                        <AvatarFallback className="text-[8px]">{label.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <span className="flex-1 truncate">{label}</span>
+                      {filterAuthorKey === authorKey && <CheckCircle2 className="h-4 w-4 ml-2" />}
+                    </DropdownMenuItem>
+                  ))}
+                  {filterTagOptions.length === 0 && filterAuthorOptions.length === 0 && (
+                    <DropdownMenuItem disabled>絞り込み対象がありません</DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
                     variant="outline"
                     size="sm"
                     className="h-8 px-2"
@@ -389,8 +493,13 @@ export const CommentsPane = memo(function CommentsPane({
                 <p>まだコメントはありません</p>
                 <p className="text-sm">最初のフィードバックを残しましょう！</p>
               </div>
+            ) : visibleComments.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Filter className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p>条件に一致するコメントはありません</p>
+              </div>
             ) : (
-              sortedComments.map((comment) => {
+              visibleComments.map((comment) => {
                 const authorName = comment.author?.name || comment.guestName || '匿名';
                 const isEditing = editingCommentId === comment.id;
                 const isReplying = replyingTo === comment.id;
@@ -635,6 +744,9 @@ export const CommentsPane = memo(function CommentsPane({
                               text={comment.content}
                               onAssetMentionClick={onAssetMentionClick}
                               assets={assets}
+                              onTimestampClick={(seconds) =>
+                                handleSeekToTimestamp(seconds, null, { pauseAfterSeek: true })
+                              }
                             />
                           </p>
                         )}
@@ -859,6 +971,9 @@ export const CommentsPane = memo(function CommentsPane({
                                         text={reply.content}
                                         onAssetMentionClick={onAssetMentionClick}
                                         assets={assets}
+                                        onTimestampClick={(seconds) =>
+                                          handleSeekToTimestamp(seconds, null, { pauseAfterSeek: true })
+                                        }
                                       />
                                     </p>
                                   )}

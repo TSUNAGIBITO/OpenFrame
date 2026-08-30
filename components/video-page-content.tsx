@@ -356,6 +356,9 @@ export function VideoPageContent({
     handleSeekToTimestamp,
     handleMuteToggle,
     handleFrameModeToggle,
+    handleLoopToggle,
+    isLooping,
+    loopRange,
     handleSkip,
     handleSpeedChange,
     handleQualityChange,
@@ -893,6 +896,9 @@ export function VideoPageContent({
             frameStepLabel={frameStepLabel}
             handleSkip={handleSkip}
             handleFrameModeToggle={handleFrameModeToggle}
+            isLooping={isLooping}
+            loopRange={loopRange}
+            handleLoopToggle={handleLoopToggle}
             handleMuteToggle={handleMuteToggle}
             isMuted={isMuted}
             selectedQualityLabel={selectedQualityLabel}

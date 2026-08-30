@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, type RefObject } from 'react';
+import { memo, useRef, useState, type RefObject } from 'react';
 import {
   AlertCircle,
   Clock,
@@ -17,6 +17,7 @@ import {
   Volume2,
   VolumeX,
   Loader2,
+  Repeat,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -78,6 +79,9 @@ interface PlayerCoreProps {
   currentTime: number;
   duration: number;
   isFrameMode: boolean;
+  isLooping: boolean;
+  loopRange: { start: number; end: number } | null;
+  handleLoopToggle: () => void;
   frameStepLabel: string;
   handleSkip: (seconds: number) => void;
   handleFrameModeToggle: () => void;
@@ -146,6 +150,9 @@ export const PlayerCore = memo(function PlayerCore({
   currentTime,
   duration,
   isFrameMode,
+  isLooping,
+  loopRange,
+  handleLoopToggle,
   frameStepLabel,
   handleSkip,
   handleFrameModeToggle,
@@ -167,6 +174,44 @@ export const PlayerCore = memo(function PlayerCore({
   handleSeekToTimestamp,
   commentMarkers,
 }: PlayerCoreProps) {
+  // タイムラインのホバープレビュー(R2/direct のネイティブ再生のみ)。
+  // 本編の videoRef から currentSrc を借りた隠し<video>でフレームを出す。
+  // YouTube/Bunny(HLS) はソースを直接シークできないため対象外
+  const hoverPreviewVideoRef = useRef<HTMLVideoElement | null>(null);
+  const [hoverPreview, setHoverPreview] = useState<{ x: number; time: number } | null>(null);
+  const [hoverPreviewReady, setHoverPreviewReady] = useState(false);
+  const hoverPreviewEnabled =
+    (activeProviderId === 'direct' || activeProviderId === 'r2') &&
+    !isAudioOnlyMediaPath(embedUrl);
+
+  const handleTimelineHoverMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!hoverPreviewEnabled || duration <= 0) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    if (rect.width <= 0) return;
+    const fraction = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+    const time = fraction * duration;
+    setHoverPreview({ x: event.clientX - rect.left, time });
+
+    const previewEl = hoverPreviewVideoRef.current;
+    if (previewEl) {
+      if (!previewEl.src) {
+        const mainSrc = videoRef.current?.currentSrc;
+        if (mainSrc) previewEl.src = mainSrc;
+      }
+      if (previewEl.src && Number.isFinite(time)) {
+        try {
+          previewEl.currentTime = time;
+        } catch {
+          // シーク不能な状態(メタデータ未取得等)は黙って無視
+        }
+      }
+    }
+  };
+
+  const handleTimelineHoverLeave = () => {
+    setHoverPreview(null);
+  };
+
   // 音声(Podcast)レビュー: R2 直接アップロードで拡張子が音声のみの場合、真っ黒な
   // 映像領域に「音声コンテンツ」であることを控えめに示す(再生は video 要素のまま)。
   const isAudioOnlySource = activeProviderId === 'r2' && isAudioOnlyMediaPath(embedUrl);
@@ -423,6 +468,19 @@ export const PlayerCore = memo(function PlayerCore({
               フレーム {frameStepLabel}
             </Button>
 
+            <Button
+              variant={isLooping ? 'default' : 'ghost'}
+              size="sm"
+              className="h-8 gap-1 text-xs"
+              onClick={handleLoopToggle}
+              title="ループ再生(ONの状態でレンジコメントをクリックするとその区間をA-Bループ)"
+            >
+              <Repeat className="h-4 w-4" />
+              {isLooping && loopRange
+                ? `${formatTime(loopRange.start)}-${formatTime(loopRange.end)}`
+                : null}
+            </Button>
+
             {activeProviderId === 'bunny' && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -533,7 +591,11 @@ export const PlayerCore = memo(function PlayerCore({
           ref={timelineRef}
           className="relative h-8 bg-muted rounded cursor-pointer select-none"
           onMouseDown={handleTimelineMouseDown}
-          onMouseMove={handleTimelineMouseMove}
+          onMouseMove={(event) => {
+            handleTimelineMouseMove(event);
+            handleTimelineHoverMove(event);
+          }}
+          onMouseLeave={handleTimelineHoverLeave}
         >
           {/* Position (width/left) is driven directly on the DOM via a rAF loop
               in use-video-player for smooth scrubbing/playback; see progressRef
@@ -560,6 +622,31 @@ export const PlayerCore = memo(function PlayerCore({
               showScrubReadout ? 'opacity-100' : 'opacity-0'
             )}
           />
+
+          {/* ホバープレビュー(フレームサムネイル)。isDragging中はスクラブ表示に譲る */}
+          {hoverPreviewEnabled && hoverPreview && !isDragging && (
+            <div
+              className="absolute bottom-full z-10 mb-2 -translate-x-1/2 pointer-events-none"
+              style={{ left: `${hoverPreview.x}px` }}
+            >
+              <div className="overflow-hidden rounded-md border bg-popover shadow-md">
+                <video
+                  ref={hoverPreviewVideoRef}
+                  muted
+                  playsInline
+                  preload="metadata"
+                  className={cn('h-[90px] w-[160px] object-contain bg-black', !hoverPreviewReady && 'hidden')}
+                  onLoadedMetadata={(event) => {
+                    // 音声のみのソースは映像が無いのでプレビューを出さない
+                    setHoverPreviewReady(event.currentTarget.videoWidth > 0);
+                  }}
+                />
+                <div className="px-2 py-0.5 text-center text-xs font-medium tabular-nums text-popover-foreground">
+                  {formatTime(hoverPreview.time)}
+                </div>
+              </div>
+            </div>
+          )}
 
           {commentMarkers.map((comment) => {
             const startPercent = duration > 0 ? (comment.timestamp / duration) * 100 : 0;
