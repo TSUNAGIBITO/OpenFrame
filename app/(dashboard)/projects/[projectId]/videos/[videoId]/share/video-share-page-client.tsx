@@ -322,7 +322,10 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
     }
   };
 
-  const isExpired = !!expiresAt && new Date(expiresAt).getTime() <= Date.now();
+  // render中のDate.now()はReactの純粋性ルールに反するため、マウント時刻で判定
+  // (期限の更新操作をすればexpiresAtごと再取得されるので実用上十分)
+  const [mountedAt] = useState(() => Date.now());
+  const isExpired = !!expiresAt && new Date(expiresAt).getTime() <= mountedAt;
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-start justify-center py-12 px-4">

@@ -194,9 +194,9 @@ export const PlayerCore = memo(function PlayerCore({
 
     const previewEl = hoverPreviewVideoRef.current;
     if (previewEl) {
-      if (!previewEl.src) {
-        const mainSrc = videoRef.current?.currentSrc;
-        if (mainSrc) previewEl.src = mainSrc;
+      if (!previewEl.src && embedUrl) {
+        // 再生開始前でもプレビューできるよう、本編と同じソースURLを直接使う
+        previewEl.src = embedUrl;
       }
       if (previewEl.src && Number.isFinite(time)) {
         try {
@@ -623,8 +623,8 @@ export const PlayerCore = memo(function PlayerCore({
             )}
           />
 
-          {/* ホバープレビュー(フレームサムネイル)。isDragging中はスクラブ表示に譲る */}
-          {hoverPreviewEnabled && hoverPreview && !isDragging && (
+          {/* ホバープレビュー(フレームサムネイル)。スクラブ表示中はそちらに譲る */}
+          {hoverPreviewEnabled && hoverPreview && !showScrubReadout && (
             <div
               className="absolute bottom-full z-10 mb-2 -translate-x-1/2 pointer-events-none"
               style={{ left: `${hoverPreview.x}px` }}

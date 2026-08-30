@@ -236,16 +236,16 @@ export const CommentsPane = memo(function CommentsPane({
     const map = new Map<string, string>();
     for (const comment of comments) {
       const label = comment.author?.name || comment.guestName || '匿名';
-      map.set(commentAuthorKey(comment.authorId, label), label);
+      map.set(commentAuthorKey(comment.author?.id ?? null, label), label);
     }
     return [...map.entries()];
   }, [comments]);
 
   const matchesCommentFilters = (comment: Comment) => {
-    if (filterTagId && comment.tagId !== filterTagId) return false;
+    if (filterTagId && comment.tag?.id !== filterTagId) return false;
     if (filterAuthorKey) {
       const label = comment.author?.name || comment.guestName || '匿名';
-      if (commentAuthorKey(comment.authorId, label) !== filterAuthorKey) return false;
+      if (commentAuthorKey(comment.author?.id ?? null, label) !== filterAuthorKey) return false;
     }
     return true;
   };

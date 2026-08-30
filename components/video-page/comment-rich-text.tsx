@@ -83,7 +83,7 @@ function renderUrls(
   onTimestampClick?: (seconds: number) => void
 ): React.ReactNode[] {
   const parts = text.split(URL_REGEX);
-  return parts.flatMap((part, index) => {
+  return parts.flatMap((part, index): React.ReactNode[] => {
     if (/^https?:\/\/[^\s]+$/.test(part)) {
       return [
         <a
