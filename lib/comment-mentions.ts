@@ -1,5 +1,6 @@
 import { db } from '@/lib/db';
 import { logError } from '@/lib/logger';
+import { createNotifications } from '@/lib/app-notifications';
 import { notifyMentionToSecretary } from '@/lib/secretary-webhook';
 
 const USER_MENTION_REGEX = /@\[(?:.+?)\]\(user:([\w-]+)\)/gi;
@@ -57,6 +58,17 @@ export async function dispatchMentionNotifications(params: {
     const plainText = content
       .replace(/@\[(.+?)\]\((?:asset|user):[\w-]+\)/gi, '@$1')
       .slice(0, 200);
+
+    // アプリ内通知(ベルアイコン)。ポータル通知と違いメールアドレスの有無に
+    // 依存せず、アクセス権を確認できた全メンション先に配信する(fire-and-forget)
+    await createNotifications(
+      users.map((user) => ({
+        userId: user.id,
+        type: 'mention' as const,
+        message: `${params.authorName}さんが「${params.videoTitle}」であなたをメンションしました`,
+        linkUrl: `/projects/${params.project.id}/videos/${params.videoId}`,
+      }))
+    );
 
     await Promise.all(
       users

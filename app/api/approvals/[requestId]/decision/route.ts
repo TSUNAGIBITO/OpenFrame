@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { auth, checkProjectAccess } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { notifyUsers } from '@/lib/notifications';
+import { createNotification } from '@/lib/app-notifications';
 import { rateLimit } from '@/lib/rate-limit';
 import { apiErrors, successResponse, withCacheControl } from '@/lib/api-response';
 import { logError } from '@/lib/logger';
@@ -194,6 +195,22 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const versionLabel = updated.version.versionLabel || `Version ${updated.version.versionNumber}`;
     const baseUrl = process.env.NEXTAUTH_URL || '';
     const requestUrl = `${baseUrl}/projects/${updated.version.video.project.id}/videos/${updated.version.video.id}`;
+
+    // アプリ内通知(ベルアイコン)。申請者へ判断結果を届ける(fire-and-forget)。
+    // 全員承認でリクエスト全体が完了した場合はその旨も併記する
+    {
+      const decisionLabel = decision === 'APPROVED' ? '承認しました' : '却下しました';
+      const completedSuffix =
+        updated.status === 'APPROVED' ? '(すべての承認者が承認し、承認が完了しました)' : '';
+      createNotification({
+        userId: updated.requestedById,
+        type: 'approval_decided',
+        message: `${actorName}さんが「${updated.version.video.title}」(${versionLabel})を${decisionLabel}${completedSuffix}`,
+        linkUrl: `/projects/${updated.version.video.project.id}/videos/${updated.version.video.id}`,
+      }).catch((error) => {
+        logError('In-app approval decision notification failed:', error);
+      });
+    }
 
     notifyUsers([updated.requestedById], {
       type: 'approval_action',

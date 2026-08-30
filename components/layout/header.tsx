@@ -34,6 +34,7 @@ import {
   SheetDescription,
 } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { NotificationBell } from '@/components/layout/notification-bell';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { cn } from '@/lib/utils';
 
@@ -228,6 +229,8 @@ export function Header({ user, showAppNavigation = false }: HeaderProps) {
               </Link>
             </Button>
           )}
+
+          {user && showAppNavigation && <NotificationBell />}
 
           <ThemeToggle />
 
