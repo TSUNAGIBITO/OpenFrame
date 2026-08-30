@@ -52,6 +52,7 @@ model User {
   sentInvitations           Invitation[] @relation("InvitationsSentBy")
   acquisition               UserAcquisition?
   analyticsEvents           AnalyticsEvent[]
+  notifications             Notification[]
 
   @@map("users")
 }
@@ -694,6 +695,32 @@ model NotificationSetting {
   updatedAt  DateTime @updatedAt
 
   @@map("notification_settings")
+}
+
+// アプリ内通知(ヘッダーのベルアイコン)。Telegram/メール等の外部通知
+// (NotificationSetting)とは独立して、常に全ユーザーへ配信される。
+// message は書き込み時点で日本語の表示文として組み立て済み。
+model Notification {
+  id        String    @id @default(cuid())
+
+  // 受信者
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 'mention' | 'reply' | 'new_comment' | 'approval_requested' | 'approval_decided'
+  type      String
+
+  // 表示文(日本語で組み立て済み)
+  message   String    @db.Text
+
+  // 遷移先(/projects/... or /watch/...)
+  linkUrl   String
+
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, readAt, createdAt(sort: Desc)])
+  @@map("notifications")
 }
 
 // ============================================

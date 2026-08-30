@@ -13,6 +13,7 @@ import {
   createShareSessionValue,
   getPendingShareCookieName,
   getPendingShareTokenFromRequest,
+  getProjectShareSessionFromRequest,
   getShareSessionCookieName,
   pendingShareCookieConfig,
   shareSessionCookieConfig,
@@ -112,12 +113,19 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     );
   }
 
+  // プレゼンテーション(/present)側で同じトークンのパスワードを解除済みなら、
+  // 動画ごとにパスワードを再入力させない
+  const projectSession = getProjectShareSessionFromRequest(request, tokenForAttempt);
+  const passwordAlreadyVerified =
+    projectSession?.passwordVerified === true && projectSession.projectId === video.projectId;
+
   const access = await validateShareLinkAccess({
     token: tokenForAttempt,
     projectId: video.projectId,
     videoId: video.id,
     requiredPermission: 'VIEW',
     presentedPassword: password,
+    passwordVerified: passwordAlreadyVerified,
   });
 
   if (access.requiresPassword && shareTokenFromBody) {

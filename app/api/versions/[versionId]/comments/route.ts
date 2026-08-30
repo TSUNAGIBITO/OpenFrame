@@ -28,6 +28,7 @@ import {
 } from '@/lib/storage-quota';
 import { isValidEmailAddress, normalizeEmail } from '@/lib/email-validation';
 import { dispatchMentionNotifications } from '@/lib/comment-mentions';
+import { createNotification } from '@/lib/app-notifications';
 
 type RouteParams = { params: Promise<{ versionId: string }> };
 const SAFE_AUDIO_PATH =
@@ -530,6 +531,35 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         videoTitle: version.video.title || 'Untitled Video',
         timestampLabel: `${mins}:${secs.toString().padStart(2, '0')}`,
       }).catch((err) => logError('Mention notification failed:', err));
+    }
+    // アプリ内通知(ベルアイコン、fire-and-forget)。返信は親コメントの投稿者へ、
+    // 新規コメントはプロジェクトオーナーへ。自分自身への通知はスキップする。
+    // 外部通知(notifyProjectOwner)と違い、オーナー自身の投稿でも返信先には届ける
+    {
+      const actorId = session?.user?.id ?? null;
+      const inAppVideoTitle = version.video.title || 'Untitled Video';
+      const inAppLinkUrl = `/projects/${project.id}/videos/${version.video.id}`;
+      if (parentId) {
+        const parentForNotification = await db.comment.findUnique({
+          where: { id: parentId },
+          select: { authorId: true },
+        });
+        if (parentForNotification?.authorId && parentForNotification.authorId !== actorId) {
+          createNotification({
+            userId: parentForNotification.authorId,
+            type: 'reply',
+            message: `${commentAuthorName}さんが「${inAppVideoTitle}」であなたのコメントに返信しました`,
+            linkUrl: inAppLinkUrl,
+          }).catch((err) => logError('In-app reply notification failed:', err));
+        }
+      } else if (project.ownerId !== actorId) {
+        createNotification({
+          userId: project.ownerId,
+          type: 'new_comment',
+          message: `${commentAuthorName}さんが「${inAppVideoTitle}」にコメントしました`,
+          linkUrl: inAppLinkUrl,
+        }).catch((err) => logError('In-app comment notification failed:', err));
+      }
     }
     if (!isOwnProject) {
       const baseUrl = process.env.NEXTAUTH_URL || '';

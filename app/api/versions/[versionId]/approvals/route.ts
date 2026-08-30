@@ -4,6 +4,7 @@ import { auth, checkProjectAccess } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { getApprovalCandidatesForProject } from '@/lib/approval-workflow';
 import { notifyUsers } from '@/lib/notifications';
+import { createNotifications } from '@/lib/app-notifications';
 import { notifyApprovalRequestToSecretary } from '@/lib/secretary-webhook';
 import { rateLimit } from '@/lib/rate-limit';
 import { apiErrors, successResponse, withCacheControl } from '@/lib/api-response';
@@ -170,6 +171,18 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const versionLabel = version.versionLabel || `Version ${version.versionNumber}`;
     const baseUrl = process.env.NEXTAUTH_URL || '';
     const requestUrl = `${baseUrl}/projects/${version.video.project.id}/videos/${version.video.id}`;
+
+    // アプリ内通知(ベルアイコン)。各承認者へ配信(fire-and-forget)
+    createNotifications(
+      approverIds.map((approverId) => ({
+        userId: approverId,
+        type: 'approval_requested' as const,
+        message: `${requesterName}さんが「${version.video.title}」(${versionLabel})の承認を依頼しました`,
+        linkUrl: `/projects/${version.video.project.id}/videos/${version.video.id}`,
+      }))
+    ).catch((error) => {
+      logError('In-app approval request notification failed:', error);
+    });
 
     notifyUsers(approverIds, {
       type: 'approval_requested',
