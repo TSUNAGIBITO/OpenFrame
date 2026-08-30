@@ -14,7 +14,8 @@ import { logError } from '@/lib/logger';
 type RouteParams = { params: Promise<{ versionId: string }> };
 const MAX_EXPORT_COMMENTS = 5000;
 
-// GET /api/versions/[versionId]/comments/export?format=csv|pdf&includeResolved=true|false
+// GET /api/versions/[versionId]/comments/export?format=csv|pdf|markers&includeResolved=true|false
+// markers: TsunaguEditor等の編集ソフトへタイムラインマーカーとして取り込むためのJSON
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const limited = await rateLimit(request, 'comment-export');
@@ -29,8 +30,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const { searchParams } = new URL(request.url);
 
     const format = (searchParams.get('format') || 'csv').toLowerCase();
-    if (format !== 'csv' && format !== 'pdf') {
-      return apiErrors.badRequest('フォーマットが正しくありません。"csv" または "pdf" を指定してください');
+    if (format !== 'csv' && format !== 'pdf' && format !== 'markers') {
+      return apiErrors.badRequest(
+        'フォーマットが正しくありません。"csv"・"pdf"・"markers" のいずれかを指定してください'
+      );
     }
 
     const includeResolved = searchParams.get('includeResolved') !== 'false';
@@ -43,6 +46,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         versionLabel: true,
         video: {
           select: {
+            id: true,
             title: true,
             project: {
               select: {
@@ -101,7 +105,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         createdAt: true,
         author: { select: { name: true } },
         guestName: true,
-        tag: { select: { name: true } },
+        tag: { select: { name: true, color: true } },
         replies: {
           orderBy: { createdAt: 'asc' },
           select: {
@@ -118,7 +122,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             createdAt: true,
             author: { select: { name: true } },
             guestName: true,
-            tag: { select: { name: true } },
+            tag: { select: { name: true, color: true } },
           },
         },
       },
@@ -131,6 +135,46 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       versionNumber: version.versionNumber,
       versionLabel: version.versionLabel,
     };
+
+    if (format === 'markers') {
+      // 親コメントのみをマーカー化(返信は本文の文脈なので対象外)。
+      // TsunaguEditorの「レビューコメント取り込み」が読む想定の安定フォーマット
+      const markers = comments.map((comment) => ({
+        time: comment.timestamp,
+        timeEnd: comment.timestampEnd ?? null,
+        text:
+          (comment.content ?? '')
+            .replace(/@\[(.+?)\]\((?:asset|user):[\w-]+\)/gi, '@$1')
+            .trim() ||
+          (comment.voiceUrl ? '(音声コメント)' : comment.imageUrl ? '(画像コメント)' : '(注釈)'),
+        author: comment.author?.name || comment.guestName || '匿名',
+        tag: comment.tag?.name ?? null,
+        color: comment.tag?.color ?? null,
+        resolved: comment.isResolved,
+      }));
+
+      const payload = {
+        format: 'tsunagu-review-markers',
+        formatVersion: 1,
+        video: {
+          title: version.video.title,
+          versionNumber: version.versionNumber,
+          versionLabel: version.versionLabel,
+          reviewUrl: `${process.env.NEXTAUTH_URL || ''}/projects/${project.id}/videos/${version.video.id}`,
+        },
+        exportedAt: new Date().toISOString(),
+        markers,
+      };
+
+      const response = new Response(JSON.stringify(payload, null, 2), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Content-Disposition': `attachment; filename="${fileBaseName}.markers.json"`,
+        },
+      });
+      return withCacheControl(response, 'private, no-store');
+    }
 
     if (format === 'csv') {
       const csv = buildCommentsCsv(rows, versionMeta);

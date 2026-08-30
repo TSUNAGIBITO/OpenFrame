@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   ChevronDown,
   Circle,
+  Clapperboard,
   Clock,
   Download,
   FileText,
@@ -66,7 +67,7 @@ interface CommentsPaneProps {
   isGuest: boolean;
   isExportingCsv: boolean;
   isExportingPdf: boolean;
-  handleExportComments: (format: 'csv' | 'pdf') => void;
+  handleExportComments: (format: 'csv' | 'pdf' | 'markers') => void;
   canResolveComments: boolean;
   handleResolveComment: (commentId: string, currentlyResolved: boolean) => void;
   handleSeekToTimestamp: (
@@ -479,6 +480,21 @@ export const CommentsPane = memo(function CommentsPane({
                   >
                     <FileText className="h-4 w-4 mr-2" />
                     PDFをダウンロード
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    disabled={!activeVersion || isGuest || isExportingCsv || isExportingPdf}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleExportComments('markers');
+                    }}
+                    title={
+                      isGuest
+                        ? 'マーカー書き出しにはアカウントへのログインが必要です'
+                        : 'TsunaguEditor等へ取り込めるマーカーJSONをダウンロード'
+                    }
+                  >
+                    <Clapperboard className="h-4 w-4 mr-2" />
+                    マーカーJSON(編集ソフト用)
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

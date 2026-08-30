@@ -13,13 +13,13 @@ export function useCommentExport({ activeVersionId, showResolved }: UseCommentEx
   const [isExportingPdf, setIsExportingPdf] = useState(false);
 
   const exportComments = useCallback(
-    async (format: 'csv' | 'pdf') => {
+    async (format: 'csv' | 'pdf' | 'markers') => {
       if (!activeVersionId) return;
 
-      if (format === 'csv') {
-        setIsExportingCsv(true);
-      } else {
+      if (format === 'pdf') {
         setIsExportingPdf(true);
+      } else {
+        setIsExportingCsv(true);
       }
 
       try {
@@ -60,10 +60,10 @@ export function useCommentExport({ activeVersionId, showResolved }: UseCommentEx
         console.error('Failed to export comments:', error);
         toast.error(error instanceof Error ? error.message : 'Failed to export comments');
       } finally {
-        if (format === 'csv') {
-          setIsExportingCsv(false);
-        } else {
+        if (format === 'pdf') {
           setIsExportingPdf(false);
+        } else {
+          setIsExportingCsv(false);
         }
       }
     },

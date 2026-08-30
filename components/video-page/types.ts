@@ -215,7 +215,7 @@ export interface VideoPageHeaderActions {
 }
 
 export interface VideoPageCommentsActions {
-  onExportComments: (format: 'csv' | 'pdf') => void;
+  onExportComments: (format: 'csv' | 'pdf' | 'markers') => void;
   onResolveComment: (commentId: string, currentlyResolved: boolean) => void;
   onEditComment: (commentId: string) => void;
   onDeleteComment: (commentId: string) => void;
