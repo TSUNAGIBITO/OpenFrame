@@ -31,6 +31,9 @@ import {
 import { resolvePublicBunnyCdnHostname } from '@/lib/bunny-cdn';
 import { isPlayableVideoUrl, resolveR2PlaybackUrl } from '@/lib/video-upload-validation';
 import { cn } from '@/lib/utils';
+import WipeCompareView, { WIPE_PLAYABLE_PROVIDERS } from './wipe-compare-view';
+
+type CompareMode = 'side-by-side' | 'wipe';
 
 interface Version {
   id: string;
@@ -122,6 +125,9 @@ export default function CompareVersionsPageClient({
 
   // Panel version IDs
   const [panelVersionIds, setPanelVersionIds] = useState<string[]>([]);
+
+  // 表示モード: 並べて表示(既定) / ワイプ
+  const [compareMode, setCompareMode] = useState<CompareMode>('side-by-side');
 
   // Shared playback state
   const [isPlaying, setIsPlaying] = useState(false);
@@ -571,6 +577,24 @@ export default function CompareVersionsPageClient({
 
   const usedVersionIds = new Set(panelVersionIds);
 
+  // ワイプ比較の可否: ちょうど2バージョンで、両方が <video> ベースで
+  // ネイティブ再生できるプロバイダー(direct/r2/bunny)のときのみ有効
+  const panelVersions = panelVersionIds
+    .map((id) => video?.versions.find((v) => v.id === id))
+    .filter((v): v is Version => v !== undefined);
+  const hasYouTubePanel = panelVersions.some((v) => v.providerId === 'youtube');
+  const wipeAvailable =
+    panelVersions.length === 2 &&
+    panelVersions.every((v) => WIPE_PLAYABLE_PROVIDERS.has(v.providerId));
+  const wipeDisabledReason = wipeAvailable
+    ? undefined
+    : hasYouTubePanel
+      ? 'YouTube動画はワイプ比較に対応していません'
+      : panelVersions.length !== 2
+        ? 'ワイプ比較は2バージョンの比較時のみ利用できます'
+        : 'この動画プロバイダーはワイプ比較に対応していません';
+  const isWipeMode = compareMode === 'wipe' && wipeAvailable;
+
   if (loading) {
     return (
       <div className="h-screen flex flex-col bg-background overflow-hidden">
@@ -639,309 +663,342 @@ export default function CompareVersionsPageClient({
             <span className="text-xs text-muted-foreground hidden sm:inline">• {video.title}</span>
           </div>
         </div>
-      </div>
 
-      {/* Video panels */}
-      <div className="flex-1 flex overflow-hidden min-h-0">
-        {panelVersionIds.map((versionId, index) => {
-          const version = video.versions.find((v) => v.id === versionId);
-          if (!version) return null;
-          const panelComments = commentsCache.get(versionId) || [];
-          const isCommentsOpen = openCommentsPanel === versionId;
-          const isLoadingComments = commentsLoading === versionId;
-
-          return (
-            <div
-              key={`${versionId}-${index}`}
-              className="flex-1 flex flex-col border-r last:border-r-0 min-w-0 overflow-hidden"
-            >
-              {/* Panel header */}
-              <div className="shrink-0 flex items-center justify-between p-2 border-b bg-muted/30">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Badge variant="secondary" className="mr-1.5">
-                        v{version.versionNumber}
-                      </Badge>
-                      <span className="truncate max-w-[100px]">
-                        {version.versionLabel || `バージョン ${version.versionNumber}`}
-                      </span>
-                      <ChevronDown className="h-3.5 w-3.5 ml-1.5 shrink-0" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    {video.versions.map((v) => (
-                      <DropdownMenuItem
-                        key={v.id}
-                        onClick={() => handleChangeVersion(index, v.id)}
-                        disabled={usedVersionIds.has(v.id) && v.id !== version.id}
-                      >
-                        <Badge
-                          variant={v.id === version.id ? 'default' : 'secondary'}
-                          className="mr-2"
-                        >
-                          v{v.versionNumber}
-                        </Badge>
-                        {v.versionLabel || `バージョン ${v.versionNumber}`}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7"
-                    onClick={() => {
-                      const player = playersRef.current.get(versionId);
-                      if (!player) return;
-                      const isMuted = mutedPanels.has(versionId);
-                      try {
-                        if (isMuted) {
-                          player.unMute();
-                        } else {
-                          player.mute();
-                        }
-                      } catch {
-                        /* */
-                      }
-                      setMutedPanels((prev) => {
-                        const next = new Set(prev);
-                        if (isMuted) {
-                          next.delete(versionId);
-                        } else {
-                          next.add(versionId);
-                        }
-                        return next;
-                      });
-                    }}
-                    title={mutedPanels.has(versionId) ? 'ミュート解除' : 'ミュート'}
-                  >
-                    {mutedPanels.has(versionId) ? (
-                      <VolumeX className="h-3.5 w-3.5" />
-                    ) : (
-                      <Volume2 className="h-3.5 w-3.5" />
-                    )}
-                  </Button>
-                  <Button
-                    variant={isCommentsOpen ? 'secondary' : 'ghost'}
-                    size="sm"
-                    className="gap-1.5 text-xs"
-                    onClick={() => toggleComments(versionId)}
-                  >
-                    <MessageSquare className="h-3.5 w-3.5" />
-                    {version._count.comments}
-                  </Button>
-                </div>
-              </div>
-
-              {/* Video embed with click-to-play overlay */}
-              <div
-                className={cn(
-                  'bg-black flex items-center justify-center relative cursor-pointer group',
-                  cursorIdle && isPlaying && 'cursor-none',
-                  isCommentsOpen ? 'h-[55%]' : 'flex-1'
-                )}
-                onClick={handlePlayPause}
-                onMouseMove={handleVideoMouseMove}
-                onMouseLeave={handleVideoMouseLeave}
-              >
-                {version.providerId === 'youtube' ? (
-                  <YouTubePanel
-                    key={versionId}
-                    version={version}
-                    isApiLoaded={isApiLoaded}
-                    onRegister={registerPlayer}
-                    onUnregister={unregisterPlayer}
-                  />
-                ) : version.providerId === 'bunny' ? (
-                  <BunnyPanel
-                    key={versionId}
-                    version={version}
-                    onRegister={registerPlayer}
-                    onUnregister={unregisterPlayer}
-                  />
-                ) : version.providerId === 'r2' ? (
-                  <R2Panel
-                    key={versionId}
-                    version={version}
-                    onRegister={registerPlayer}
-                    onUnregister={unregisterPlayer}
-                  />
-                ) : isSafeUrl(version.originalUrl) ? (
-                  <iframe
-                    src={version.originalUrl}
-                    className="w-full h-full pointer-events-none"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                ) : null}
-
-                {/* Play/pause overlay */}
-                <div
-                  className={cn(
-                    'absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity duration-300 pointer-events-none',
-                    isPlaying
-                      ? cursorIdle
-                        ? 'opacity-0'
-                        : 'opacity-0 group-hover:opacity-100'
-                      : 'opacity-100'
-                  )}
-                >
-                  <div className="w-14 h-14 rounded-full bg-black/60 flex items-center justify-center">
-                    {isPlaying ? (
-                      <Pause className="h-7 w-7 text-white" />
-                    ) : (
-                      <Play className="h-7 w-7 text-white ml-1" />
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Read-only comments panel */}
-              {isCommentsOpen && (
-                <div className="h-[45%] flex flex-col border-t bg-card overflow-hidden">
-                  <div className="shrink-0 flex items-center justify-between px-3 py-2 border-b">
-                    <div className="flex items-center gap-1.5">
-                      <MessageSquare className="h-3.5 w-3.5" />
-                      <span className="text-xs font-medium">コメント</span>
-                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                        {panelComments.length}
-                      </Badge>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6"
-                      onClick={() => setOpenCommentsPanel(null)}
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-
-                  <div className="flex-1 overflow-y-auto p-2 space-y-2">
-                    {isLoadingComments ? (
-                      <div className="flex items-center justify-center py-6">
-                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                      </div>
-                    ) : panelComments.length === 0 ? (
-                      <div className="text-center py-6 text-muted-foreground text-xs">
-                        このバージョンにはコメントがありません
-                      </div>
-                    ) : (
-                      [...panelComments]
-                        .sort((a, b) => a.timestamp - b.timestamp)
-                        .map((comment) => {
-                          const authorName =
-                            comment.author?.name || comment.guestName || '匿名';
-                          return (
-                            <div
-                              key={comment.id}
-                              className={cn(
-                                'rounded-lg border p-2 text-xs',
-                                comment.isResolved && 'opacity-60'
-                              )}
-                            >
-                              <div className="flex items-center gap-1.5 mb-1">
-                                <Avatar className="h-4 w-4">
-                                  <AvatarImage src={comment.author?.image ?? undefined} />
-                                  <AvatarFallback className="text-[8px]">
-                                    {authorName.charAt(0)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <span className="font-medium truncate">{authorName}</span>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleSeek(comment.timestamp);
-                                  }}
-                                  className="ml-auto flex items-center gap-0.5 text-primary bg-primary/10 px-1 py-0.5 rounded text-[10px] hover:bg-primary/20 transition-colors"
-                                >
-                                  <Clock className="h-2.5 w-2.5" />
-                                  {formatTime(comment.timestamp)}
-                                </button>
-                              </div>
-                              {comment.content && (
-                                <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap break-words">
-                                  {comment.content}
-                                </p>
-                              )}
-                              {comment.tag && (
-                                <Badge
-                                  variant="outline"
-                                  className="mt-1 text-[10px] px-1.5 py-0"
-                                  style={{
-                                    borderColor: comment.tag.color,
-                                    color: comment.tag.color,
-                                  }}
-                                >
-                                  {comment.tag.name}
-                                </Badge>
-                              )}
-                            </div>
-                          );
-                        })
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Shared playback controls */}
-      <div className="shrink-0 px-4 py-2 bg-background border-t">
-        <div className="flex items-center gap-2 mb-2">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handlePlayPause}>
-            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 ml-0.5" />}
+        {/* 表示モード切り替え: 並べて表示 / ワイプ */}
+        <div className="flex items-center gap-1 rounded-md border p-0.5">
+          <Button
+            variant={!isWipeMode ? 'secondary' : 'ghost'}
+            size="sm"
+            className="h-6 px-2 text-xs"
+            onClick={() => setCompareMode('side-by-side')}
+          >
+            並べて表示
           </Button>
-          <span ref={timecodeRef} className="text-xs text-muted-foreground tabular-nums">
-            {formatTime(currentTime)} / {formatTime(duration)}
+          {/* disabled ボタンは pointer-events が無効になり title が出ないため span で包む */}
+          <span title={wipeDisabledReason}>
+            <Button
+              variant={isWipeMode ? 'secondary' : 'ghost'}
+              size="sm"
+              className="h-6 px-2 text-xs"
+              disabled={!wipeAvailable}
+              onClick={() => setCompareMode('wipe')}
+            >
+              ワイプ
+            </Button>
           </span>
         </div>
-
-        <div
-          ref={timelineRef}
-          className="relative h-8 bg-muted rounded cursor-pointer select-none"
-          onMouseDown={handleTimelineMouseDown}
-          onMouseMove={handleTimelineMouseMove}
-        >
-          {/* Progress bar */}
-          <div
-            ref={progressBarRef}
-            className="absolute left-0 top-0 h-full bg-primary/30 rounded pointer-events-none"
-            style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
-          />
-          {/* Playhead */}
-          <div
-            ref={playheadRef}
-            className="absolute top-0 h-full w-1 bg-primary rounded pointer-events-none"
-            style={{ left: `calc(${duration > 0 ? (currentTime / duration) * 100 : 0}% - 2px)` }}
-          />
-
-          {/* Comment markers on timeline */}
-          {allTimelineComments.map((comment) => {
-            const markerColor = comment.tag?.color || (comment.isResolved ? '#22C55E' : '#22D3EE');
-            return (
-              <button
-                key={comment.id}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleSeek(comment.timestamp);
-                }}
-                className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full transition-transform hover:scale-150 z-10"
-                style={{
-                  left: `calc(${duration > 0 ? (comment.timestamp / duration) * 100 : 0}% - 6px)`,
-                  backgroundColor: markerColor,
-                }}
-                title={`v${comment.versionNumber} • ${formatTime(comment.timestamp)} - ${comment.content?.substring(0, 30) || '(コメント)'}...`}
-              />
-            );
-          })}
-        </div>
       </div>
+
+      {isWipeMode ? (
+        <WipeCompareView versionA={panelVersions[0]} versionB={panelVersions[1]} />
+      ) : (
+        <>
+          {/* Video panels */}
+          <div className="flex-1 flex overflow-hidden min-h-0">
+            {panelVersionIds.map((versionId, index) => {
+              const version = video.versions.find((v) => v.id === versionId);
+              if (!version) return null;
+              const panelComments = commentsCache.get(versionId) || [];
+              const isCommentsOpen = openCommentsPanel === versionId;
+              const isLoadingComments = commentsLoading === versionId;
+
+              return (
+                <div
+                  key={`${versionId}-${index}`}
+                  className="flex-1 flex flex-col border-r last:border-r-0 min-w-0 overflow-hidden"
+                >
+                  {/* Panel header */}
+                  <div className="shrink-0 flex items-center justify-between p-2 border-b bg-muted/30">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <Badge variant="secondary" className="mr-1.5">
+                            v{version.versionNumber}
+                          </Badge>
+                          <span className="truncate max-w-[100px]">
+                            {version.versionLabel || `バージョン ${version.versionNumber}`}
+                          </span>
+                          <ChevronDown className="h-3.5 w-3.5 ml-1.5 shrink-0" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        {video.versions.map((v) => (
+                          <DropdownMenuItem
+                            key={v.id}
+                            onClick={() => handleChangeVersion(index, v.id)}
+                            disabled={usedVersionIds.has(v.id) && v.id !== version.id}
+                          >
+                            <Badge
+                              variant={v.id === version.id ? 'default' : 'secondary'}
+                              className="mr-2"
+                            >
+                              v{v.versionNumber}
+                            </Badge>
+                            {v.versionLabel || `バージョン ${v.versionNumber}`}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => {
+                          const player = playersRef.current.get(versionId);
+                          if (!player) return;
+                          const isMuted = mutedPanels.has(versionId);
+                          try {
+                            if (isMuted) {
+                              player.unMute();
+                            } else {
+                              player.mute();
+                            }
+                          } catch {
+                            /* */
+                          }
+                          setMutedPanels((prev) => {
+                            const next = new Set(prev);
+                            if (isMuted) {
+                              next.delete(versionId);
+                            } else {
+                              next.add(versionId);
+                            }
+                            return next;
+                          });
+                        }}
+                        title={mutedPanels.has(versionId) ? 'ミュート解除' : 'ミュート'}
+                      >
+                        {mutedPanels.has(versionId) ? (
+                          <VolumeX className="h-3.5 w-3.5" />
+                        ) : (
+                          <Volume2 className="h-3.5 w-3.5" />
+                        )}
+                      </Button>
+                      <Button
+                        variant={isCommentsOpen ? 'secondary' : 'ghost'}
+                        size="sm"
+                        className="gap-1.5 text-xs"
+                        onClick={() => toggleComments(versionId)}
+                      >
+                        <MessageSquare className="h-3.5 w-3.5" />
+                        {version._count.comments}
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Video embed with click-to-play overlay */}
+                  <div
+                    className={cn(
+                      'bg-black flex items-center justify-center relative cursor-pointer group',
+                      cursorIdle && isPlaying && 'cursor-none',
+                      isCommentsOpen ? 'h-[55%]' : 'flex-1'
+                    )}
+                    onClick={handlePlayPause}
+                    onMouseMove={handleVideoMouseMove}
+                    onMouseLeave={handleVideoMouseLeave}
+                  >
+                    {version.providerId === 'youtube' ? (
+                      <YouTubePanel
+                        key={versionId}
+                        version={version}
+                        isApiLoaded={isApiLoaded}
+                        onRegister={registerPlayer}
+                        onUnregister={unregisterPlayer}
+                      />
+                    ) : version.providerId === 'bunny' ? (
+                      <BunnyPanel
+                        key={versionId}
+                        version={version}
+                        onRegister={registerPlayer}
+                        onUnregister={unregisterPlayer}
+                      />
+                    ) : version.providerId === 'r2' ? (
+                      <R2Panel
+                        key={versionId}
+                        version={version}
+                        onRegister={registerPlayer}
+                        onUnregister={unregisterPlayer}
+                      />
+                    ) : isSafeUrl(version.originalUrl) ? (
+                      <iframe
+                        src={version.originalUrl}
+                        className="w-full h-full pointer-events-none"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    ) : null}
+
+                    {/* Play/pause overlay */}
+                    <div
+                      className={cn(
+                        'absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity duration-300 pointer-events-none',
+                        isPlaying
+                          ? cursorIdle
+                            ? 'opacity-0'
+                            : 'opacity-0 group-hover:opacity-100'
+                          : 'opacity-100'
+                      )}
+                    >
+                      <div className="w-14 h-14 rounded-full bg-black/60 flex items-center justify-center">
+                        {isPlaying ? (
+                          <Pause className="h-7 w-7 text-white" />
+                        ) : (
+                          <Play className="h-7 w-7 text-white ml-1" />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Read-only comments panel */}
+                  {isCommentsOpen && (
+                    <div className="h-[45%] flex flex-col border-t bg-card overflow-hidden">
+                      <div className="shrink-0 flex items-center justify-between px-3 py-2 border-b">
+                        <div className="flex items-center gap-1.5">
+                          <MessageSquare className="h-3.5 w-3.5" />
+                          <span className="text-xs font-medium">コメント</span>
+                          <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                            {panelComments.length}
+                          </Badge>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => setOpenCommentsPanel(null)}
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+
+                      <div className="flex-1 overflow-y-auto p-2 space-y-2">
+                        {isLoadingComments ? (
+                          <div className="flex items-center justify-center py-6">
+                            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                          </div>
+                        ) : panelComments.length === 0 ? (
+                          <div className="text-center py-6 text-muted-foreground text-xs">
+                            このバージョンにはコメントがありません
+                          </div>
+                        ) : (
+                          [...panelComments]
+                            .sort((a, b) => a.timestamp - b.timestamp)
+                            .map((comment) => {
+                              const authorName =
+                                comment.author?.name || comment.guestName || '匿名';
+                              return (
+                                <div
+                                  key={comment.id}
+                                  className={cn(
+                                    'rounded-lg border p-2 text-xs',
+                                    comment.isResolved && 'opacity-60'
+                                  )}
+                                >
+                                  <div className="flex items-center gap-1.5 mb-1">
+                                    <Avatar className="h-4 w-4">
+                                      <AvatarImage src={comment.author?.image ?? undefined} />
+                                      <AvatarFallback className="text-[8px]">
+                                        {authorName.charAt(0)}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <span className="font-medium truncate">{authorName}</span>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleSeek(comment.timestamp);
+                                      }}
+                                      className="ml-auto flex items-center gap-0.5 text-primary bg-primary/10 px-1 py-0.5 rounded text-[10px] hover:bg-primary/20 transition-colors"
+                                    >
+                                      <Clock className="h-2.5 w-2.5" />
+                                      {formatTime(comment.timestamp)}
+                                    </button>
+                                  </div>
+                                  {comment.content && (
+                                    <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap break-words">
+                                      {comment.content}
+                                    </p>
+                                  )}
+                                  {comment.tag && (
+                                    <Badge
+                                      variant="outline"
+                                      className="mt-1 text-[10px] px-1.5 py-0"
+                                      style={{
+                                        borderColor: comment.tag.color,
+                                        color: comment.tag.color,
+                                      }}
+                                    >
+                                      {comment.tag.name}
+                                    </Badge>
+                                  )}
+                                </div>
+                              );
+                            })
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Shared playback controls */}
+          <div className="shrink-0 px-4 py-2 bg-background border-t">
+            <div className="flex items-center gap-2 mb-2">
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handlePlayPause}>
+                {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 ml-0.5" />}
+              </Button>
+              <span ref={timecodeRef} className="text-xs text-muted-foreground tabular-nums">
+                {formatTime(currentTime)} / {formatTime(duration)}
+              </span>
+            </div>
+
+            <div
+              ref={timelineRef}
+              className="relative h-8 bg-muted rounded cursor-pointer select-none"
+              onMouseDown={handleTimelineMouseDown}
+              onMouseMove={handleTimelineMouseMove}
+            >
+              {/* Progress bar */}
+              <div
+                ref={progressBarRef}
+                className="absolute left-0 top-0 h-full bg-primary/30 rounded pointer-events-none"
+                style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+              />
+              {/* Playhead */}
+              <div
+                ref={playheadRef}
+                className="absolute top-0 h-full w-1 bg-primary rounded pointer-events-none"
+                style={{
+                  left: `calc(${duration > 0 ? (currentTime / duration) * 100 : 0}% - 2px)`,
+                }}
+              />
+
+              {/* Comment markers on timeline */}
+              {allTimelineComments.map((comment) => {
+                const markerColor =
+                  comment.tag?.color || (comment.isResolved ? '#22C55E' : '#22D3EE');
+                return (
+                  <button
+                    key={comment.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSeek(comment.timestamp);
+                    }}
+                    className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full transition-transform hover:scale-150 z-10"
+                    style={{
+                      left: `calc(${duration > 0 ? (comment.timestamp / duration) * 100 : 0}% - 6px)`,
+                      backgroundColor: markerColor,
+                    }}
+                    title={`v${comment.versionNumber} • ${formatTime(comment.timestamp)} - ${comment.content?.substring(0, 30) || '(コメント)'}...`}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
