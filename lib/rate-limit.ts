@@ -81,6 +81,11 @@ export const RATE_LIMIT_CONFIGS: Record<string, RateLimitConfig> = {
   // Exports
   'comment-export': { windowMs: 60 * 1000, maxRequests: 10 }, // 10 per minute
 
+  // External integration (TsunaguEditor) reply push. One request carries up to
+  // 100 replies, so the request budget mirrors comment-export rather than the
+  // per-comment 'comment' bucket.
+  'integration-reply': { windowMs: 60 * 1000, maxRequests: 10 }, // 10 per minute
+
   // Downloads — strict enough to limit upstream probing/cost abuse
   'video-download': { windowMs: 60 * 1000, maxRequests: 8 }, // 8 per minute
   'video-download-prepare': { windowMs: 60 * 1000, maxRequests: 5 }, // 5 per minute

@@ -4,6 +4,7 @@
 // pull_review_markers both parse this shape.
 
 export interface MarkerSourceComment {
+  id: string;
   content: string | null;
   timestamp: number;
   timestampEnd: number | null;
@@ -29,6 +30,9 @@ export function buildReviewMarkersPayload(
 ) {
   // 親コメントのみをマーカー化(返信は本文の文脈なので対象外)
   const markers = comments.map((comment) => ({
+    // コメント ID。TsunaguEditor が /api/integration/review-replies で返信を
+    // 付ける先。formatVersion 1 のまま追加(additive)。
+    id: comment.id,
     time: comment.timestamp,
     timeEnd: comment.timestampEnd ?? null,
     text:
@@ -58,6 +62,7 @@ export function buildReviewMarkersPayload(
 
 /** Prisma select shared by both marker routes (parent comments only). */
 export const MARKER_COMMENT_SELECT = {
+  id: true,
   content: true,
   timestamp: true,
   timestampEnd: true,

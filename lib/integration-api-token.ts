@@ -1,0 +1,57 @@
+/**
+ * A machine caller for the external-integration endpoints (TsunaguEditor).
+ *
+ * The「指摘→修正→再納品」loop ends with the editor pushing a fixed cut back as a
+ * new version. That push has no browser and no NextAuth session, and unlike the
+ * reply endpoint it writes to storage and billing, so it authenticates with a
+ * host-configured machine token rather than a share link.
+ *
+ * Mirrors lib/admin-api-token.ts: off unless `OPENFRAME_INTEGRATION_TOKEN` is
+ * set, so a self-hosted instance that never sets it keeps the endpoints closed.
+ */
+
+import { createHash, timingSafeEqual } from 'node:crypto';
+
+/**
+ * The shortest token this accepts.
+ *
+ * Behind this header sits the ability to upload into any workspace's storage,
+ * so a short token is a guessable path to it. A token under this length is
+ * treated as no token at all rather than as a weaker one: failing closed makes
+ * a bad value visible on the first call, where silently accepting it would
+ * leave the endpoint open and look fine.
+ */
+export const MIN_INTEGRATION_API_TOKEN_LENGTH = 32;
+
+/** The configured token, or null when it is absent or too short to be safe. */
+export function getIntegrationApiToken(): string | null {
+  const raw = process.env.OPENFRAME_INTEGRATION_TOKEN?.trim();
+  if (!raw || raw.length < MIN_INTEGRATION_API_TOKEN_LENGTH) return null;
+  return raw;
+}
+
+/**
+ * Constant-time comparison over SHA-256 digests.
+ *
+ * Hashing first is not about secrecy, it is about length: `timingSafeEqual`
+ * throws on unequal-length buffers, and the obvious length check before it
+ * would leak the token's length through timing. Digests are always 32 bytes.
+ */
+function tokensMatch(candidate: string, expected: string): boolean {
+  const digest = (value: string) => createHash('sha256').update(value, 'utf8').digest();
+  return timingSafeEqual(digest(candidate), digest(expected));
+}
+
+/** True when the request carries `Authorization: Bearer <the configured token>`. */
+export function isIntegrationTokenRequest(request: Request): boolean {
+  const expected = getIntegrationApiToken();
+  if (!expected) return false;
+
+  const header = request.headers.get('authorization');
+  if (!header) return false;
+
+  const [scheme, ...rest] = header.trim().split(/\s+/);
+  if (scheme.toLowerCase() !== 'bearer' || rest.length !== 1) return false;
+
+  return tokensMatch(rest[0], expected);
+}

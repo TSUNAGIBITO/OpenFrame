@@ -14,6 +14,7 @@ const meta = {
 
 function comment(overrides: Partial<MarkerSourceComment> = {}): MarkerSourceComment {
   return {
+    id: 'cmt_1',
     content: 'ここのテロップを大きく',
     timestamp: 12.5,
     timestampEnd: null,
@@ -36,6 +37,7 @@ describe('buildReviewMarkersPayload', () => {
     expect(payload.video.reviewUrl).toContain('/projects/prj_1/videos/vid_1');
     expect(payload.markers).toHaveLength(1);
     expect(payload.markers[0]).toMatchObject({
+      id: 'cmt_1',
       time: 12.5,
       timeEnd: null,
       text: 'ここのテロップを大きく',
@@ -59,6 +61,14 @@ describe('buildReviewMarkersPayload', () => {
       '(画像コメント)',
       '(注釈)',
     ]);
+  });
+
+  it('carries each comment id so a reply can target it', () => {
+    const payload = buildReviewMarkersPayload(
+      [comment({ id: 'cmt_a' }), comment({ id: 'cmt_b' })],
+      meta
+    );
+    expect(payload.markers.map((m) => m.id)).toEqual(['cmt_a', 'cmt_b']);
   });
 
   it('uses guestName then 匿名 when there is no author', () => {
