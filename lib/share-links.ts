@@ -75,8 +75,12 @@ export async function validateShareLinkAccess({
   }
 
   const projectMatches = link.projectId === projectId;
-  // When a specific video is requested, require the link to be scoped to that exact video.
-  const videoMatches = videoId === undefined ? link.videoId === null : link.videoId === videoId;
+  // When a specific video is requested, accept either a link scoped to that exact video or a
+  // project-level link (videoId=null). Project-level links grant access to every video in the
+  // project — callers always derive `projectId` server-side from the requested video, so the
+  // `projectMatches` check above guarantees the video belongs to the link's project.
+  const videoMatches =
+    videoId === undefined ? link.videoId === null : link.videoId === null || link.videoId === videoId;
   const permissionMatches = hasRequiredPermission(link.permission, requiredPermission);
 
   if (!projectMatches || !videoMatches || !permissionMatches || isShareLinkExpired(link)) {

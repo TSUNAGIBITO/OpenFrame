@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from 'crypto';
+import { createHash, createHmac, timingSafeEqual } from 'crypto';
 import type { NextRequest } from 'next/server';
 
 const DEFAULT_SESSION_TTL_SECONDS = 60 * 60 * 24 * 14; // 14 days
@@ -124,6 +124,64 @@ export function getPendingShareTokenFromRequest(
   }
 
   return payload.token;
+}
+
+// --- プロジェクト全体共有(プレゼンテーション)用セッション ---
+// /present/[token] のパスワード解除状態を保持する。クッキー名にはトークンの
+// フィンガープリント(sha256の先頭16文字)を使い、名前からトークンが漏れないようにする。
+
+interface ProjectShareSessionPayload {
+  scope: 'project';
+  token: string;
+  projectId: string;
+  exp: number;
+  passwordVerified: boolean;
+}
+
+export function getProjectShareSessionCookieName(token: string): string {
+  const fingerprint = createHash('sha256').update(token).digest('base64url').slice(0, 16);
+  return `openframe_present_session_${fingerprint}`;
+}
+
+export function createProjectShareSessionValue(
+  token: string,
+  projectId: string,
+  passwordVerified: boolean,
+  ttlSeconds = DEFAULT_SESSION_TTL_SECONDS
+): string {
+  return createSignedValue({
+    scope: 'project',
+    token,
+    projectId,
+    passwordVerified,
+    exp: Math.floor(Date.now() / 1000) + ttlSeconds,
+  } satisfies ProjectShareSessionPayload);
+}
+
+// サーバーコンポーネント(next/headers の cookies())からも使えるよう、生のクッキー値を受け取る
+export function parseProjectShareSessionValue(
+  cookieValue: string,
+  token: string
+): { projectId: string; passwordVerified: boolean } | null {
+  const payload = parseSignedValue<ProjectShareSessionPayload>(cookieValue);
+  if (!payload || payload.scope !== 'project' || payload.token !== token) {
+    return null;
+  }
+
+  if (payload.exp <= Math.floor(Date.now() / 1000)) {
+    return null;
+  }
+
+  return { projectId: payload.projectId, passwordVerified: payload.passwordVerified };
+}
+
+export function getProjectShareSessionFromRequest(
+  request: NextRequest,
+  token: string
+): { projectId: string; passwordVerified: boolean } | null {
+  const cookieValue = request.cookies.get(getProjectShareSessionCookieName(token))?.value;
+  if (!cookieValue) return null;
+  return parseProjectShareSessionValue(cookieValue, token);
 }
 
 export const shareSessionCookieConfig = {

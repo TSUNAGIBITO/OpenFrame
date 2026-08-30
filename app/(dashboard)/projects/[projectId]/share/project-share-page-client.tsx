@@ -20,6 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import ProjectPresentationShareCard from './project-presentation-share-card';
 
 interface ProjectMember {
   id: string;
@@ -193,6 +194,9 @@ export default function ProjectSharePageClient({ projectId }: ProjectSharePagePr
               </div>
             </CardContent>
           </Card>
+
+          {/* プロジェクト全体を1リンクで共有するプレゼンテーションリンク */}
+          <ProjectPresentationShareCard projectId={projectId} />
 
           {/* Invite People - Only show for INVITE visibility */}
           {projectVisibility === 'INVITE' && (
