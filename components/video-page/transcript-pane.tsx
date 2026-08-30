@@ -30,7 +30,7 @@ interface TranscriptPaneProps {
 export function TranscriptPane({ versionId, formatTime, onSeek, isActive }: TranscriptPaneProps) {
   const [transcript, setTranscript] = useState<TranscriptState | null>(null);
   const [canTranscribe, setCanTranscribe] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [hasFetched, setHasFetched] = useState(false);
   const [isRequesting, setIsRequesting] = useState(false);
   const [query, setQuery] = useState('');
   const pollRef = useRef<number | null>(null);
@@ -43,6 +43,7 @@ export function TranscriptPane({ versionId, formatTime, onSeek, isActive }: Tran
       const body = await res.json();
       setTranscript(body?.data?.transcript ?? null);
       setCanTranscribe(!!body?.data?.canTranscribe);
+      setHasFetched(true);
     } catch {
       // ネットワーク失敗時は次のポーリングに任せる
     }
@@ -50,8 +51,11 @@ export function TranscriptPane({ versionId, formatTime, onSeek, isActive }: Tran
 
   useEffect(() => {
     if (!isActive || !versionId) return;
-    setIsLoading(true);
-    fetchTranscript().finally(() => setIsLoading(false));
+    // タイマー経由で呼ぶ(effect本体での同期setStateを避けるlintルール対応)
+    const timerId = window.setTimeout(() => {
+      void fetchTranscript();
+    }, 0);
+    return () => window.clearTimeout(timerId);
   }, [isActive, versionId, fetchTranscript]);
 
   // 実行中はポーリング
@@ -97,7 +101,7 @@ export function TranscriptPane({ versionId, formatTime, onSeek, isActive }: Tran
     return <p className="text-sm text-muted-foreground">バージョンがありません</p>;
   }
 
-  if (isLoading && !transcript) {
+  if (!hasFetched && !transcript) {
     return (
       <div className="flex items-center justify-center py-8 text-muted-foreground">
         <Loader2 className="h-5 w-5 animate-spin" />
