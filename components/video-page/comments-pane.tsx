@@ -134,9 +134,10 @@ interface CommentsPaneProps {
   assets: VideoAsset[];
   mentionUsers?: MentionUser[];
   onAssetMentionClick: (assetId: string) => void;
-  activePane: 'comments' | 'assets';
-  setActivePane: (pane: 'comments' | 'assets') => void;
+  activePane: 'comments' | 'assets' | 'transcript';
+  setActivePane: (pane: 'comments' | 'assets' | 'transcript') => void;
   assetsPane: ReactNode;
+  transcriptPane: ReactNode;
 }
 
 export const CommentsPane = memo(function CommentsPane({
@@ -216,6 +217,7 @@ export const CommentsPane = memo(function CommentsPane({
   activePane,
   setActivePane,
   assetsPane,
+  transcriptPane,
 }: CommentsPaneProps) {
   // タグ・作成者での絞り込み(このペイン内のみ。タイムラインのマーカーには影響しない)
   const [filterTagId, setFilterTagId] = useState<string | null>(null);
@@ -339,6 +341,15 @@ export const CommentsPane = memo(function CommentsPane({
                 <Badge variant="secondary" className="ml-2">
                   {assets.length}
                 </Badge>
+              </Button>
+              <Button
+                variant={activePane === 'transcript' ? 'default' : 'ghost'}
+                size="sm"
+                className="h-8 shrink-0"
+                onClick={() => setActivePane('transcript')}
+              >
+                <FileText className="h-4 w-4 mr-1" />
+                文字起こし
               </Button>
             </div>
           </div>
@@ -481,6 +492,13 @@ export const CommentsPane = memo(function CommentsPane({
             aria-hidden={activePane !== 'assets'}
           >
             {assetsPane}
+          </div>
+
+          <div
+            className={cn(activePane === 'transcript' ? 'block p-4' : 'hidden')}
+            aria-hidden={activePane !== 'transcript'}
+          >
+            {transcriptPane}
           </div>
 
           <div

@@ -60,6 +60,22 @@ services:
       - minio-data:/data
     restart: unless-stopped
 
+  # 文字起こしワーカー(faster-whisper)。appの内部APIをポーリングする。
+  # モデルキャッシュはvolumeに永続化(初回のみダウンロード)
+  transcriber:
+    build:
+      context: ./transcriber
+    env_file:
+      - .env.docker
+    environment:
+      TRANSCRIBE_APP_ORIGIN: http://app:3000
+    depends_on:
+      - app
+    volumes:
+      - transcriber-models:/root/.cache
+    restart: unless-stopped
+
 volumes:
   postgres-data:
   minio-data:
+  transcriber-models:

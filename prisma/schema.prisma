@@ -393,6 +393,7 @@ model VideoVersion {
   
   // Relations
   comments        Comment[]
+  transcript      Transcript?
   watchProgress   WatchProgress[]
   approvalRequests ApprovalRequest[]
   
@@ -901,4 +902,23 @@ model RateLimit {
   @@index([key, action])
   @@index([windowStart])
   @@map("rate_limits")
+}
+
+
+// 文字起こし(faster-whisperワーカーが生成)。バージョンごとに1件。
+// segments は [{start:number, end:number, text:string}] のJSON配列
+model Transcript {
+  id            String   @id @default(cuid())
+  versionId     String   @unique
+  version       VideoVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  status        String   @default("queued") // queued | processing | done | error
+  language      String?
+  segments      Json?
+  error         String?  @db.Text
+  requestedById String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([status, createdAt])
+  @@map("transcripts")
 }
