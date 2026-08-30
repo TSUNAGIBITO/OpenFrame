@@ -63,9 +63,13 @@ export function NotificationBell() {
   }, []);
 
   useEffect(() => {
-    void fetchNotifications();
+    // 初回取得もタイマー経由(effect本体での同期setStateを避けるlintルール対応)
+    const initialTimer = setTimeout(() => void fetchNotifications(), 0);
     const timer = setInterval(() => void fetchNotifications(), POLL_INTERVAL_MS);
-    return () => clearInterval(timer);
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(timer);
+    };
   }, [fetchNotifications]);
 
   const handleOpenChange = (open: boolean) => {
