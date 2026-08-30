@@ -28,7 +28,7 @@ function hasRequiredPermission(actual: SharePermission, required: SharePermissio
   return actual === 'COMMENT';
 }
 
-function isLinkExpired(link: ShareLink): boolean {
+export function isShareLinkExpired(link: Pick<ShareLink, 'expiresAt'>): boolean {
   if (!link.expiresAt) return false;
   return link.expiresAt.getTime() <= Date.now();
 }
@@ -79,7 +79,7 @@ export async function validateShareLinkAccess({
   const videoMatches = videoId === undefined ? link.videoId === null : link.videoId === videoId;
   const permissionMatches = hasRequiredPermission(link.permission, requiredPermission);
 
-  if (!projectMatches || !videoMatches || !permissionMatches || isLinkExpired(link)) {
+  if (!projectMatches || !videoMatches || !permissionMatches || isShareLinkExpired(link)) {
     return {
       hasAccess: false,
       canComment: false,

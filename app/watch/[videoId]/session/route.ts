@@ -3,7 +3,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { checkRateLimit, getClientIp, rateLimit, rateLimitHeaders } from '@/lib/rate-limit';
 import { getPublicOrigin, isTrustedSameOriginRequest } from '@/lib/request-origin';
-import { MAX_SHARE_PASSWORD_LENGTH, validateShareLinkAccess } from '@/lib/share-links';
+import {
+  MAX_SHARE_PASSWORD_LENGTH,
+  isShareLinkExpired,
+  validateShareLinkAccess,
+} from '@/lib/share-links';
 import {
   createPendingShareValue,
   createShareSessionValue,
@@ -128,10 +132,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   }
 
   if (!access.hasAccess) {
-    const response = NextResponse.json(
-      { error: access.requiresPassword ? 'パスワードが正しくありません' : '共有セッションが無効です' },
-      { status: 401 }
-    );
+    // 期限切れはゲストに理由が伝わるようメッセージを分ける
+    const errorMessage = access.requiresPassword
+      ? 'パスワードが正しくありません'
+      : access.link && isShareLinkExpired(access.link)
+        ? 'リンクの有効期限が切れています'
+        : '共有セッションが無効です';
+    const response = NextResponse.json({ error: errorMessage }, { status: 401 });
     response.cookies.delete(getShareSessionCookieName(video.id));
     return response;
   }

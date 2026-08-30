@@ -51,6 +51,26 @@ function resolveShareBaseUrl(request: NextRequest): string {
   return request.nextUrl.origin;
 }
 
+// expiresAt の入力値を検証する。null=無期限、ISO文字列=未来日時のみ許可
+function parseExpiresAtInput(
+  value: unknown
+): { ok: true; expiresAt: Date | null } | { ok: false; message: string } {
+  if (value === null) {
+    return { ok: true, expiresAt: null };
+  }
+  if (typeof value !== 'string') {
+    return { ok: false, message: '有効期限の形式が正しくありません' };
+  }
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return { ok: false, message: '有効期限の形式が正しくありません' };
+  }
+  if (parsed.getTime() <= Date.now()) {
+    return { ok: false, message: '有効期限には未来の日時を指定してください' };
+  }
+  return { ok: true, expiresAt: parsed };
+}
+
 function buildWatchUrl(request: NextRequest, videoId: string, token: string): string {
   const url = new URL(`/watch/${videoId}`, resolveShareBaseUrl(request));
   url.searchParams.set('shareToken', token);
@@ -159,6 +179,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       );
     }
     const passwordHash = password ? await bcrypt.hash(password, 12) : null;
+
+    let expiresAt: Date | null = null;
+    if (body?.expiresAt !== undefined) {
+      const parsedExpiry = parseExpiresAtInput(body.expiresAt);
+      if (!parsedExpiry.ok) {
+        return apiErrors.badRequest(parsedExpiry.message);
+      }
+      expiresAt = parsedExpiry.expiresAt;
+    }
+
     const token = randomBytes(24).toString('base64url');
 
     let link: {
@@ -193,7 +223,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
                   allowGuests,
                   allowDownloads,
                   passwordHash,
-                  expiresAt: null,
+                  expiresAt,
                 },
                 select: {
                   id: true,
@@ -217,6 +247,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
                 allowGuests,
                 allowDownloads,
                 passwordHash,
+                expiresAt,
               },
               select: {
                 id: true,
@@ -293,6 +324,15 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       );
     }
 
+    let expiresAtUpdate: Date | null | undefined;
+    if (body && typeof body === 'object' && 'expiresAt' in body) {
+      const parsedExpiry = parseExpiresAtInput(body.expiresAt);
+      if (!parsedExpiry.ok) {
+        return apiErrors.badRequest(parsedExpiry.message);
+      }
+      expiresAtUpdate = parsedExpiry.expiresAt;
+    }
+
     const existing = await db.shareLink.findFirst({
       where: {
         projectId,
@@ -322,6 +362,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       data: {
         ...(allowGuests !== undefined ? { allowGuests } : {}),
         ...(allowDownloads !== undefined ? { allowDownloads } : {}),
+        // 有効期限のみの変更ではトークンを再生成しない（既存リンクを維持したまま期限を切り替えられる）
+        ...(expiresAtUpdate !== undefined ? { expiresAt: expiresAtUpdate } : {}),
         ...(passwordHashUpdate !== undefined ? { passwordHash: passwordHashUpdate } : {}),
         ...(shouldRotateToken ? { token: randomBytes(24).toString('base64url') } : {}),
       },

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft,
+  CalendarClock,
   Check,
   Copy,
   Link2,
@@ -16,6 +17,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface VideoSharePageProps {
   projectId: string;
@@ -28,6 +36,26 @@ interface ShareLinkData {
   allowGuests: boolean;
   allowDownloads: boolean;
   hasPassword: boolean;
+  expiresAt: string | null;
+}
+
+type ExpiryOption = 'none' | '24h' | '7d' | '30d' | 'custom';
+
+function formatExpiryLabel(iso: string): string {
+  const date = new Date(iso);
+  const pad = (value: number) => String(value).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(
+    date.getHours()
+  )}:${pad(date.getMinutes())}`;
+}
+
+// datetime-local 入力用にローカル時刻の "YYYY-MM-DDTHH:mm" へ変換する
+function toDatetimeLocalValue(iso: string): string {
+  const date = new Date(iso);
+  const pad = (value: number) => String(value).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(
+    date.getHours()
+  )}:${pad(date.getMinutes())}`;
 }
 
 interface ShareResponse {
@@ -47,6 +75,9 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
   const [hasPassword, setHasPassword] = useState(false);
   const [password, setPassword] = useState('');
   const [allowDownloads, setAllowDownloads] = useState(false);
+  const [expiresAt, setExpiresAt] = useState<string | null>(null);
+  const [expiryOption, setExpiryOption] = useState<ExpiryOption>('none');
+  const [customExpiry, setCustomExpiry] = useState('');
 
   useEffect(() => {
     if (!projectId || !videoId) return;
@@ -70,11 +101,18 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
         setShareUrl(payload.data.shareUrl);
         setHasPassword(!!payload.data.link?.hasPassword);
         setAllowDownloads(!!payload.data.link?.allowDownloads);
+        const loadedExpiresAt = payload.data.link?.expiresAt ?? null;
+        setExpiresAt(loadedExpiresAt);
+        if (loadedExpiresAt) {
+          setExpiryOption('custom');
+          setCustomExpiry(toDatetimeLocalValue(loadedExpiresAt));
+        }
       } catch {
         setError('共有リンクの読み込みに失敗しました');
         setShareUrl(null);
         setHasPassword(false);
         setAllowDownloads(false);
+        setExpiresAt(null);
       } finally {
         setLoading(false);
       }
@@ -96,11 +134,15 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
     setSubmitting(true);
     setError('');
 
+    // 再生成時は期限切れでない既存の有効期限を引き継ぐ
+    const activeExpiresAt =
+      expiresAt && new Date(expiresAt).getTime() > Date.now() ? expiresAt : null;
+
     try {
       const response = await fetch(`/api/projects/${projectId}/videos/${videoId}/share`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ allowGuests: true, allowDownloads }),
+        body: JSON.stringify({ allowGuests: true, allowDownloads, expiresAt: activeExpiresAt }),
       });
 
       const payload = (await response.json()) as ShareResponse;
@@ -112,6 +154,7 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
       setShareUrl(payload.data.shareUrl);
       setHasPassword(!!payload.data.link?.hasPassword);
       setAllowDownloads(!!payload.data.link?.allowDownloads);
+      setExpiresAt(payload.data.link?.expiresAt ?? null);
       setPassword('');
     } catch {
       setError('共有リンクの作成に失敗しました');
@@ -140,6 +183,9 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
       setShareUrl(null);
       setHasPassword(false);
       setAllowDownloads(false);
+      setExpiresAt(null);
+      setExpiryOption('none');
+      setCustomExpiry('');
       setPassword('');
     } catch {
       setError('共有リンクの無効化に失敗しました');
@@ -177,6 +223,7 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
       setShareUrl(data.shareUrl);
       setHasPassword(!!data.link?.hasPassword);
       setAllowDownloads(!!data.link?.allowDownloads);
+      setExpiresAt(data.link?.expiresAt ?? null);
       setPassword('');
     } catch {
       setError('リンクのセキュリティ設定の更新に失敗しました');
@@ -211,12 +258,71 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
       setShareUrl(data.shareUrl);
       setAllowDownloads(!!data.link?.allowDownloads);
       setHasPassword(!!data.link?.hasPassword);
+      setExpiresAt(data.link?.expiresAt ?? null);
     } catch {
       setError('ダウンロード設定の更新に失敗しました');
     } finally {
       setSubmitting(false);
     }
   };
+
+  const updateExpirySetting = async () => {
+    if (!projectId || !videoId || !shareUrl) return;
+
+    let nextExpiresAt: string | null = null;
+    if (expiryOption === '24h') {
+      nextExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    } else if (expiryOption === '7d') {
+      nextExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+    } else if (expiryOption === '30d') {
+      nextExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    } else if (expiryOption === 'custom') {
+      if (!customExpiry) {
+        setError('カスタム日時を入力してください');
+        return;
+      }
+      const parsed = new Date(customExpiry);
+      if (Number.isNaN(parsed.getTime())) {
+        setError('カスタム日時の形式が正しくありません');
+        return;
+      }
+      if (parsed.getTime() <= Date.now()) {
+        setError('有効期限には未来の日時を指定してください');
+        return;
+      }
+      nextExpiresAt = parsed.toISOString();
+    }
+
+    setSubmitting(true);
+    setError('');
+
+    try {
+      const response = await fetch(`/api/projects/${projectId}/videos/${videoId}/share`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ expiresAt: nextExpiresAt }),
+      });
+      const payload = (await response.json().catch(() => null)) as
+        | ShareResponse
+        | { error?: string }
+        | null;
+      if (!response.ok || ('error' in (payload || {}) && payload?.error)) {
+        setError((payload as { error?: string } | null)?.error || '有効期限の更新に失敗しました');
+        return;
+      }
+      const data = (payload as ShareResponse).data;
+      setShareUrl(data.shareUrl);
+      setHasPassword(!!data.link?.hasPassword);
+      setAllowDownloads(!!data.link?.allowDownloads);
+      setExpiresAt(data.link?.expiresAt ?? null);
+    } catch {
+      setError('有効期限の更新に失敗しました');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const isExpired = !!expiresAt && new Date(expiresAt).getTime() <= Date.now();
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-start justify-center py-12 px-4">
@@ -334,6 +440,53 @@ export default function VideoSharePageClient({ projectId, videoId }: VideoShareP
                       </Button>
                     )}
                   </div>
+                </div>
+
+                <div className="rounded-lg border p-3 space-y-2">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <CalendarClock className={isExpired ? 'h-4 w-4 text-destructive' : 'h-4 w-4'} />
+                    リンクの有効期限
+                  </div>
+                  <p
+                    className={
+                      isExpired ? 'text-xs font-medium text-destructive' : 'text-xs text-muted-foreground'
+                    }
+                  >
+                    {expiresAt
+                      ? isExpired
+                        ? `有効期限が切れています（${formatExpiryLabel(expiresAt)} まで）。新しい期限を設定するか、無期限に変更してください`
+                        : `有効期限: ${formatExpiryLabel(expiresAt)} まで`
+                      : '無期限'}
+                  </p>
+                  <div className="flex gap-2">
+                    <Select
+                      value={expiryOption}
+                      onValueChange={(value) => setExpiryOption(value as ExpiryOption)}
+                      disabled={submitting}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="有効期限を選択" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">無期限</SelectItem>
+                        <SelectItem value="24h">24時間</SelectItem>
+                        <SelectItem value="7d">7日</SelectItem>
+                        <SelectItem value="30d">30日</SelectItem>
+                        <SelectItem value="custom">カスタム日時</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button onClick={updateExpirySetting} disabled={submitting} variant="outline">
+                      保存
+                    </Button>
+                  </div>
+                  {expiryOption === 'custom' && (
+                    <Input
+                      type="datetime-local"
+                      value={customExpiry}
+                      onChange={(e) => setCustomExpiry(e.target.value)}
+                      disabled={submitting}
+                    />
+                  )}
                 </div>
               </div>
             ) : (
