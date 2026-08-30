@@ -338,6 +338,7 @@ export function VideoPageContent({
     isMuted,
     isFrameMode,
     frameStepLabel,
+    frameStepSeconds,
     showScrubReadout,
     playbackSpeed,
     qualityOptions,
@@ -894,6 +895,7 @@ export function VideoPageContent({
             duration={duration}
             isFrameMode={isFrameMode}
             frameStepLabel={frameStepLabel}
+            frameStepSeconds={frameStepSeconds}
             handleSkip={handleSkip}
             handleFrameModeToggle={handleFrameModeToggle}
             isLooping={isLooping}

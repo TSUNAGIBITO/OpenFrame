@@ -83,6 +83,7 @@ interface PlayerCoreProps {
   loopRange: { start: number; end: number } | null;
   handleLoopToggle: () => void;
   frameStepLabel: string;
+  frameStepSeconds: number;
   handleSkip: (seconds: number) => void;
   handleFrameModeToggle: () => void;
   handleMuteToggle: () => void;
@@ -154,6 +155,7 @@ export const PlayerCore = memo(function PlayerCore({
   loopRange,
   handleLoopToggle,
   frameStepLabel,
+  frameStepSeconds,
   handleSkip,
   handleFrameModeToggle,
   handleMuteToggle,
@@ -454,7 +456,13 @@ export const PlayerCore = memo(function PlayerCore({
           </Button>
 
           <span className="text-xs text-muted-foreground ml-1 tabular-nums">
-            {formatTime(currentTime)} / {formatTime(duration)}
+            {/* フレームモード+fps検出済みのときはHH:MM:SS:FF表記(プロ編集者との
+                「何フレーム目」のやりとり用)。fps未検出(1s送り)のときは従来表記 */}
+            {isFrameMode && frameStepLabel === '1f' && frameStepSeconds > 0
+              ? `${formatTime(currentTime)}:${String(
+                  Math.floor((currentTime % 1) / frameStepSeconds)
+                ).padStart(2, '0')} / ${formatTime(duration)}`
+              : `${formatTime(currentTime)} / ${formatTime(duration)}`}
           </span>
 
           <div className="ml-auto flex items-center">
