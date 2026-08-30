@@ -181,7 +181,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     const body = await request.json();
-    const { title, description, position } = body;
+    const { title, description, position, folder } = body;
 
     // Validate types before using string methods to prevent type confusion attacks
     if (
@@ -191,10 +191,20 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       return apiErrors.badRequest('position は 0 以上の整数である必要があります');
     }
 
+    // フォルダ: 1〜80文字の文字列(前後空白は除去)、null でフォルダから外す
+    if (folder !== undefined && folder !== null && typeof folder !== 'string') {
+      return apiErrors.badRequest('folder は文字列または null である必要があります');
+    }
+    const trimmedFolder = typeof folder === 'string' ? folder.trim() : folder;
+    if (typeof trimmedFolder === 'string' && (trimmedFolder.length === 0 || trimmedFolder.length > 80)) {
+      return apiErrors.badRequest('フォルダ名は1〜80文字で入力してください');
+    }
+
     const updateData: Record<string, unknown> = {};
     if (typeof title === 'string') updateData.title = title.trim();
     if (typeof description === 'string') updateData.description = description.trim() || null;
     if (position !== undefined) updateData.position = position;
+    if (trimmedFolder !== undefined) updateData.folder = trimmedFolder;
 
     // Keep the response to scalar video fields: including versions would pull
     // in BigInt columns (sizeBytes) that JSON.stringify cannot serialize, and
@@ -207,6 +217,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         title: true,
         description: true,
         position: true,
+        folder: true,
         projectId: true,
         updatedAt: true,
       },

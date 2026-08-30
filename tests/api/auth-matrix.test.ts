@@ -66,6 +66,7 @@ import * as projectTagsRoute from '@/app/api/projects/[projectId]/tags/route';
 import * as projectTagRoute from '@/app/api/projects/[projectId]/tags/[tagId]/route';
 import * as videosBulkDeleteRoute from '@/app/api/projects/[projectId]/videos/bulk-delete/route';
 import * as videosBunnyInitRoute from '@/app/api/projects/[projectId]/videos/bunny-init/route';
+import * as videosFolderRoute from '@/app/api/projects/[projectId]/videos/folder/route';
 import * as videosMoveRoute from '@/app/api/projects/[projectId]/videos/move/route';
 import * as videosR2CompleteRoute from '@/app/api/projects/[projectId]/videos/r2-complete/route';
 import * as videosR2InitRoute from '@/app/api/projects/[projectId]/videos/r2-init/route';
@@ -145,7 +146,7 @@ vi.mock('@/lib/r2', async (importOriginal) => {
 // The count guard
 // ---------------------------------------------------------------------------
 // Bump this only together with a new entry in ROUTE_CASES or in PUBLIC_ROUTES.
-const EXPECTED_ROUTE_MODULE_COUNT = 63;
+const EXPECTED_ROUTE_MODULE_COUNT = 64;
 
 /**
  * Routes that are public by design, and why. Everything else must reject an
@@ -493,6 +494,13 @@ const ROUTE_CASES: readonly RouteCase[] = [
     url: (f) => `/api/projects/${f.projectId}/videos/bunny-init`,
     params: (f) => ({ projectId: f.projectId }),
     body: { title: 'anon' },
+  },
+  {
+    file: 'projects/[projectId]/videos/folder/route.ts',
+    module: videosFolderRoute,
+    url: (f) => `/api/projects/${f.projectId}/videos/folder`,
+    params: (f) => ({ projectId: f.projectId }),
+    body: { videoIds: ['x'], folder: 'y' },
   },
   {
     file: 'projects/[projectId]/videos/move/route.ts',

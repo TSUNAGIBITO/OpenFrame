@@ -19,6 +19,7 @@ import {
   Trash2,
   CheckSquare,
   Check,
+  Folder,
   FolderInput,
   XCircle,
 } from 'lucide-react';
@@ -59,6 +60,7 @@ import {
 } from '@/lib/video-providers';
 import { resolvePublicBunnyCdnHostname } from '@/lib/bunny-cdn';
 import { MoveVideosDialog } from '@/components/move-videos-dialog';
+import { VideoFolderDialog } from '@/components/video-folder-dialog';
 import { cn } from '@/lib/utils';
 
 export type VideoApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
@@ -103,9 +105,13 @@ interface VideoCardProps {
     duration: string;
     lastUpdated: string;
     approvalStatus?: VideoApprovalStatus | null;
+    // プロジェクト内の1階層フォルダ(未分類はnull)
+    folder?: string | null;
   };
   projectId: string;
   canManage: boolean;
+  /** フォルダ移動ダイアログに表示する、プロジェクト内の既存フォルダ名一覧 */
+  projectFolders?: string[];
   canSelect?: boolean;
   selectionMode?: boolean;
   selected?: boolean;
@@ -118,6 +124,7 @@ export function VideoCard({
   video,
   projectId,
   canManage,
+  projectFolders = [],
   canSelect = false,
   selectionMode = false,
   selected = false,
@@ -150,6 +157,9 @@ export function VideoCard({
 
   // Move dialog
   const [showMoveDialog, setShowMoveDialog] = useState(false);
+
+  // Folder dialog
+  const [showFolderDialog, setShowFolderDialog] = useState(false);
   const bunnyCdnHostname = useMemo(() => resolvePublicBunnyCdnHostname(), []);
   const resolvedThumbnailUrl = useMemo(() => {
     if (!video.thumbnailUrl) return '';
@@ -456,6 +466,10 @@ export function VideoCard({
                       <Plus className="mr-2 h-4 w-4" />
                       バージョンを追加
                     </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setShowFolderDialog(true)}>
+                      <Folder className="mr-2 h-4 w-4" />
+                      フォルダに移動
+                    </DropdownMenuItem>
                     <DropdownMenuItem onSelect={() => setShowMoveDialog(true)}>
                       <FolderInput className="mr-2 h-4 w-4" />
                       プロジェクトに移動
@@ -634,6 +648,16 @@ export function VideoCard({
         projectId={projectId}
         videoIds={[video.id]}
         onMoved={() => onDeleted?.(video.id)}
+      />
+
+      {/* Move into a folder within the project */}
+      <VideoFolderDialog
+        open={showFolderDialog}
+        onOpenChange={setShowFolderDialog}
+        projectId={projectId}
+        videoIds={[video.id]}
+        existingFolders={projectFolders}
+        currentFolder={video.folder ?? null}
       />
     </>
   );

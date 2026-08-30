@@ -19,6 +19,8 @@ import {
   Loader2,
   Trash2,
   ChevronDown,
+  ChevronRight,
+  Folder,
   FolderInput,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -46,6 +48,7 @@ import {
 import { VideoCard } from '@/components/video-card';
 import { VideoDragDropUploader } from '@/components/video-drag-drop-uploader';
 import { MoveVideosDialog } from '@/components/move-videos-dialog';
+import { VideoFolderDialog } from '@/components/video-folder-dialog';
 import type { DirectUploadProvider } from '@/components/video-page/types';
 import {
   runProjectDownloadManifest,
@@ -68,7 +71,13 @@ interface SerializedVideo {
   updatedAt: string;
   // アクティブバージョンの最新承認依頼ステータス(なし・取消時はnull)
   approvalStatus: 'PENDING' | 'APPROVED' | 'REJECTED' | null;
+  // プロジェクト内の1階層フォルダ(未分類はnull)
+  folder: string | null;
 }
+
+// 未分類セクションの折りたたみ状態をlocalStorageに保存するときのキー
+// (フォルダ名と衝突しないようフォルダ名として不正な空文字を使う)
+const UNFILED_GROUP_KEY = '';
 
 interface ProjectContentClientProps {
   project: {
@@ -82,6 +91,8 @@ interface ProjectContentClientProps {
   projectId: string;
   videos: SerializedVideo[];
   allVideoIds: string[];
+  /** プロジェクト内の既存フォルダ名一覧(フォルダ移動ダイアログ用) */
+  projectFolders: string[];
   canEdit: boolean;
   canDownloadProject: boolean;
   isOwner: boolean;
@@ -98,6 +109,7 @@ export function ProjectContentClient({
   projectId,
   videos,
   allVideoIds,
+  projectFolders,
   canEdit,
   canDownloadProject,
   isOwner,
@@ -118,12 +130,75 @@ export function ProjectContentClient({
   const [isDeletingSelected, setIsDeletingSelected] = useState(false);
   const [showDeleteSelectedDialog, setShowDeleteSelectedDialog] = useState(false);
   const [showMoveSelectedDialog, setShowMoveSelectedDialog] = useState(false);
+  const [showFolderSelectedDialog, setShowFolderSelectedDialog] = useState(false);
+
+  // 折りたたまれたフォルダ名の一覧(プロジェクトごとにlocalStorageへ保存)。
+  // SSRとの不一致を避けるため、初期値は空でマウント後に読み込む
+  const collapseStorageKey = `openframe:video-folder-collapsed:${projectId}`;
+  const [collapsedFolders, setCollapsedFolders] = useState<string[]>([]);
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(collapseStorageKey);
+      if (!raw) return;
+      const parsed: unknown = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        setCollapsedFolders(parsed.filter((item): item is string => typeof item === 'string'));
+      }
+    } catch {
+      // 壊れた保存値は無視(次のトグルで上書きされる)
+    }
+  }, [collapseStorageKey]);
+
+  const toggleFolderCollapsed = useCallback(
+    (key: string) => {
+      setCollapsedFolders((prev) => {
+        const next = prev.includes(key) ? prev.filter((item) => item !== key) : [...prev, key];
+        try {
+          window.localStorage.setItem(collapseStorageKey, JSON.stringify(next));
+        } catch {
+          // localStorageが使えない環境では永続化を諦める(表示上のトグルは機能する)
+        }
+        return next;
+      });
+    },
+    [collapseStorageKey]
+  );
 
   const canSelectVideos = canDownloadProject || canEdit;
 
   useEffect(() => {
     setLocalVideos(videos);
   }, [videos]);
+
+  // 表示中ページの動画をフォルダごとにまとめる。フォルダが1つもなければnullを返し、
+  // 従来どおりのフラットなグリッド表示にフォールバックする。
+  // フォルダがあるときのみ、未分類の動画を先頭の「未分類」セクションに置く
+  const videoGroups = useMemo(() => {
+    const folderNames = Array.from(
+      new Set(
+        localVideos
+          .map((video) => video.folder)
+          .filter((folder): folder is string => typeof folder === 'string' && folder.length > 0)
+      )
+    ).sort((a, b) => a.localeCompare(b, 'ja'));
+
+    if (folderNames.length === 0) return null;
+
+    const groups: { key: string; label: string; videos: SerializedVideo[] }[] = [];
+    const unfiled = localVideos.filter((video) => !video.folder);
+    if (unfiled.length > 0) {
+      groups.push({ key: UNFILED_GROUP_KEY, label: '未分類', videos: unfiled });
+    }
+    for (const name of folderNames) {
+      groups.push({
+        key: name,
+        label: name,
+        videos: localVideos.filter((video) => video.folder === name),
+      });
+    }
+    return groups;
+  }, [localVideos]);
 
   const selectedCount = selectedVideoIds.length;
   const pageVideoIds = useMemo(() => localVideos.map((video) => video.id), [localVideos]);
@@ -527,6 +602,17 @@ export function ProjectContentClient({
               <Button
                 variant="outline"
                 size="sm"
+                onClick={() => setShowFolderSelectedDialog(true)}
+                disabled={selectedCount === 0 || isDeletingSelected}
+              >
+                <Folder className="h-4 w-4 mr-2" />
+                フォルダに移動
+              </Button>
+            )}
+            {canEdit && (
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setShowMoveSelectedDialog(true)}
                 disabled={selectedCount === 0 || isDeletingSelected}
               >
@@ -555,22 +641,71 @@ export function ProjectContentClient({
 
       {/* Videos Grid */}
       {localVideos.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {localVideos.map((video) => (
-            <VideoCard
-              key={video.id}
-              video={video}
-              projectId={projectId}
-              canManage={canEdit}
-              canSelect={canSelectVideos}
-              selectionMode={selectionMode}
-              selected={selectedVideoIds.includes(video.id)}
-              onEnterSelectionMode={handleEnterSelectionMode}
-              onSelectedChange={(selected) => toggleVideoSelection(video.id, selected)}
-              onDeleted={handleVideoDeleted}
-            />
-          ))}
-        </div>
+        videoGroups ? (
+          <div className="space-y-6">
+            {videoGroups.map((group) => {
+              const isCollapsed = collapsedFolders.includes(group.key);
+              return (
+                <section key={group.key || '__unfiled__'}>
+                  <button
+                    type="button"
+                    onClick={() => toggleFolderCollapsed(group.key)}
+                    aria-expanded={!isCollapsed}
+                    className="mb-3 flex w-full items-center gap-2 rounded-md px-1 py-1 text-left transition-colors hover:bg-accent/50"
+                  >
+                    {isCollapsed ? (
+                      <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    )}
+                    <Folder className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="min-w-0 truncate font-medium">{group.label}</span>
+                    <Badge variant="secondary" className="text-xs">
+                      {group.videos.length}
+                    </Badge>
+                  </button>
+                  {!isCollapsed && (
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {group.videos.map((video) => (
+                        <VideoCard
+                          key={video.id}
+                          video={video}
+                          projectId={projectId}
+                          canManage={canEdit}
+                          projectFolders={projectFolders}
+                          canSelect={canSelectVideos}
+                          selectionMode={selectionMode}
+                          selected={selectedVideoIds.includes(video.id)}
+                          onEnterSelectionMode={handleEnterSelectionMode}
+                          onSelectedChange={(selected) => toggleVideoSelection(video.id, selected)}
+                          onDeleted={handleVideoDeleted}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </section>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {localVideos.map((video) => (
+              <VideoCard
+                key={video.id}
+                video={video}
+                projectId={projectId}
+                canManage={canEdit}
+                projectFolders={projectFolders}
+                canSelect={canSelectVideos}
+                selectionMode={selectionMode}
+                selected={selectedVideoIds.includes(video.id)}
+                onEnterSelectionMode={handleEnterSelectionMode}
+                onSelectedChange={(selected) => toggleVideoSelection(video.id, selected)}
+                onDeleted={handleVideoDeleted}
+              />
+            ))}
+          </div>
+        )
       ) : (
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-16">
@@ -655,6 +790,15 @@ export function ProjectContentClient({
         projectId={projectId}
         videoIds={selectedVideoIds}
         onMoved={handleVideosMoved}
+      />
+
+      <VideoFolderDialog
+        open={showFolderSelectedDialog}
+        onOpenChange={setShowFolderSelectedDialog}
+        projectId={projectId}
+        videoIds={selectedVideoIds}
+        existingFolders={projectFolders}
+        onDone={handleClearSelection}
       />
     </>
   );

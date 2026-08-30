@@ -342,7 +342,10 @@ model Video {
   
   // Ordering within project
   position    Int      @default(0)
-  
+
+  // プロジェクト内の1階層フォルダ(ラベル)。null=未分類。最大80文字はAPI側で強制(DBでは制限しない)
+  folder      String?
+
   // Project relation
   projectId   String
   project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)

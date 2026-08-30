@@ -103,12 +103,18 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
   }
 
   // Fetch videos separately utilizing bounds
-  const [paginatedVideos, totalVideos, allVideoIds] = await Promise.all([
+  const [paginatedVideos, totalVideos, allVideoIds, folderRows] = await Promise.all([
     db.video.findMany({
       where: { projectId: project.id },
       skip,
       take: pageSize,
-      orderBy: [{ updatedAt: sortOrder }, { id: sortOrder }],
+      // フォルダ(未分類が先)→更新日時の順で並べ、ページをまたいでも
+      // 同じフォルダの動画が固まるようにする(グルーピングはページ内のみ)
+      orderBy: [
+        { folder: { sort: 'asc', nulls: 'first' } },
+        { updatedAt: sortOrder },
+        { id: sortOrder },
+      ],
       include: {
         versions: {
           where: { isActive: true },
@@ -134,7 +140,18 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
       select: { id: true },
       orderBy: [{ position: 'asc' }, { id: 'asc' }],
     }),
+    // フォルダ移動ダイアログ用に、プロジェクト内の既存フォルダ名一覧を取得
+    db.video.findMany({
+      where: { projectId: project.id, folder: { not: null } },
+      select: { folder: true },
+      distinct: ['folder'],
+      orderBy: { folder: 'asc' },
+    }),
   ]);
+
+  const projectFolders = folderRows
+    .map((row) => row.folder)
+    .filter((folder): folder is string => typeof folder === 'string' && folder.length > 0);
 
   const totalPages = Math.ceil(totalVideos / pageSize);
 
@@ -155,6 +172,7 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
       lastUpdated: formatRelativeTime(video.updatedAt),
       updatedAt: video.updatedAt.toISOString(),
       approvalStatus: latestApprovalStatus === 'CANCELED' ? null : latestApprovalStatus,
+      folder: video.folder,
     };
   });
 
@@ -200,6 +218,7 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
             projectId={projectId}
             videos={videos}
             allVideoIds={allVideoIds.map((video) => video.id)}
+            projectFolders={projectFolders}
             canEdit={false}
             canDownloadProject={canDownloadProject}
             isOwner={false}
@@ -232,6 +251,7 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
         projectId={projectId}
         videos={videos}
         allVideoIds={allVideoIds.map((video) => video.id)}
+        projectFolders={projectFolders}
         canEdit={canEdit}
         canDownloadProject={canDownloadProject}
         isOwner={isOwner}
