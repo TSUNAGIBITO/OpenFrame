@@ -8,6 +8,7 @@ import {
   flattenCommentsForExport,
 } from '@/lib/comment-export';
 import { apiErrors, withCacheControl } from '@/lib/api-response';
+import { buildReviewMarkersPayload } from '@/lib/marker-export';
 import { rateLimit } from '@/lib/rate-limit';
 import { logError } from '@/lib/logger';
 
@@ -137,34 +138,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     };
 
     if (format === 'markers') {
-      // 親コメントのみをマーカー化(返信は本文の文脈なので対象外)。
-      // TsunaguEditorの「レビューコメント取り込み」が読む想定の安定フォーマット
-      const markers = comments.map((comment) => ({
-        time: comment.timestamp,
-        timeEnd: comment.timestampEnd ?? null,
-        text:
-          (comment.content ?? '')
-            .replace(/@\[(.+?)\]\((?:asset|user):[\w-]+\)/gi, '@$1')
-            .trim() ||
-          (comment.voiceUrl ? '(音声コメント)' : comment.imageUrl ? '(画像コメント)' : '(注釈)'),
-        author: comment.author?.name || comment.guestName || '匿名',
-        tag: comment.tag?.name ?? null,
-        color: comment.tag?.color ?? null,
-        resolved: comment.isResolved,
-      }));
-
-      const payload = {
-        format: 'tsunagu-review-markers',
-        formatVersion: 1,
-        video: {
-          title: version.video.title,
-          versionNumber: version.versionNumber,
-          versionLabel: version.versionLabel,
-          reviewUrl: `${process.env.NEXTAUTH_URL || ''}/projects/${project.id}/videos/${version.video.id}`,
-        },
-        exportedAt: new Date().toISOString(),
-        markers,
-      };
+      const payload = buildReviewMarkersPayload(comments, {
+        videoTitle: version.video.title,
+        videoId: version.video.id,
+        projectId: project.id,
+        versionNumber: version.versionNumber,
+        versionLabel: version.versionLabel,
+      });
 
       const response = new Response(JSON.stringify(payload, null, 2), {
         status: 200,
